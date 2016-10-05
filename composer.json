@@ -1,8 +1,8 @@
 {
-  "name": "melisplatform/melis-prospect",
+  "name": "melisplatform/melis-cms-prospect",
   "type": "melisplatform-module",
   "license": "OSL-3.0",
-  "homepage": "https://github.com/melisplatform/melis-prospect",
+  "homepage": "https://github.com/melisplatform/melis-cms-prospect",
   "require": {
     "php": "^5.5 || ^7.0"
   },
