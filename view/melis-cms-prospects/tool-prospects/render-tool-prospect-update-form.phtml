@@ -1,0 +1,19 @@
+<div id="prospectupdateformalert"></div>
+<span id="prosid" style="display:none"></span>
+<?php 
+$form = $this->melistoolprospects_tool_prospect_form;
+echo $this->form()->openTag($form);
+echo $this->melisFieldCollection($form);
+echo $this->form()->closeTag();
+?>
+
+
+<?php 
+echo $this->melisModalInvoker()->render(
+    array(
+        'text' => '<i class="fa fa-times"></i> '.$this->translate('tr_melistoolprospects_common_close'),
+        'class' => 'btn btn-danger pull-left'
+    ), 'dismiss');
+?>
+
+<a href="#modal-template-manager-actions" class="btn btn-success pull-right" onclick="toolProspects.updateProspectData()" id="btnProspectUpdate"><i class="fa fa-save"></i>  <?= $this->translate('tr_tool_text_prospect_manager_update'); ?></a>
