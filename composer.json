@@ -1,8 +1,8 @@
 {
-  "name": "melisplatform/melis-cms-prospect",
+  "name": "melisplatform/melis-cms-prospects",
   "type": "melisplatform-module",
   "license": "OSL-3.0",
-  "homepage": "https://github.com/melisplatform/melis-cms-prospect",
+  "homepage": "https://github.com/melisplatform/melis-cms-prospects",
   "require": {
     "php": "^5.5 || ^7.0"
   },
@@ -11,7 +11,7 @@
   },
   "autoload": {
     "psr-4": {
-      "MelisCmsProspect\\": "src/"
+      "MelisCmsProspects\\": "src/"
     }
   }
 }
