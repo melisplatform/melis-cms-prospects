@@ -1,8 +1,22 @@
 {
   "name": "melisplatform/melis-cms-prospects",
+  "description": "Melis Platform prospects module",
   "type": "melisplatform-module",
   "license": "OSL-3.0",
   "homepage": "https://github.com/melisplatform/melis-cms-prospects",
+  "support": {
+    "source": "https://github.com/melisplatform/melis-cms-prospects",
+    "issues": "https://github.com/melisplatform/melis-cms-prospects/issues"
+  },
+  "keywords": [
+    "cms",
+    "melis",
+    "zf2",
+    "module"
+  ],
+  "extra": {
+    "module-name": "MelisCmsProspects"
+  },
   "require": {
     "php": "^5.5 || ^7.0"
   },
