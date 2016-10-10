@@ -1,9 +1,10 @@
 <?php
+
 /**
  * Melis Technology (http://www.melistechnology.com)
  *
- * @copyright Copyright (c) 2015 Melis Technology (http://www.melistechnology.com)
- * 
+ * @copyright Copyright (c) 2016 Melis Technology (http://www.melistechnology.com)
+ *
  */
 
 namespace MelisCmsProspects\Controller;
@@ -12,11 +13,18 @@ use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\ViewModel;
 use Zend\View\Model\JsonModel;
 use Zend\Session\Container;
+
 /**
- * Page Historic Plugin
+ * Dashboard controller for MelisProspects
+ * 
+ * Used to render dashboard components in MelisPlatform Back Office
+ *
  */
 class DashboardController extends AbstractActionController
 {
+    /**
+     * Generate the prospects dashboard entry
+     */
 	public function dashboardStatisticsAction()
 	{
 		$melisKey = $this->params()->fromRoute('melisKey', '');
@@ -47,57 +55,11 @@ class DashboardController extends AbstractActionController
 		return $view;
 	}
 
-
-// 	public function getStatsValuesAction()
-// 	{
-	    
-// 	    $chartFor = get_object_vars($this->getRequest()->getPost());
-	    
-// 	    $chartFor = $chartFor['chartFor'];
-	    
-// 		$limit = 10;
-// 		$success = 1;
-// 		$values = array();
-				
-// 		$prospectTable = $this->getServiceLocator()->get('MelisProspects');
-// 		$prospects = $prospectTable->getNumberProspectsPerDay($limit);
-// 		if ($prospects)
-// 		{
-// 			$prospects = $prospects->toArray();
-			
-// 			$todayStart = mktime(0, 0, 0, date('m'), date('d'), date('Y'));
-// 			$todayEnd = mktime(23, 59, 59, date('m'), date('d'), date('Y'));
-			
-// 			for ($cpt = 0; $cpt < $limit; $cpt++)
-// 			{
-// 				$num = 0;
-// 				$todayStart -= 60*60*24;
-// 				$todayEnd -= 60*60*24;
-// 				foreach ($prospects as $prospect)
-// 				{
-// 					$timeProspects = strtotime($prospect['pros_contact_date']);
-// 					if ($timeProspects >= $todayStart && $timeProspects <= $todayEnd)
-// 					{
-// 						$num = $prospect['nb'];
-// 						break;
-// 					}	
-// 				}
-				
-// 				$values[] = array($todayStart * 1000, $num);
-// 			}
-// 		}
-		
-// 		return new JsonModel(array(
-// 		    'chartFor' => $chartFor,
-//     		'success' => $success,
-//     		'values' => $values,
-//     	));
-// 	}
-	
-	public function getDashboardStatsAction(){
-	    // Get Post DataString
-
-	    
+	/**
+	 * Returns JSon datas for the graphs on the dashboard
+	 */
+	public function getDashboardStatsAction()
+	{
 	    // Graph Range X-Axis Limit to this value
 		$limit = 10;
 		$success = 1;
@@ -142,8 +104,6 @@ class DashboardController extends AbstractActionController
 		    }
 		}
 				
-
-	    
 		return new JsonModel(array(
 		    'date' => date('Y-m-d'),
 		    'success' => $success,

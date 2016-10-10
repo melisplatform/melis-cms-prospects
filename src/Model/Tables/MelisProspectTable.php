@@ -1,9 +1,17 @@
 <?php
 
+/**
+ * Melis Technology (http://www.melistechnology.com)
+ *
+ * @copyright Copyright (c) 2016 Melis Technology (http://www.melistechnology.com)
+ *
+ */
+
 namespace MelisCmsProspects\Model\Tables;
 
 use MelisEngine\Model\Tables\MelisGenericTable;
 use Zend\Db\TableGateway\TableGateway;
+
 class MelisProspectTable extends MelisGenericTable 
 {
     protected $tableGateway;
@@ -15,6 +23,12 @@ class MelisProspectTable extends MelisGenericTable
         $this->idField = 'pros_id';
     }
     
+    /**
+     * Gets the number of prospect per day 
+     * 
+     * @param int $maxDays How many past days you want
+     * @return NULL|\Zend\Db\ResultSet\ResultSetInterface
+     */
     public function getNumberProspectsPerDay($maxDays = 30)
     {
     	$select = $this->tableGateway->getSql()->select();
@@ -26,7 +40,6 @@ class MelisProspectTable extends MelisGenericTable
     	$resultSet = $this->tableGateway->selectWith($select);
     
     	return $resultSet;
-    	
     }
     
     /* 

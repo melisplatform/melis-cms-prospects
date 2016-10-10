@@ -3,7 +3,7 @@
 /**
  * Melis Technology (http://www.melistechnology.com)
  *
- * @copyright Copyright (c) 2015 Melis Technology (http://www.melistechnology.com)
+ * @copyright Copyright (c) 2016 Melis Technology (http://www.melistechnology.com)
  *
  */
 
@@ -16,7 +16,7 @@ use MelisCore\Service\MelisCoreRightsService;
 use Zend\Session\Container;
 
 /**
- * Prospects Manager
+ * This controller handles the display of the Prospect Tool
  */
 class ToolProspectsController extends AbstractActionController
 {
@@ -239,7 +239,6 @@ class ToolProspectsController extends AbstractActionController
         $view->prospectsModal = $melisTool->getModal('melistoolprospects_tool_prospects_empty_modal');
         
         return $view;
-        
     }
     
     /**
@@ -253,6 +252,7 @@ class ToolProspectsController extends AbstractActionController
          
         $view = new ViewModel();
         $view->setVariable('melistoolprospects_tool_prospect_form', $melisTool->getForm('melistoolprospects_tool_prospects_update'));
+        
         return $view;
     }
     
@@ -289,10 +289,6 @@ class ToolProspectsController extends AbstractActionController
         
         return $view; 
     }
-    
-    
-    
-
 
     /**
      * Returns all prospect data in JSON format
@@ -314,7 +310,6 @@ class ToolProspectsController extends AbstractActionController
         $tableData = array();
         if($this->getRequest()->isPost())
         {
-            
             $colId = array_keys($melisTool->getColumns());
             
             $sortOrder = $this->getRequest()->getPost('order');
@@ -370,15 +365,12 @@ class ToolProspectsController extends AbstractActionController
             }
         }
         
-        
-
         return new JsonModel(array(
             'draw' => (int) $draw,
             'recordsTotal' => $dataCount,
             'recordsFiltered' =>  $prospectTable->getTotalFiltered(),
             'data' => $tableData,
         ));
-
     }
     
     public function exportToCsvAction()
@@ -431,7 +423,6 @@ class ToolProspectsController extends AbstractActionController
         $id = $this->params()->fromRoute('id', $this->params()->fromQuery('id', ''));
         
         return new JsonModel($prospectTable->getEntryById($id));
-
     }
     
     /**
@@ -493,7 +484,7 @@ class ToolProspectsController extends AbstractActionController
                         $errors[$keyError]['label'] = $valueForm['spec']['options']['label'];
                 }
             }
-         }
+        }
 
         $response = array(
             'success' => $success,
@@ -501,7 +492,8 @@ class ToolProspectsController extends AbstractActionController
             'textMessage' => $textMessage,
             'errors' => $errors
         );
-         $this->getEventManager()->trigger('meliscmsprospects_toolprospects_save_end', $this, $response);
+        
+        $this->getEventManager()->trigger('meliscmsprospects_toolprospects_save_end', $this, $response);
          
         return new JsonModel($response);
         

@@ -3,7 +3,7 @@
 /**
  * Melis Technology (http://www.melistechnology.com)
  *
- * @copyright Copyright (c) 2015 Melis Technology (http://www.melistechnology.com)
+ * @copyright Copyright (c) 2016 Melis Technology (http://www.melistechnology.com)
  *
  */
 
@@ -13,6 +13,10 @@ use Zend\EventManager\EventManagerInterface;
 use Zend\EventManager\ListenerAggregateInterface;
 use MelisCore\Listener\MelisCoreGeneralListener;
 
+/**
+ * This listener listen to prospects events in order to add entries in the
+ * flash messenger
+ */
 class MelisCmsProspectFlashMessengerListener extends MelisCoreGeneralListener implements ListenerAggregateInterface
 {
 	
@@ -26,14 +30,12 @@ class MelisCmsProspectFlashMessengerListener extends MelisCoreGeneralListener im
         	function($e){
 
         		$sm = $e->getTarget()->getServiceLocator();
-        		
         		$flashMessenger = $sm->get('MelisCoreFlashMessenger');
+        		
         		$params = $e->getParams();
-        		//$flashMessenger->addToFlashMessenger($params['textTitle'], $params['textMessage'], $flashMessenger::WARNING);
         		$results = $e->getTarget()->forward()->dispatch(
         		    'MelisCore\Controller\MelisFlashMessenger',
         		    array_merge(array('action' => 'log'), $params))->getVariables();
-
         	},
         -1000);
         
