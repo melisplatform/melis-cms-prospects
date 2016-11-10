@@ -93,8 +93,8 @@ class ToolProspectsController extends AbstractActionController
         $melisTool = $this->getServiceLocator()->get('MelisCoreTool');
         $melisKey = $this->params()->fromRoute('melisKey', '');
         
-        $melisProspects = $this->serviceLocator->get('MelisProspects');
-        $numPropects = $melisProspects->getProspectsDataForWidgets('numPropects');
+        $melisProspectsService = $this->getServiceLocator()->get('MelisProspectsService');
+        $numPropects = $melisProspectsService->getProspectsDataForWidgets('numPropects');
         
         $view = new ViewModel();
         $view->melisKey = $melisKey;
@@ -113,8 +113,8 @@ class ToolProspectsController extends AbstractActionController
         $melisTool = $this->getServiceLocator()->get('MelisCoreTool');
         $melisKey = $this->params()->fromRoute('melisKey', '');
         
-        $melisProspects = $this->serviceLocator->get('MelisProspects');
-        $numPropectsMonth = $melisProspects->getProspectsDataForWidgets('numPropectsMonth');
+        $melisProspectsService = $this->getServiceLocator()->get('MelisProspectsService');
+        $numPropectsMonth = $melisProspectsService->getProspectsDataForWidgets('numPropectsMonth');
         
         $view = new ViewModel();
         $view->melisKey = $melisKey;
@@ -132,8 +132,8 @@ class ToolProspectsController extends AbstractActionController
         $melisTool = $this->getServiceLocator()->get('MelisCoreTool');
         $melisKey = $this->params()->fromRoute('melisKey', '');
         
-        $melisProspects = $this->serviceLocator->get('MelisProspects');
-        $numPropectsMonthAvg = $melisProspects->getProspectsDataForWidgets('numPropectsMonthAvg');
+        $melisProspectsService = $this->getServiceLocator()->get('MelisProspectsService');
+        $numPropectsMonthAvg = $melisProspectsService->getProspectsDataForWidgets('numPropectsMonthAvg');
         
         $view = new ViewModel();
         $view->melisKey = $melisKey;
@@ -398,14 +398,15 @@ class ToolProspectsController extends AbstractActionController
     	$response = array();
     	$this->getEventManager()->trigger('meliscmsprospects_toolprospects_delete_start', $this, $response);
         
+    	$translator = $this->getServiceLocator()->get('translator');
         $prospectTable = $this->getServiceLocator()->get('MelisProspects');
         $id = $this->params()->fromRoute('id', $this->params()->fromQuery('id', ''));
         
         $prospectTable->deleteById($id);
 
         $response = array(
-            'textTitle' => 'tr_melistoolprospects_tool_prospects',
-            'textMessage' => 'tr_prospect_manager_fm_delete_data_content',
+            'textTitle' => $translator->translate('tr_melistoolprospects_tool_prospects'),
+            'textMessage' => $translator->translate('tr_prospect_manager_fm_delete_data_content'),
             'success' => true,
         );
         $this->getEventManager()->trigger('meliscmsprospects_toolprospects_delete_end', $this, $response);

@@ -137,7 +137,7 @@ return array(
                                 'MelisCmsProspects_tool_prospects_widgets' => array( 
                                     'conf' => array(
                                         'id' => 'id_MelisCmsProspects_tool_prospects_widgets',
-                                        'name' => 'tr_MelisCmsProspects_tool_prospects_widgets',
+                                        'name' => 'tr_melistoolprospects_tool_prospects_widgets',
                                         'melisKey' => 'MelisCmsProspects_tool_prospects_widgets',
                                     ),
                                     'forward' => array(
@@ -152,7 +152,7 @@ return array(
                                         'MelisCmsProspects_tool_prospects_header_num_prospects' => array( 
                                             'conf' => array(
                                                 'id' => 'id_MelisCmsProspects_tool_prospects_header_num_prospects',
-                                                'name' => 'tr_MelisCmsProspects_tool_prospects_header_num_prospects',
+                                                'name' => 'tr_melistoolprospects_tool_prospects_header_num_prospects',
                                                 'melisKey' => 'MelisCmsProspects_tool_prospects_header_num_prospects',
                                                 'width' => '4' // width of the widget
                                             ),
@@ -168,7 +168,7 @@ return array(
                                         'MelisCmsProspects_tool_prospects_header_num_prospects_this_month' => array(
                                             'conf' => array(
                                                 'id' => 'id_MelisCmsProspects_tool_prospects_header_num_prospects_this_month',
-                                                'name' => 'tr_MelisCmsProspects_tool_prospects_header_num_prospects_this_month',
+                                                'name' => 'tr_melistoolprospects_tool_prospects_header_num_prospects_this_month',
                                                 'melisKey' => 'MelisCmsProspects_tool_prospects_header_num_prospects_this_month',
                                                 'width' => '4' // width of the widget
                                             ),
@@ -184,7 +184,7 @@ return array(
                                         'MelisCmsProspects_tool_prospects_header_num_prospects_average_per_month' => array(
                                             'conf' => array(
                                                 'id' => 'id_MelisCmsProspects_tool_prospects_header_num_prospects_average_per_month',
-                                                'name' => 'tr_MelisCmsProspects_tool_prospects_header_num_prospects_average_per_month',
+                                                'name' => 'tr_melistoolprospects_tool_prospects_header_num_prospects_average_per_month',
                                                 'melisKey' => 'MelisCmsProspects_tool_prospects_header_num_prospects_average_per_month',
                                                 'width' => '4' // width of the widget
                                             ),

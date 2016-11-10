@@ -31,8 +31,11 @@ class DashboardController extends AbstractActionController
 		
 		$melisProspects = $this->serviceLocator->get('MelisProspects');
 		$melisTool = $this->getServiceLocator()->get('MelisCoreTool');
+		$melisProspectsService = $this->getServiceLocator()->get('MelisProspectsService');
+		
 		// Get Total number Prospects
-		$numPropects = $melisProspects->getProspectsDataForWidgets('numPropects');
+		$numPropects = $melisProspectsService->getProspectsDataForWidgets('numPropects');
+		
 		// Get Total Recent Prospects
 		$recentPropects = $melisProspects->getDashboardRecentProspectData(5)->toArray();
 		$prosData = $recentPropects;
@@ -71,14 +74,14 @@ class DashboardController extends AbstractActionController
 		    $chartFor = get_object_vars($this->getRequest()->getPost());
 		    $chartFor = isset($chartFor['chartFor']) ? $chartFor['chartFor'] : 'monthly';
 		    
-		    $prospectTable = $this->getServiceLocator()->get('MelisProspects');
+		    $melisProspectsService = $this->getServiceLocator()->get('MelisProspectsService');
 		    
 		    // Last Date/value of the Graph will be the Current Date
 		    $curdate = date('Y-m-d');
 		    for ($ctr = $limit ; $ctr > 0 ;$ctr--)
 		    {
 		        // Retreve Prospects Values from database
-		        $nb = $prospectTable->getProspectsDataByDate($chartFor,$curdate);
+		        $nb = $melisProspectsService->getProspectsDataByDate($chartFor,$curdate);
 		    
 		        // Checking type of report
 		        switch ($chartFor) {

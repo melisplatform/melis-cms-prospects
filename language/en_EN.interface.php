@@ -12,14 +12,14 @@
 	    'tr_melistoolprospects_prospects_pros_contact_date' => 'Date',
 	    
         // Prospects
-	    'tr_prospect_manager_fm_delete_data_title' => 'Prospect Data Delete.',
-	    'tr_prospect_manager_fm_delete_data_content' => 'Prospect data has been deleted successfully.',
-	    'tr_prospect_manager_fm_delete_update_title' => 'Prospect Update Data',
-	    'tr_prospect_manager_fm_update_data_content' => 'Prospect data has been updated.',
-	    'tr_prospect_manager_fm_update_data_content_error' => 'Unable to update prospect data please check the form for more info.',
+	    'tr_prospect_manager_fm_delete_data_title' => 'Prospect Delete.',
+	    'tr_prospect_manager_fm_delete_data_content' => 'Prospect has been deleted successfully.',
+	    'tr_prospect_manager_fm_delete_update_title' => 'Prospect Update',
+	    'tr_prospect_manager_fm_update_data_content' => 'Prospect has been updated.',
+	    'tr_prospect_manager_fm_update_data_content_error' => 'Unable to update prospect please check the form for more info.',
 	    'tr_tool_text_prospect_manager_update' => 'Save',
 	    'tr_tool_text_prospect_manager_delete' => 'Delete',
-	    'tr_tool_text_prospect_manager_delete_confirm' => 'Are you sure you want to delete this data?',
+	    'tr_tool_text_prospect_manager_delete_confirm' => 'Are you sure you want to delete this prospect?',
 	    // Prospects Widgets
 	    'tr_melistoolprospects_tool_prospects_header_indicators' => '',
 	    'tr_melistoolprospects_tool_prospects_header_num_indicators' => 'Number of Prospects',

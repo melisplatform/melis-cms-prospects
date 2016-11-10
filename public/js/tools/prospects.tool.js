@@ -120,6 +120,7 @@ var toolProspects = {
     	    		toolProspects.refreshTable();
     	    		$('#modal-prospect').modal('hide');
     	    		melisCoreTool.resetLabels("#idformprospectdata");
+    	    		melisHelper.melisOkNotification(data.textTitle, data.textMessage, '#72af46');
     	    	} 
     	    	else
     	    	{
@@ -150,6 +151,7 @@ var toolProspects = {
 	    	    	    	// refresh the table after deleting an item
 	    	    	    	if(data.success) {
 	    	    	    		toolProspects.refreshTable();
+	    	    	    		melisHelper.melisOkNotification(data.textTitle, data.textMessage, '#72af46');
 	    	    	    	}
 	    	    	    	else {
 	    	    	    		melisHelper.melisKoNotification(data.textTitle, data.textMessage, data.errors, 0);

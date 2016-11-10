@@ -19,24 +19,22 @@ return array(
                         'ajaxCallback' => '',
                         'filters' => array(
                             'left' => array(
-                                'toolprospect-search' => array(
+                                'toolprospect-limit' => array(
                                     'module' => 'MelisCmsProspects',
                                     'controller' => 'ToolProspects',
-                                    'action' => 'render-tool-prospects-content-filters-search'
+                                    'action' => 'render-tool-prospects-content-filters-limit'
                                 ),
                                 'toolprospect-date-filter' => array(
                                     'module' => 'MelisCmsProspects',
                                     'controller' => 'ToolProspects',
                                     'action' => 'render-tool-prospects-content-filters-date'
                                 ),
-
-                                
                             ),
                             'center' => array(
-                                'toolprospect-limit' => array(
+                                'toolprospect-search' => array(
                                     'module' => 'MelisCmsProspects',
                                     'controller' => 'ToolProspects',
-                                    'action' => 'render-tool-prospects-content-filters-limit'
+                                    'action' => 'render-tool-prospects-content-filters-search'
                                 ),
                             ),
                             'right' => array(
