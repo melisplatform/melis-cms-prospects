@@ -90,25 +90,5 @@ class Module
     
         $translator->addTranslationFile('phparray', __DIR__ . '/../language/' . $locale . '.interface.php');
     }
-    
-    public function getServiceConfig()
-    {
-        return array(
-			'factories' => array(
-			    'MelisCmsProspects\Service\MelisCmsProspectsService' =>  function($sm) {
-    			    $melisCmsProspects = new \MelisCmsProspects\Service\MelisCmsProspectsService();
-    			    $melisCmsProspects->setServiceLocator($sm);
-    			    return $melisCmsProspects;
-			    },
-				'MelisCmsProspects\Model\Tables\MelisProspectTable' =>  function($sm) {
-					return new MelisProspectTable($sm->get('MelisProspectGateway'));
-				},
-			    'MelisProspectGateway' => function($sm) {
-			         $hydratingResultSet = new HydratingResultSet(new ObjectProperty(), new MelisProspects());
-			         return new TableGateway('melis_cms_prospects', $sm->get('Zend\Db\Adapter\Adapter'), null, $hydratingResultSet);
-			    },
-			),
-        );
-    }
  
 }

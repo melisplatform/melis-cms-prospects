@@ -56,7 +56,11 @@ return array(
         'aliases' => array(
             'translator' => 'MvcTranslator',
             'MelisProspects' => 'MelisCmsProspects\Model\Tables\MelisProspectTable',
-            'MelisProspectsService' => 'MelisCmsProspects\Service\MelisCmsProspectsService',
+        ),
+        'factories' => array(
+            'MelisProspectsService' => 'MelisCmsProspects\Service\Factory\MelisCmsProspectsServiceFactory',
+            
+            'MelisCmsProspects\Model\Tables\MelisProspectTable' => 'MelisCmsProspects\Model\Tables\Factory\MelisProspectsTableFactory',
         ),
     ),
     'controllers' => array(
