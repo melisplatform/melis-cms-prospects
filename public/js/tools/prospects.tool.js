@@ -32,32 +32,8 @@ $(document).ready(function() {
 
 
 window.initProspectEditor = function() {
-
-	var locale = "";
-	
-	if(melisLangId == "en_EN") {
-		locale = "en";
-	}
-	else {
-		locale = melisLangId;
-	}
-	
-	if (typeof tinymce != 'undefined' && tinymce != null) {
-        tinymce.remove("textarea#id_pros_message");
-	}
-	
-	tinymce.init({
-		mode: "none",
-		selector : "textarea#id_pros_message",
-		language: locale,
-		  height: 200,
-		  plugins: [
-		    'advlist autolink lists link image charmap print preview anchor',
-		    'searchreplace visualblocks code fullscreen',
-		    'insertdatetime media table contextmenu paste'
-		  ],
-		  toolbar: 'undo redo | styleselect | bold italic | link image |  alignleft aligncenter alignright alignjustify',
-	});
+	// Initialize TinyMCE editor
+	melisTinyMCE.createTinyMCE("tool", "textarea#id_pros_message", {height: 200});
 }
 
 window.initDatePickerFilter = function(d) {
@@ -96,12 +72,7 @@ var toolProspects = {
 		
 		updateProspectData: function() {
     		var datastring = $("#idformprospectdata").serializeArray();
-    		datastring.splice(4);
-
-    		datastring.push({
-    			name: "pros_message", 
-    			value: tinymce.activeEditor.getContent(),
-    		});
+    		
     		datastring.push({
     			name: "pros_id", 
     			value: $("#prosid").html(),
@@ -177,17 +148,11 @@ var toolProspects = {
 	    	    				var name = $(this).attr('name');
 	    	    				$("#prosid").html(values['pros_id']);
 	    	    				$("#" + $(this).attr('id')).val(values[name]);
-	    	    				initProspectEditor();
-	    	    				//tinymce.editors[0].setContent(values['pros_message']);
 	    	    				tinymce.activeEditor.setContent(values['pros_message']);
 	    	    			});
 	    	    		});
 	    	    	}
-	    	    	else {
-	    	    		// validations here
-	    	    	}
     	        }
-    	    		
     	    });
     	},
 }

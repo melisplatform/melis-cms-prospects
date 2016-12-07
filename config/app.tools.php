@@ -117,7 +117,7 @@ return array(
                     'modals' => array( // handles the contents of the modals
                         'melistoolprospects_tool_prospects_update_modal' => array(
                             'id' => 'id_melistoolprospects_tool_prospects_update',
-                            'class' => 'glyphicons user',
+                            'class' => 'glyphicons pencil',
                             'tab-header' => '',
                             'tab-text' => 'tr_melistoolprospects_tool_prospects',
                             'content' => array(
