@@ -37,21 +37,21 @@ window.initProspectEditor = function() {
 }
 
 window.initDatePickerFilter = function(d) {
-		d.startDate = dStartDate;
-		d.endDate   = dEndDate;
-		var icon = '<i class="glyphicon glyphicon-calendar fa fa-calendar"></i> ';
-		var dateSelectionContent = "";
-		if(dStartDate.length == 0 && dEndDate.length == 0) {
-			dateSelectionContent = translations.tr_meliscore_datepicker_select_date + icon +  ' <b class="caret"></b>';
-		}
-		else {
-			dateSelectionContent = translations.tr_meliscore_datepicker_select_date  + icon + "<span class='sdate'>" + dStartDate + ' - ' + dEndDate + '</span> <b class="caret"></b>';
-		}
+	d.startDate = dStartDate;
+	d.endDate   = dEndDate;
+	var icon = '<i class="glyphicon glyphicon-calendar fa fa-calendar"></i> ';
+	var dateSelectionContent = "";
+	if(dStartDate.length == 0 && dEndDate.length == 0) {
+		dateSelectionContent = translations.tr_meliscore_datepicker_select_date + icon +  ' <b class="caret"></b>';
+	}
+	else {
+		dateSelectionContent = translations.tr_meliscore_datepicker_select_date  + icon + "<span class='sdate'>" + dStartDate + ' - ' + dEndDate + '</span> <b class="caret"></b>';
+	}
 
-      $(document).on("init.dt", function(e, settings) {
-    	  $('#tableToolProspect_wrapper #dt_bsdatepicker .dt_dateInfo').html(dateSelectionContent);
-    	  dStartDate = ""; dEndDate = ""; //clear date when Prospects page is reloaded
-      });
+    $(document).on("init.dt", function(e, settings) {
+    	$('#tableToolProspect_wrapper #dt_bsdatepicker .dt_dateInfo').html(dateSelectionContent);
+    	dStartDate = ""; dEndDate = ""; //clear date when Prospects page is reloaded
+    });
 
 }
 
@@ -63,6 +63,7 @@ var toolProspects = {
 		
 		initTool: function() {
 			melisCoreTool.initTable(toolProspects.table());
+			console.log('test');
 		},
 		
 		refreshTable: function() {
@@ -91,11 +92,11 @@ var toolProspects = {
     	    		toolProspects.refreshTable();
     	    		$('#modal-prospect').modal('hide');
     	    		melisCoreTool.resetLabels("#idformprospectdata");
-    	    		melisHelper.melisOkNotification(data.textTitle, data.textMessage, '#72af46');
+    	    		melisHelper.melisOkNotification(data.textTitle, data.textMessage);
     	    	} 
     	    	else
     	    	{
-		    		melisCoreTool.alertDanger("#prospectupdateformalert", 'Error!', data.textMessage + "<br/>");
+		    		melisCoreTool.alertDanger("#prospectupdateformalert", '', data.textMessage);
 		    		melisHelper.melisKoNotification(data.textTitle, data.textMessage, data.errors, 0);
 		    		melisCoreTool.highlightErrors(data.success, data.errors, "idformprospectdata");
 		    	}

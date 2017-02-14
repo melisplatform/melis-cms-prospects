@@ -114,7 +114,7 @@ class ToolProspectsController extends AbstractActionController
         $melisKey = $this->params()->fromRoute('melisKey', '');
         
         $melisProspectsService = $this->getServiceLocator()->get('MelisProspectsService');
-        $numPropectsMonth = $melisProspectsService->getProspectsDataForWidgets('numPropectsMonth');
+        $numPropectsMonth = $melisProspectsService->getWidgetProspects('curMonth');
         
         $view = new ViewModel();
         $view->melisKey = $melisKey;
@@ -133,11 +133,11 @@ class ToolProspectsController extends AbstractActionController
         $melisKey = $this->params()->fromRoute('melisKey', '');
         
         $melisProspectsService = $this->getServiceLocator()->get('MelisProspectsService');
-        $numPropectsMonthAvg = $melisProspectsService->getProspectsDataForWidgets('numPropectsMonthAvg');
+        $numPropectsMonthAvg = $melisProspectsService->getWidgetProspects('avgMonth');
         
         $view = new ViewModel();
         $view->melisKey = $melisKey;
-        $view->numPropectsMonthAvg = $numPropectsMonthAvg;
+        $view->numPropectsMonthAvg = (float)$numPropectsMonthAvg['average'];
         
         return $view;
     }
@@ -405,11 +405,12 @@ class ToolProspectsController extends AbstractActionController
         $prospectTable->deleteById($id);
 
         $response = array(
-            'textTitle' => $translator->translate('tr_melistoolprospects_tool_prospects'),
-            'textMessage' => $translator->translate('tr_prospect_manager_fm_delete_data_content'),
+            'textTitle' => 'tr_melistoolprospects_tool_prospects',
+            'textMessage' => 'tr_prospect_manager_fm_delete_data_content',
             'success' => true,
         );
-        $this->getEventManager()->trigger('meliscmsprospects_toolprospects_delete_end', $this, $response);
+        
+        $this->getEventManager()->trigger('meliscmsprospects_toolprospects_delete_end', $this, array_merge($response, array('typeCode' => 'CMS_PROSPECTS_DELETE', 'itemId' => $id)));
         
         return new JsonModel($response);
     }
@@ -434,9 +435,10 @@ class ToolProspectsController extends AbstractActionController
     {
     	$response = array();
     	$this->getEventManager()->trigger('meliscmsprospects_toolprospects_save_start', $this, $response);
-    	
+    	$id = null;
         $success = 0;
         $errors  = array();
+        $textTitle = 'tr_melistoolprospects_tool_prospects';
         $textMessage = '';
         // for event logging
         $translator = $this->getServiceLocator()->get('translator');
@@ -489,12 +491,12 @@ class ToolProspectsController extends AbstractActionController
 
         $response = array(
             'success' => $success,
-            'textTitle' => $translator->translate('tr_melistoolprospects_tool_prospects'),
+            'textTitle' => $textTitle,
             'textMessage' => $textMessage,
             'errors' => $errors
         );
         
-        $this->getEventManager()->trigger('meliscmsprospects_toolprospects_save_end', $this, $response);
+        $this->getEventManager()->trigger('meliscmsprospects_toolprospects_save_end', $this, array_merge($response, array('typeCode' => 'CMS_PROSPECTS_UPDATE', 'itemId' => $id)));
          
         return new JsonModel($response);
         

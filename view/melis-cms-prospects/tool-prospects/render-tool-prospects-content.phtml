@@ -43,13 +43,10 @@ if (!empty($this->zoneconfig['conf']['id']))
 			// this script cannot be separated to this file since all table configuration and initialization are done here
 			// render table to DataTable plugin
 			$(document).ready(function() {
-					<?= $this->getToolDataTableConfig; ?>
-					
-
-				      $(document).on("init.dt", function(e, settings) {
-				    	  melisCoreTool.init();
-						         
-				      });
+				<?= $this->getToolDataTableConfig; ?>
+			    $(document).on("init.dt", function(e, settings) {
+			    	melisCoreTool.init();
+			    });
 			});
 			</script>
 	</div>

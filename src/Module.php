@@ -32,6 +32,8 @@ class Module
         $sm = $e->getApplication()->getServiceManager();
         $routeMatch = $sm->get('router')->match($sm->get('request'));
         
+        $this->createTranslations($e);
+        
         if (!empty($routeMatch))
         {
             $routeName = $routeMatch->getMatchedRouteName();
@@ -41,7 +43,6 @@ class Module
 	        {
 		        if ($module[0] == 'melis-backoffice')
 		        {
-                    $this->createTranslations($e);
                     $eventManager->attach(new MelisCmsProspectFlashMessengerListener());
 		        }
 	        }
@@ -60,6 +61,7 @@ class Module
 			include __DIR__ . '/../config/app.interface.php',
 			include __DIR__ . '/../config/diagnostic.config.php',
     	    include __DIR__ . '/../config/app.tools.php',
+    	    include __DIR__ . '/../config/app.plugins.php',
     	);
     	
     	foreach ($configFiles as $file) {
@@ -87,8 +89,21 @@ class Module
     
         $container = new Container('meliscore');
         $locale = $container['melis-lang-locale'];
-    
-        $translator->addTranslationFile('phparray', __DIR__ . '/../language/' . $locale . '.interface.php');
+        
+        if (empty($locale)){
+            $container = new Container('melisplugins');
+            $locale = $container['melis-plugins-lang-locale'];
+        }
+        
+        if (!empty($locale)){
+            
+            // Inteface translations
+            $interfaceTransPath = 'module/MelisModuleConfig/languages/MelisCmsProspects/' . $locale . '.interface.php';
+            $default = __DIR__ . '/../language/en_EN.interface.php';
+            $transPath = (file_exists($interfaceTransPath))? $interfaceTransPath : $default;
+            $translator->addTranslationFile('phparray', $transPath);
+            
+        }
     }
  
 }

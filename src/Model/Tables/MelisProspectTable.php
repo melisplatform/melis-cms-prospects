@@ -64,4 +64,23 @@ class MelisProspectTable extends MelisGenericTable
         
         return $dataProspects;
     }
+    
+    public function getCurrentMonth()
+    {
+        $select = $this->tableGateway->getSql()->select();
+        $select->where('YEAR(pros_contact_date) = YEAR(CURRENT_DATE())');
+        $select->where('MONTH(pros_contact_date) = MONTH(CURRENT_DATE())');
+    
+        $resultData = $this->tableGateway->selectWith($select);
+        return $resultData;
+    }
+    
+    public function getAvgMonth($months)
+    {        
+        $sql = "SELECT sum(`monthly`)/$months AS average FROM (SELECT COUNT(*) as `monthly` from melis_cms_prospects group by YEAR(`pros_contact_date`), MONTH(`pros_contact_date`)) AS average";
+
+        $resultData = $this->tableGateway->getAdapter()->driver->getConnection()->execute($sql);
+    
+        return $resultData;
+    }
 }

@@ -67,7 +67,11 @@ return array(
         'invokables' => array(
             'MelisCmsProspects\Controller\ToolProspects' => 'MelisCmsProspects\Controller\ToolProspectsController',
             'MelisCmsProspects\Controller\Dashboard' => 'MelisCmsProspects\Controller\DashboardController',
-            'MelisCmsProspects\Controller\Diagnostic' => 'MelisCmsProspects\Controller\DiagnosticController',
+        ),
+    ),
+    'controller_plugins' => array(
+        'invokables' => array(
+            'MelisCmsProspectsShowFormPlugin' => 'MelisCmsProspects\Controller\Plugin\MelisCmsProspectsShowFormPlugin'
         ),
     ),
     'view_manager' => array(
@@ -75,6 +79,7 @@ return array(
         'display_exceptions'       => true,
         'doctype'                  => 'HTML5',
         'template_map' => array(
+            'MelisCmsProspects/prospects-form' => __DIR__ . '/../view/melis-cms-prospects/plugins/prospects-form.phtml',
         ),
         'template_path_stack' => array(
             __DIR__ . '/../view',

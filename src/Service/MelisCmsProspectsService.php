@@ -42,13 +42,13 @@ class MelisCmsProspectsService implements MelisCmsProspectsServiceInterface, Ser
 	    
 	    $prospectsTable = $this->getServiceLocator()->get('MelisProspects');
 	    
-	    if ($prosId != null)
+	    try 
 	    {
-	        $prosId = $prospectsTable->save($datas);
+	        $prosId = $prospectsTable->save($datas, $prosId);
 	    }
-	    else
+	    catch (\Exception $e)
 	    {
-	        $prospectsTable->save($datas, $prosId);
+	        echo $e->getMessage();
 	    }
 	    
 	    return $prosId;
@@ -211,6 +211,38 @@ class MelisCmsProspectsService implements MelisCmsProspectsServiceInterface, Ser
 	
 	    return $nb;
 	
+	}
+	
+	/**
+	 * This method retrieves the data used for the list widget
+	 * @param varchar $identifier accepts curMonth|avgMonth
+	 * @return float|null , float on success, otherwise null
+	 */
+	public function getWidgetProspects($identifier)
+	{
+	    // Event parameters prepare
+	    $results = null;
+	     
+	    // Service implementation start
+	    $prospectTable = $this->getServiceLocator()->get('MelisProspects');
+	    switch($identifier){
+	        case 'curMonth':
+	            $results = $prospectTable->getCurrentMonth()->count(); break;
+	        case 'avgMonth':
+	            
+	            $minDate = $prospectTable->getProspectsOrderByDate('ASC')->current();
+	            $maxDate = $prospectTable->getProspectsOrderByDate('DESC')->current();
+	            $minDate = ($minDate) ? strtotime($minDate->pros_contact_date) : 0;	           
+	            $maxDate = ($maxDate) ? strtotime($maxDate->pros_contact_date) : 0;
+	            $days = ceil(abs($minDate - time()) / 86400); // get days difference
+	            $months = intval($days/30);      
+	            $results = $prospectTable->getAvgMonth($months)->current(); break;
+	        default:
+	            break;
+	    }
+	    // Service implementation end
+	     
+	    return $results;
 	}
 
 }
