@@ -32,8 +32,6 @@ class Module
         $sm = $e->getApplication()->getServiceManager();
         $routeMatch = $sm->get('router')->match($sm->get('request'));
         
-        $this->createTranslations($e);
-        
         if (!empty($routeMatch))
         {
             $routeName = $routeMatch->getMatchedRouteName();
@@ -41,9 +39,12 @@ class Module
             
             if (!empty($module[0]))
 	        {
+	            $this->createTranslations($e, $module[0]);
+	            
 		        if ($module[0] == 'melis-backoffice')
 		        {
                     $eventManager->attach(new MelisCmsProspectFlashMessengerListener());
+                    
 		        }
 	        }
         }
@@ -82,28 +83,30 @@ class Module
         );
     }
     
-    public function createTranslations($e)
+    public function createTranslations($e, $module)
     {
-        $sm = $e->getApplication()->getServiceManager();
-        $translator = $sm->get('translator');
-    
-        $container = new Container('meliscore');
-        $locale = $container['melis-lang-locale'];
-        
-        if (empty($locale)){
+        // Checking if the Request is from Melis-BackOffice or Front
+        if ($module == 'melis-backoffice')
+        {
+            $container = new Container('meliscore');
+            $locale = $container['melis-lang-locale'];
+        }
+        else
+        {
             $container = new Container('melisplugins');
             $locale = $container['melis-plugins-lang-locale'];
         }
         
-        if (!empty($locale)){
+        if (!empty($locale))
+        {
+            $sm = $e->getApplication()->getServiceManager();
+            $translator = $sm->get('translator');
             
             // Inteface translations
             $interfaceTransPath = 'module/MelisModuleConfig/languages/MelisCmsProspects/' . $locale . '.interface.php';
             $default = __DIR__ . '/../language/en_EN.interface.php';
             $transPath = (file_exists($interfaceTransPath))? $interfaceTransPath : $default;
             $translator->addTranslationFile('phparray', $transPath);
-            
         }
     }
- 
 }

@@ -360,6 +360,8 @@ class ToolProspectsController extends AbstractActionController
                 // manually modify value of the desired row
                 $tableData[$ctr]['DT_RowId'] = $tableData[$ctr]['pros_id'];
                 $tableData[$ctr]['pros_contact_date'] = strftime($melisTranslation->getDateFormatByLocate($locale), strtotime($tableData[$ctr]['pros_contact_date']));
+                
+                $tableData[$ctr]['pros_theme'] = $translator->translate($tableData[$ctr]['pros_theme']);
                 $tableData[$ctr]['pros_message'] = strip_tags($tableData[$ctr]['pros_message']);
 
             }
