@@ -354,7 +354,7 @@ class ToolProspectsController extends AbstractActionController
                 // apply text limits
                 foreach($tableData[$ctr] as $vKey => $vValue)
                 {
-                    $tableData[$ctr][$vKey] = $melisTool->limitedText($vValue);
+                    $tableData[$ctr][$vKey] = htmlspecialchars($melisTool->limitedText($vValue), ENT_QUOTES, 'UTF-8');
                 }
                 
                 // manually modify value of the desired row

@@ -276,6 +276,13 @@ return array(
                                                     ),
                                                 ),
                                             ),
+                                            array(
+                                                'name'    => 'regex', false,
+                                                'options' => array(
+                                                    'pattern' => '/^([0-9\(\)\/\+ \-]*)$/',
+                                                    'messages'=> array(\Zend\Validator\Regex::NOT_MATCH => 'tr_tool_text_prospect_validation_invalid_phone_num'),
+                                                ),
+                                            ),
                                         ),
                                         'filters'  => array(
                                             array('name' => 'StripTags'),

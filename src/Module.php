@@ -102,11 +102,23 @@ class Module
             $sm = $e->getApplication()->getServiceManager();
             $translator = $sm->get('translator');
             
-            // Inteface translations
-            $interfaceTransPath = 'module/MelisModuleConfig/languages/MelisCmsProspects/' . $locale . '.interface.php';
-            $default = __DIR__ . '/../language/en_EN.interface.php';
-            $transPath = (file_exists($interfaceTransPath))? $interfaceTransPath : $default;
-            $translator->addTranslationFile('phparray', $transPath);
+            $translationType = array(
+                'interface',
+            );
+            	
+            foreach($translationType as $type){
+                	
+                $transPath = "module/MelisModuleConfig/languages/MelisCmsProspects/$locale.$type.php";
+                	
+                if(!file_exists($transPath)){
+                    	
+                    // if translation is not found, use melis default translations
+                    $locale = (file_exists(__DIR__ . "/../language/$locale.$type.php"))? $locale : "en_EN";
+                    $transPath = __DIR__ . "/../language/$locale.$type.php";
+                }
+                	
+                $translator->addTranslationFile('phparray', $transPath);
+            }
         }
     }
 }
