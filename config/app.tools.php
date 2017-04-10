@@ -256,6 +256,12 @@ return array(
                                     'validators' => array(
                                         array(
                                             'name'    => 'IsInt',
+                                            'options' => array(
+                                                'messages' => array(
+                                                    \Zend\I18n\Validator\IsInt::NOT_INT => 'tr_meliscms_tool_platform_not_digit',
+                                                    \Zend\I18n\Validator\IsInt::INVALID => 'tr_meliscms_tool_platform_not_digit',
+                                                )
+                                            )
                                         ),
                                     ),
                                     'filters' => array(

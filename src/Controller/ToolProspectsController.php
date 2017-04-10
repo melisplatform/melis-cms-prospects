@@ -177,7 +177,7 @@ class ToolProspectsController extends AbstractActionController
         $view = new ViewModel();
         $view->melisKey = $melisKey;
         $view->tableColumns = $columns;
-        $view->getToolDataTableConfig = $melisTool->getDataTableConfiguration('#tableToolProspect', true);
+        $view->getToolDataTableConfig = $melisTool->getDataTableConfiguration('#tableToolProspect', true, false, array('order' => '[[ 0, "desc" ]]'));
         
         return $view;
     }
@@ -354,7 +354,7 @@ class ToolProspectsController extends AbstractActionController
                 // apply text limits
                 foreach($tableData[$ctr] as $vKey => $vValue)
                 {
-                    $tableData[$ctr][$vKey] = htmlspecialchars($melisTool->limitedText($vValue), ENT_QUOTES, 'UTF-8');
+                    $tableData[$ctr][$vKey] = $melisTool->sanitize($melisTool->limitedText($vValue));
                 }
                 
                 // manually modify value of the desired row
@@ -452,6 +452,7 @@ class ToolProspectsController extends AbstractActionController
         if($this->getRequest()->isPost())
         {
             $postValues = get_object_vars($this->getRequest()->getPost());
+            $postValues = $melisTool->sanitizePost($postValues);
             $id = $this->getRequest()->getPost('pros_id');
             $prospectForm->setData($postValues);
             

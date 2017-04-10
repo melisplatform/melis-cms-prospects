@@ -87,8 +87,8 @@
         						<?php for($i = 0; $i < count($recentData); $i++){ ?>
             						<tr>
             							<td class="center"><?php echo $recentData[$i]['pros_id']?> </td>
-            							<td><div class="pros-dash-lbl"><?php echo $recentData[$i]['pros_name']?></div></td>
-            							<td><div class="pros-dash-lbl"><?php echo $recentData[$i]['pros_email']?></div></td>
+            							<td><div class="pros-dash-lbl"><?php echo $this->escapeHtml($recentData[$i]['pros_name']); ?></div></td>
+            							<td><div class="pros-dash-lbl"><?php echo $this->escapeHtml($recentData[$i]['pros_email']); ?></div></td>
             							<td><?php echo date($this->dateFormat, strtotime($recentData[$i]['pros_contact_date']))?></td>
             						</tr>
         						<?php } ?>
