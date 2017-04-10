@@ -11,5 +11,5 @@ $loader = require_once  '../../../vendor/autoload.php';
 $loader->add("MelisCmsProspectsTest\\", $cwd);
 $loader->register();
 
-ServiceManagerGrabber::setServiceConfig(require_once '../../../config/test.application.config.php');
+ServiceManagerGrabber::setServiceConfig();
 ob_start();

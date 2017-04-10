@@ -9,22 +9,29 @@
 
 namespace MelisCmsProspectsTest\Controller;
 
-use PHPUnit_Framework_TestCase;
-use MelisCmsProspectsTest\ServiceManagerGrabber;
+use MelisCore\ServiceManagerGrabber;
 use Zend\Test\PHPUnit\Controller\AbstractHttpControllerTestCase;
 class MelisCmsProspectsControllerTest extends AbstractHttpControllerTestCase
 {
     protected $traceError = false;
+    protected $sm;
+    protected $method = 'save';
 
     public function setUp()
     {
-        $this->setApplicationConfig(
-            include '../../../config/test.application.config.php'
-        );
-
-        parent::setUp();
-
+        $this->sm  = new ServiceManagerGrabber();
     }
+
+
+
+    public function getPayload($method)
+    {
+        return $this->sm->getPhpUnitTool()->getPayload('MelisCmsProspects', $method);
+    }
+
+    /**
+     * START ADDING YOUR TESTS HERE
+     */
 
     public function testBasicMelisCmsProspectsTestSuccess()
     {
@@ -61,6 +68,7 @@ class MelisCmsProspectsControllerTest extends AbstractHttpControllerTestCase
         $this->assertEquals("equalvalue", "equalvalue");
     }
 
-}
 
+
+}
 
