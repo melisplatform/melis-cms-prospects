@@ -3,6 +3,10 @@
 return array(
     'plugins' => array(
         'melistoolprospects' => array(
+            'conf' => array(
+                // user rights exclusions
+                'rightsDisplay' => 'none',
+            ),
             'tools' => array(
                 'melistoolprospects_tool_prospects' => array(
                     'conf' => array(

@@ -3,6 +3,10 @@
 return array(
     'plugins' => array(
         'meliscmsprospects' => array(
+            'conf' => array(
+                // user rights exclusions
+                'rightsDisplay' => 'none',
+            ),
             'plugins' => array(
                 'MelisCmsProspectsShowFormPlugin' => array(
                     'front' => array(
