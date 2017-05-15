@@ -1,6 +1,6 @@
 <?php 
 	return array(
-	    'tr_melistoolprospects_tool_prospects' => 'Prospects',
+	    'tr_melistoolprospects_tool_prospects' => 'Prospect',
 	    'tr_melistoolprospects_prospects_pros_id' => 'ID',
 	    'tr_melistoolprospects_prospects_pros_type' => 'Contact',
 	    'tr_melistoolprospects_prospects_pros_theme' => 'Theme',
@@ -52,7 +52,7 @@
 	    'tr_melistoolprospects_common_delete' => 'Delete',
 	    'tr_melistoolprospects_common_refresh' => 'Refresh',
 	    'tr_melistoolprospects_common_close' => 'Close',
-	    'tr_melistoolprospects_prospects_common_pros_id' => 'Prospect ID',
+	    'tr_melistoolprospects_prospects_common_pros_id' => 'ID',
 			
 	    // widgets
 	    'tr_melistoolprospects_tool_prospects_widgets' => 'Widgets',
