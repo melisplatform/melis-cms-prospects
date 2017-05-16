@@ -38,37 +38,6 @@ class MelisCmsProspectsControllerTest extends AbstractHttpControllerTestCase
         $this->assertEquals("equalvalue", "equalvalue");
     }
 
-    public function testBasicMelisCmsProspectsTestError()
-    {
-        $this->assertEquals("supposed-to", "display-an-error");
-    }
-
-    public function testBasicMelisCmsProspectsTestSuccess1()
-    {
-        $this->assertEquals("equalvalue", "equalvalue1");
-    }
-
-    public function testBasicMelisCmsProspectsTestSuccess2()
-    {
-        $this->assertEquals("equalvalue", "equalvalue");
-    }
-
-    public function testBasicMelisCmsProspectsTestSuccess3()
-    {
-        $this->assertEquals("equalvalue", "equalvalue");
-    }
-
-    public function testBasicMelisCmsProspectsTestSuccess4()
-    {
-        $this->assertEquals("equalvalue", "equalvalue2");
-    }
-
-    public function testBasicMelisCmsProspectsTestSuccess5()
-    {
-        $this->assertEquals("equalvalue", "equalvalue");
-    }
-
-
 
 }
 
