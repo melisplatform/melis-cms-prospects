@@ -452,7 +452,7 @@ class ToolProspectsController extends AbstractActionController
         if($this->getRequest()->isPost())
         {
             $postValues = get_object_vars($this->getRequest()->getPost());
-            $postValues = $melisTool->sanitizePost($postValues);
+            $postValues = $melisTool->sanitizePost($postValues, array('pros_message'));
             $id = $this->getRequest()->getPost('pros_id');
             $prospectForm->setData($postValues);
             

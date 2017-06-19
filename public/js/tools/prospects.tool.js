@@ -28,6 +28,15 @@ $(document).ready(function() {
 		}
 		
 	});
+	
+	$("body").on("click", "#id_MelisCmsProspects_tool_prospects_modal .tooltabmodal .mce-btn", function(){
+		var mcePopUp = $("#mce-modal-block").length;
+		
+		if(mcePopUp){
+			$("#mce-modal-block").css('z-index',1059);
+			$(".mce-floatpanel.mce-window").css('z-index', 1060);
+		}
+	});
 });
 
 
