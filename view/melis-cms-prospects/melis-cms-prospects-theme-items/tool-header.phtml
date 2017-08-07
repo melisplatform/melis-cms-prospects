@@ -1,0 +1,24 @@
+<?php
+$id = '';
+$themeId = isset($this->theme->pros_theme_id) ? (int) $this->theme->pros_theme_id : null;
+if (!empty($this->zoneconfig['conf']['id']))
+    $id = $themeId . '_' . $this->zoneconfig['conf']['id'];
+?>
+
+<div class="me-heading bg-white border-bottom" id="<?= $id; ?>" data-melisKey="<?= $this->melisKey; ?>" data-themeId="<?= $themeId; ?>">
+    <div class="row">
+        <div class="me-hl col-xs-12 col-sm-8 col-md-9">
+            <h1 class="content-heading"><?= sprintf($this->translate('tr_melis_cms_prospects_theme_items_header_title'), $this->theme->pros_theme_name); ?></h1>
+            <p><?= $this->translate('tr_melis_cms_prospects_theme_items_header_title_description'); ?></p>
+        </div>
+        <div class="me-hr col-xs-12 col-sm-4 col-md-3">
+            <?php
+            if(!empty($this->zoneconfig['interface'])) {
+                foreach($this->zoneconfig['interface'] as $keyConfig => $menuConfig) {
+                    echo $this->$keyConfig;
+                }
+            }
+            ?>
+        </div>
+    </div>
+</div> 

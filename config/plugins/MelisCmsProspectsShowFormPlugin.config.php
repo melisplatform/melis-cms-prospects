@@ -10,19 +10,35 @@ return array(
             'plugins' => array(
                 'MelisCmsProspectsShowFormPlugin' => array(
                     'front' => array(
-                        'template_path' => 'MelisCmsProspects/prospects-form',
+                        'template_path' => array('MelisCmsProspects/prospects-form'),
                         'id' => 'showform',
+                        // Fields to display
+                        'fields' => '',
+                        // Required fields
+                        'required_fields' => '',
+                        
                         'formid' => '',
                         'action' => '',
                         'type' => '',
                         'post' => array(),
+                        'theme' => '',
+                        // List the files to be automatically included for the correct display of the plugin
+                        // To overide a key, just add it again in your site module
+                        // To delete an entry, use the keyword "disable" instead of the file path for the same key
+                        'files' => array(
+                            'css' => array(
+                            ),
+                            'js' => array(
+                            ),
+                        ),
                         'forms' => array(
                             'contact_us' => array(
                                 'attributes' => array(
-                                    'name' => 'contactus',
-                                    'id' => 'contactus',
-                                    'method' => '',
+                                    'name' => 'contact-us',
+                                    'id' => 'contact-us',
+                                    'method' => 'POST',
                                     'action' => '',
+                                    'data-pluginid' => 'showform'
                                 ),
                                 'hydrator'  => 'Zend\Stdlib\Hydrator\ArraySerializable',
                                 'elements' => array(
@@ -104,17 +120,10 @@ return array(
                                     array(
                                         'spec' => array(
                                             'name' => 'pros_theme',
-                                            'type' => 'Zend\Form\Element\Select',
+                                            'type' => 'MelisCmsProspectThemeItemSelect',
                                             'options' => array(
                                                 'label' => 'tr_contactus_subject',
                                                 'empty_option' => 'tr_contactus_subj_choose',
-                                                'value_options' => array(
-                                                    'subj_opt_1' => 'tr_contactus_subj_opt_1',
-                                                    'subj_opt_2' => 'tr_contactus_subj_opt_2',
-                                                    'subj_opt_3' => 'tr_contactus_subj_opt_3',
-                                                    'subj_opt_4' => 'tr_contactus_subj_opt_4',
-                                                    'subj_opt_5' => 'tr_contactus_subj_opt_5',
-                                                ),
                                                 'disable_inarray_validator' => true,
                                             ),
                                             'attributes' => array(
@@ -332,10 +341,144 @@ return array(
                         ),
                     ),
                     'melis' => array(
-                        
+                        'name' => 'tr_MelisCmsProspectsShowFormPlugin_Name',
+                        'thumbnail' => '/MelisCmsProspects/plugins/images/MelisCmsProspectsShowFormPlugin_thumb.jpg',
+                        'description' => 'tr_MelisCmsProspectsShowFormPlugin_Description',
+                        'files' => array(
+                            'css' => array(
+                            ),
+                            'js' => array(
+                            ),
+                        ),
+                        'js_initialization' => array(),
+                        'modal_form' => array(
+                            'plugin_prospect_tab_01' => array(
+                                'tab_title' => 'tr_prospects_plugin_tab_properties',
+                                'tab_icon'  => 'fa fa-cog',
+                                'tab_form_layout' => 'MelisCmsProspects/prospects-form/melis/form_tab1',
+                                'attributes' => array(
+                                    'name' => 'plugin_prospect_tab_01',
+                                    'id' => 'plugin_prospect_tab_01',
+                                    'method' => '',
+                                    'action' => '',
+                                ),
+                                'hydrator'  => 'Zend\Stdlib\Hydrator\ArraySerializable',
+                                'elements' => array(
+                                    array(
+                                        'spec' => array(
+                                            'name' => 'template_path',
+                                            'type' => 'MelisEnginePluginTemplateSelect',
+                                            'options' => array(
+                                                'label' => 'tr_melis_Plugins_Template',
+                                                'tooltip' => 'tr_melis_Plugins_Template tooltip',
+                                                'empty_option' => 'tr_melis_Plugins_Choose',
+                                                'disable_inarray_validator' => true,
+                                            ),
+                                            'attributes' => array(
+                                                'id' => 'id_page_tpl_id',
+                                                'class' => 'form-control',
+                                                'required' => 'required',
+                                            ),
+                                        ),
+                                    ),
+                                ),
+                                'input_filter' => array(
+                                    'template_path' => array(
+                                        'name'     => 'template_path',
+                                        'required' => true,
+                                        'validators' => array(
+                                            array(
+                                                'name' => 'NotEmpty',
+                                                'options' => array(
+                                                    'messages' => array(
+                                                        \Zend\Validator\NotEmpty::IS_EMPTY => 'tr_front_template_path_empty',
+                                                    ),
+                                                ),
+                                            ),
+                                        ),
+                                        'filters'  => array(
+                                        ),
+                                    ),
+                                ),
+                            ),
+                            'plugin_prospect_tab_02' => array(
+                                'tab_title' => 'tr_MelisCmsProspectsShowFormPlugin_modal_fields',
+                                'tab_icon'  => 'fa fa-pencil',
+                                'tab_form_layout' => 'MelisCmsProspects/prospects-form/melis/form_tab2',
+                                'attributes' => array(
+                                    'name' => 'plugin_prospect_tab_02',
+                                    'id' => 'plugin_prospect_tab_02',
+                                    'method' => '',
+                                    'action' => '',
+                                ),
+                                'hydrator'  => 'Zend\Stdlib\Hydrator\ArraySerializable',
+                                'elements' => array(
+
+                                ),
+                                'input_filter' => array(
+
+                                )
+                            ),
+                            'plugin_prospect_tab_03' => array(
+                                'tab_title' => 'tr_melis_cms_prospects_theme',
+                                'tab_icon'  => 'fa fa-pencil',
+                                'tab_form_layout' => 'MelisCmsProspects/prospects-form/melis/form_tab1',
+                                'attributes' => array(
+                                    'name' => 'plugin_prospect_tab_03',
+                                    'id' => 'plugin_prospect_tab_03',
+                                    'method' => '',
+                                    'action' => '',
+                                ),
+                                'hydrator'  => 'Zend\Stdlib\Hydrator\ArraySerializable',
+                                'elements' => array(
+                                    array(
+                                        'spec' => array(
+                                            'name' => 'theme',
+                                            'type' => 'MelisCmsProspectThemeSelect',
+                                            'options' => array(
+                                                'label' => 'tr_melis_cms_prospects_theme_plugin_modal_theme',
+                                                'tooltip' => 'tr_melis_cms_prospects_theme_plugin_modal_theme tooltip',
+                                                'empty_option' => 'tr_meliscms_form_common_Choose',
+                                                'disable_inarray_validator' => true,
+                                                'open_tool' => array(
+                                                    'tool_name' => 'tr_melis_cms_prospects_theme',
+                                                    'tooltip' => 'tr_melis_cms_prospects_theme edit',
+                                                    'tool_icon' => 'fa-pencil',
+                                                    'tool_id' => 'id_MelisCmsProspects_tool_themes',
+                                                    'tool_meliskey' => 'MelisCmsProspects_tool_themes',
+                                                ),
+                                            ),
+                                            'attributes' => array(
+                                                'id' => 'theme',
+                                                'class' => 'form-control',
+                                                'required' => 'required',
+                                            ),
+                                        ),
+                                    ),
+                                ),
+                                'input_filter' => array(
+                                    'theme' => array(
+                                        'name'     => 'theme',
+                                        'required' => true,
+                                        'validators' => array(
+                                            array(
+                                                'name' => 'NotEmpty',
+                                                'options' => array(
+                                                    'messages' => array(
+                                                        \Zend\Validator\NotEmpty::IS_EMPTY => 'tr_melis_cms_prospects_plugin_config_no_theme',
+                                                    ),
+                                                ),
+                                            ),
+                                        ),
+                                        'filters'  => array(
+                                        ),
+                                    ),
+                                )
+                            ),
+                        )
                     ),
                 ),
-             ),
+            ),
         ),
-     ),
+    ),
 );

@@ -1,0 +1,91 @@
+<?php
+    $availableFields = $this->frontConfig['fields'];
+    $requiredFields =  $this->frontConfig['required_fields'];
+?>
+<p class="modal-text-info"><?= $this->translate('tr_MelisCmsProspectsShowFormPlugin_modal_fields_description'); ?></p>
+<!-- modules -->
+<style>
+    .module-cont {
+        padding-left: 0px;
+        padding-right: 0px;
+    }
+</style>
+<div class="fields-settings">
+	<div class="row">
+		<div class="col-xs-5"><h4><?php echo $this->translate('tr_melis_cms_prospects_plugin_config_fields')?></h4></div>
+		<div class="col-xs-4 text-center"><h4><?php echo $this->translate('tr_melis_cms_prospects_plugin_config_status')?></h4></div>
+		<div class="col-xs-3 text-center"><h4><?php echo $this->translate('tr_melis_cms_prospects_plugin_config_mandatory')?></h4></div>
+	</div>
+    <div class="fields-sortable">
+        <form method="POST" name="MelisCmsProspectsShowFormPlugin_select_field" id="MelisCmsProspectsShowFormPlugin_select_field">
+        <?php
+            if (!empty($this->cbElements)) {
+                foreach($this->cbElements as $name => $label) { ?>
+                    <div class="module-cont clearfix">
+                    	<div class="row">
+                    		<div class="col-xs-5">
+                        		<h4><?= $label; ?></h4>
+                        	</div>
+                    		<div class="col-xs-4 text-center">
+                                <div class="make-switch module-switch prospects-plugin-switch"
+                                	data-label-icon="fa fa-arrows-h"
+                                    data-on-label="<?= $this->translate('tr_MelisCmsProspectsShowFormPlugin_show'); ?>"
+                                    data-off-label="<?= $this->translate('tr_MelisCmsProspectsShowFormPlugin_hide'); ?>">
+                                    <?php
+                                        $status = '';
+                                        $disableReqFld = 'disabled';
+                                        if(in_array($name, $availableFields)) {
+                                            $status = 'checked';
+                                            $disableReqFld = '';
+                                        }
+                                    ?>
+                                    <input name="fields[]" value="<?= $name; ?>" type="checkbox" <?= $status; ?>/>
+                                </div>
+                        	</div>
+                    		<div class="col-xs-3 text-center">
+                    			<?php 
+                    			    $checked = '';
+                    			    if (in_array($name, $requiredFields) && empty($disableReqFld)) {
+                    			        $checked = 'checked';
+                    			    }
+                    			?>
+                    			<input id="<?= $name; ?>" type="checkbox" class="font-awesome-checkbox" name="required_fields[]" value="<?= $name; ?>" <?= $checked?> <?= $disableReqFld?>>
+                    			<label for="<?= $name; ?>"></label>
+                    		</div>
+                    	</div>
+                    </div>
+                    <?php
+                }
+            }
+        ?>
+        </form>
+    </div>
+</div>
+
+<script type="text/javascript">
+    $(document).ready(function() {
+        // initialize jquery sortable
+        $(".fields-sortable form").sortable({
+            containment: "parent",
+            placeholder: "ui-sortable-placeholder",
+            opacity: 0.8,
+            revert: 300,
+            tolerance: "pointer",
+        });
+        setOnOff();
+        
+        $(".prospects-plugin-switch").on('switch-change', function(e, data){
+            var inputField = $(this).find("input").val();
+			if(data.value === true){
+				$("input[value='"+inputField+"']").attr("disabled", false);
+	    	}else{
+	    		$("input[value='"+inputField+"']").attr("checked", false);
+	    		$("input[value='"+inputField+"']").attr("disabled", true);
+	    	}
+        });
+    });
+</script>
+
+
+
+

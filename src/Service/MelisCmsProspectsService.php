@@ -44,6 +44,7 @@ class MelisCmsProspectsService implements MelisCmsProspectsServiceInterface, Ser
 	    
 	    try 
 	    {
+	        $datas['pros_theme'] = !empty($datas['pros_theme']) ? $datas['pros_theme'] : null;
 	        $prosId = $prospectsTable->save($datas, $prosId);
 	    }
 	    catch (\Exception $e)

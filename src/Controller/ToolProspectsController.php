@@ -230,14 +230,12 @@ class ToolProspectsController extends AbstractActionController
      */
     public function renderToolProspectsModalContainerAction() {
         
-        $melisKey = $this->params()->fromRoute('melisKey', '');
-        $melisTool = $this->getServiceLocator()->get('MelisCoreTool');
-        $melisTool->setMelisToolKey('melistoolprospects', 'melistoolprospects_tool_prospects');
-        
+        $id = $this->params()->fromQuery('id');
         $view = new ViewModel();
+        $melisKey = $this->params()->fromRoute('melisKey', '');
         $view->melisKey = $melisKey;
-        $view->prospectsModal = $melisTool->getModal('melistoolprospects_tool_prospects_empty_modal');
-        
+        $view->id = $id;
+        $view->setTerminal(true);
         return $view;
     }
     
@@ -247,12 +245,63 @@ class ToolProspectsController extends AbstractActionController
      */
     public function renderToolProspectUpdateFormAction()
     {
-        $melisTool = $this->getServiceLocator()->get('MelisCoreTool');
-        $melisTool->setMelisToolKey('melistoolprospects', 'melistoolprospects_tool_prospects');
-         
-        $view = new ViewModel();
-        $view->setVariable('melistoolprospects_tool_prospect_form', $melisTool->getForm('melistoolprospects_tool_prospects_update'));
+        $prospectId = (int) $this->params()->fromQuery('prospectId', '');
         
+        $melisCoreConfig = $this->serviceLocator->get('MelisCoreConfig');
+        $appConfigForm = $melisCoreConfig->getFormMergedAndOrdered('melistoolprospects/tools/melistoolprospects_tool_prospects/forms/melistoolprospects_tool_prospects_update','melistoolprospects_tool_prospects_update');
+        $factory = new \Zend\Form\Factory();
+        $formElements = $this->serviceLocator->get('FormElementManager');
+        $factory->setFormElementManager($formElements);
+        $form = $factory->createForm($appConfigForm);
+        
+        $prospectTable = $this->getServiceLocator()->get('MelisProspects');
+        $themeTable = $this->getServiceLocator()->get('MelisCmsProspectsThemeTable');
+        $themeItemTable = $this->getServiceLocator()->get('MelisCmsProspectsThemeItemTable');
+        $container = new Container('meliscore');
+        
+        if(!empty($prospectId)){
+            
+           $prospect =  $prospectTable->getEntryById($prospectId)->current();
+           
+           if(!empty($prospect)){
+               
+               $theme  =  $themeItemTable->getEntryById($prospect->pros_theme)->current();
+               
+               if(!empty($theme)){
+                   
+                   $temp  =  $themeItemTable->getItemByThemeId($theme->pros_theme_id, (int) $container['melis-lang-id'], true);
+                   $data = array();
+                   
+                   foreach($temp as $item){
+                       $i = $item;
+                       if(empty($item->item_trans_text)){
+                           $i = $themeItemTable->getItemById(
+                               $item->pros_theme_item_id,
+                               null,
+                               true
+                               )->current();
+                       }
+                       $data[] = $i;
+                   }
+                  
+                   $form->get('pros_theme')->loadValueOptions($data);
+               }else{
+                   
+                   $load[] = array(
+                       'pros_theme_item_id' => $prospect->pros_theme,
+                       'pros_theme_name' => $prospect->pros_theme
+                    );
+                   
+                   $form->get('pros_theme')->loadValueOptions($load);
+               }
+               $form->setData((array)$prospect);
+           }
+        }
+        
+        $melisKey = $this->params()->fromRoute('melisKey', '');
+        $view = new ViewModel();
+        $view->melisKey = $melisKey;
+        $view->form = $form;
         return $view;
     }
     
@@ -346,6 +395,8 @@ class ToolProspectsController extends AbstractActionController
                     'endDate' =>  $melisTool->formatToQueryDate($this->getRequest()->getPost('endDate'), '/')
                 )
             ));
+
+            $themeItemTable = $this->getServiceLocator()->get('MelisCmsProspectsThemeItemTable');
             
             // store fetched Object Data into array so we can apply any string modifications
             $tableData = $getData->toArray();
@@ -360,8 +411,20 @@ class ToolProspectsController extends AbstractActionController
                 // manually modify value of the desired row
                 $tableData[$ctr]['DT_RowId'] = $tableData[$ctr]['pros_id'];
                 $tableData[$ctr]['pros_contact_date'] = strftime($melisTranslation->getDateFormatByLocate($locale), strtotime($tableData[$ctr]['pros_contact_date']));
+                $itemName = '';
+                if(is_numeric($tableData[$ctr]['pros_theme'])){
+                    
+                    $themeItem = $themeItemTable->getItemById($tableData[$ctr]['pros_theme'], (int) $melisTool->getCurrentLocaleID(), true)->current();
+                    
+                    if(empty($themeItem)){
+                        $themeItem =  $themeItemTable->getItemById($tableData[$ctr]['pros_theme'], null, true)->current();
+                    }
+                    
+                    $itemName = !empty($themeItem) ? $themeItem->pros_theme_name . ' / ' . $themeItem->item_trans_text : '';
+                }
                 
-                $tableData[$ctr]['pros_theme'] = $translator->translate($tableData[$ctr]['pros_theme']);
+                $tableData[$ctr]['pros_theme'] = !empty($itemName) ? $itemName : $translator->translate($tableData[$ctr]['pros_theme']);
+
                 $tableData[$ctr]['pros_message'] = strip_tags($tableData[$ctr]['pros_message']);
 
             }
@@ -460,6 +523,7 @@ class ToolProspectsController extends AbstractActionController
             {
                 $data = $prospectForm->getData();
                 // get the current data
+                
                 $curData = $prospectTable->getEntryById($id);
                 $curData = $curData->current();
                 

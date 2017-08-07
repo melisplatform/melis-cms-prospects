@@ -1,28 +1,13 @@
 <?php 
-$id = '';
-if (!empty($this->zoneconfig['conf']['id']))
-    $id = ' id="' .$this->zoneconfig['conf']['id'] . '"';
-    $data_melisKey = $this->melisKey;
+    $id = '';
+    if (!empty($this->zoneconfig['conf']['id'])){
+        $id = $this->zoneconfig['conf']['id'];
+    } 
 ?>
-<div <?= $id; ?> data-melisKey="<?= $data_melisKey; ?>">
-
-    <!-- MODAL WITH TABS -->
-    <?php 
-    $this->melisModal()->setModalId('modal-prospect');
-    if(!empty($this->zoneconfig['interface'])) {
-        foreach($this->zoneconfig['interface'] as $keyConfig => $menuConfig) {
-            echo $this->$keyConfig;
-        }
-        $this->melisModal()->setActiveTab('id_melistoolprospects_tool_prospects_update');
-    }
-    elseif(count($this->zoneconfig['interface']) < 1) {
-        $this->melisModal()->setTabs($this->prospectsModal);
-    }
-    
-    $this->melisModal()->hasCloseButton(false);
-    echo $this->melisModal()->renderModal();
-    
-
-    ?>
-    <!-- END MODAL WITH TABS -->
+<div >
+    <div class="modal fade" id="<?= $this->id ?>_container">
+        <div class="modal-dialog" role="afgsd">
+          <div id="<?= $this->id ?>" data-melisKey="<?= $this->melisKey; ?>" class="modal-content"></div>
+        </div>
+    </div>
 </div>

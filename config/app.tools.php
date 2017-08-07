@@ -119,28 +119,28 @@ return array(
                         'csvFileName' => 'prospect_export.csv',
                     ),
                     'modals' => array( // handles the contents of the modals
-                        'melistoolprospects_tool_prospects_update_modal' => array(
-                            'id' => 'id_melistoolprospects_tool_prospects_update',
-                            'class' => 'glyphicons pencil',
-                            'tab-header' => '',
-                            'tab-text' => 'tr_melistoolprospects_tool_prospects',
-                            'content' => array(
-                                'module' => 'MelisCmsProspects',
-                                'controller' => 'ToolProspects',
-                                'action' => 'render-tool-prospect-update-form',
-                            ),
-                        ),
-                        'melistoolprospects_tool_prospects_empty_modal' => array(
-                            'id' => 'id_melistoolprospects_tool_prospects_empty_modal',
-                            'class' => 'glyphicons user',
-                            'tab-header' => '',
-                            'tab-text' => 'tr_tool_text_prospect_manager_empty_modal',
-                            'content' => array(
-                                'module' => 'MelisCmsProspects',
-                                'controller' => 'ToolProspects',
-                                'action' => 'render-tool-prospects-modal-empty-content'
-                            ),
-                        ),
+//                         'melistoolprospects_tool_prospects_update_modal' => array(
+//                             'id' => 'id_melistoolprospects_tool_prospects_update',
+//                             'class' => 'glyphicons pencil',
+//                             'tab-header' => '',
+//                             'tab-text' => 'tr_melistoolprospects_tool_prospects',
+//                             'content' => array(
+//                                 'module' => 'MelisCmsProspects',
+//                                 'controller' => 'ToolProspects',
+//                                 'action' => 'render-tool-prospect-update-form',
+//                             ),
+//                         ),
+//                         'melistoolprospects_tool_prospects_empty_modal' => array(
+//                             'id' => 'id_melistoolprospects_tool_prospects_empty_modal',
+//                             'class' => 'glyphicons user',
+//                             'tab-header' => '',
+//                             'tab-text' => 'tr_tool_text_prospect_manager_empty_modal',
+//                             'content' => array(
+//                                 'module' => 'MelisCmsProspects',
+//                                 'controller' => 'ToolProspects',
+//                                 'action' => 'render-tool-prospects-modal-empty-content'
+//                             ),
+//                         ),
                 
                     ), // end modals
                     'forms' => array(
@@ -160,11 +160,12 @@ return array(
                                         'type' => 'MelisText',
                                         'options' => array(
                                             'label' => 'tr_melistoolprospects_prospects_common_pros_id',
+                                            'tooltip' => 'tr_melistoolprospects_prospects_common_pros_id tooltip',
                                         ),
                                         'attributes' => array(
                                             'id' => 'id_pros_id',
                                             'value' => '',
-                                            'disabled' => 'disabled',
+                                            'readonly' => 'readonly',
                                         ),
                                     ),
                                 ),
@@ -174,6 +175,7 @@ return array(
                                         'type' => 'MelisText',
                                         'options' => array(
                                             'label' => 'tr_melistoolprospects_prospects_pros_name',
+                                            'tooltip' => 'tr_melistoolprospects_prospects_pros_name tooltip',
                                         ),
                                         'attributes' => array(
                                             'id' => 'id_pros_name',
@@ -187,6 +189,7 @@ return array(
                                         'type' => 'MelisText',
                                         'options' => array(
                                             'label' => 'tr_melistoolprospects_prospects_pros_email',
+                                            'tooltip' => 'tr_melistoolprospects_prospects_pros_email tooltip',
                                         ),
                                         'attributes' => array(
                                             'id' => 'id_pros_email',
@@ -200,6 +203,7 @@ return array(
                                         'type' => 'MelisText',
                                         'options' => array(
                                             'label' => 'tr_melistoolprospects_prospects_pros_telephone',
+                                            'tooltip' => 'tr_melistoolprospects_prospects_pros_telephone tooltip',
                                         ),
                                         'attributes' => array(
                                             'id' => 'id_pros_telephone',
@@ -213,6 +217,7 @@ return array(
                                         'type' => 'MelisText',
                                         'options' => array(
                                             'label' => 'tr_melistoolprospects_prospects_pros_contact_date',
+                                            'tooltip' => 'tr_melistoolprospects_prospects_pros_contact_date tooltip',
                                         ),
                                         'attributes' => array(
                                             'id' => 'id_pros_contact_date',
@@ -221,16 +226,31 @@ return array(
                                         ),
                                     ),
                                 ),
+//                                 array(
+//                                     'spec' => array(
+//                                         'name' => 'pros_theme',
+//                                         'type' => 'MelisText',
+//                                         'options' => array(
+//                                             'label' => 'tr_melistoolprospects_prospects_pros_theme',
+//                                             'tooltip' => 'tr_melistoolprospects_prospects_pros_theme tooltip',
+//                                         ),
+//                                         'attributes' => array(
+//                                             'id' => 'id_pros_theme',
+//                                             'value' => '',
+//                                         ),
+//                                     ),
+//                                 ),
                                 array(
                                     'spec' => array(
                                         'name' => 'pros_theme',
-                                        'type' => 'MelisText',
+                                        'type' => 'MelisCmsProspectThemeItemSelect',
                                         'options' => array(
                                             'label' => 'tr_melistoolprospects_prospects_pros_theme',
+                                            'tooltip' => 'tr_melistoolprospects_prospects_pros_theme tooltip',
+                                            'disable_inarray_validator' => true,
                                         ),
                                         'attributes' => array(
-                                            'id' => 'id_pros_theme',
-                                            'value' => '',
+                                            'id' => 'id_pros_message',
                                         ),
                                     ),
                                 ),
@@ -240,6 +260,7 @@ return array(
                                         'type' => 'TextArea',
                                         'options' => array(
                                             'label' => 'tr_melistoolprospects_prospects_pros_message',
+                                            'tooltip' => 'tr_melistoolprospects_prospects_pros_message tooltip',
                                         ),
                                         'attributes' => array(
                                             'id' => 'id_pros_message',
@@ -250,8 +271,6 @@ return array(
                                         ),
                                     ),
                                 ),
-
-                
                             ),// end elements
                             'input_filter' => array(
                                 'pros_id' => array(
@@ -274,7 +293,7 @@ return array(
                 
                                 'pros_name' => array(
                                     'name'     => 'pros_name',
-                                    'required' => true,
+                                    'required' => false,
                                     'validators' => array(
                                         array(
                                             'name'    => 'StringLength',
@@ -303,7 +322,7 @@ return array(
                                 ),
                                 'pros_email' => array(
                                     'name'     => 'pros_email',
-                                    'required' => true,
+                                    'required' => false,
                                     'validators' => array(
                                         array(
                                             'name' => 'EmailAddress',
@@ -342,7 +361,7 @@ return array(
                                 ),
                                 'pros_telephone' => array(
                                     'name'     => 'pros_telephone',
-                                    'required' => true,
+                                    'required' => false,
                                     'validators' => array(
                                         array(
                                             'name'    => 'regex', false,
@@ -396,16 +415,8 @@ return array(
                                 ),
                                 'pros_message' => array(
                                     'name'     => 'pros_message',
-                                    'required' => true,
+                                    'required' => false,
                                     'validators' => array(
-//                                         array(
-//                                             'name'    => 'StringLength',
-//                                             'options' => array(
-//                                                 'encoding' => 'UTF-8',
-//                                                 'min'      => 1,
-//                                                 //'max'      => 255,
-//                                             ),
-//                                         ),
                                         array(
                                             'name' => 'NotEmpty',
                                             'options' => array(
@@ -426,6 +437,312 @@ return array(
                         ),
                     ), // end forms
                 ), // end melistoolprospects_tool_prospects
+                'melistoolprospects_tool_prospects_themes' => array(
+                    'conf' => array(
+                        'title' => 'tr_melis_cms_prospects_theme',
+                        'id' => 'id_melistoolprospects_tool_prospects_themes',
+                    ),
+                    // configure and control the view of the table if you want to use datatable
+                    'table' => array(
+                        // table ID
+                        'target' => '#tableToolProspectsTheme',
+                        'ajaxUrl' => '/melis/MelisCmsProspects/ProspectThemes/getData',
+                        'dataFunction' => '',
+                        'ajaxCallback' => '',
+                        'filters' => array(
+                            'left' => array(
+                                'tool-prospect-themes-limit' => array(
+                                    'module' => 'MelisCmsProspects',
+                                    'controller' => 'ProspectThemes',
+                                    'action' => 'limit'
+                                ),
+                            ),
+                            'center' => array(
+                                'tool-prospect-themes-search' => array(
+                                    'module' => 'MelisCmsProspects',
+                                    'controller' => 'ProspectThemes',
+                                    'action' => 'search'
+                                ),
+                            ),
+                            'right' => array(
+                                'tool-prospect-themes-refresh' => array(
+                                    'module' => 'MelisCmsProspects',
+                                    'controller' => 'ProspectThemes',
+                                    'action' => 'refresh'
+                                ),
+                            ),
+                        ),
+                        'columns' => array(
+                            'pros_theme_id' => array(
+                                'text' => 'tr_melis_cms_prospects_theme_pros_theme_id',
+                                'css' => array('width' => '20%', 'padding-right' => '0'),
+                                'sortable' => true,
+
+                            ),
+//                             'pros_theme_code' => array(
+//                                 'text' => 'tr_melis_cms_prospects_theme_pros_theme_code',
+//                                 'css' => array('width' => '30%', 'padding-right' => '0'),
+//                                 'sortable' => true,
+
+//                             ),
+                            'pros_theme_name' => array(
+                                'text' => 'tr_melis_cms_prospects_theme_pros_theme_name',
+                                'css' => array('width' => '30%', 'padding-right' => '0'),
+                                'sortable' => true,
+
+                            ),
+                        ), // end columns
+
+                        // define what columns can be used in searching
+                        'searchables' => array('pros_theme_id', 'pros_theme_code', 'pros_theme_name'),
+
+                        'actionButtons' => array(
+                            'item_list' => array(
+                                'module' => 'MelisCmsProspects',
+                                'controller' => 'ProspectThemes',
+                                'action' => 'item-list',
+                            ),
+                            'edit' => array(
+                                'module' => 'MelisCmsProspects',
+                                'controller' => 'ProspectThemes',
+                                'action' => 'edit',
+                            ),
+                            'delete' => array(
+                                'module' => 'MelisCmsProspects',
+                                'controller' => 'ProspectThemes',
+                                'action' => 'delete',
+                            ),
+                        )
+                    ),
+                    'export' => array(),
+                    'forms' => array(
+                        'prospects_theme_form' => array(
+                            'attributes' => array(
+                                'name' => 'prospects_theme_form',
+                                'id' => 'prospects_theme_form',
+                                'method' => 'POST',
+                                'action' => '',
+                            ),
+                            'hydrator'  => 'Zend\Stdlib\Hydrator\ArraySerializable',
+                            'elements' => array(
+                                array(
+                                    'spec' => array(
+                                        'name' => 'pros_theme_id',
+                                        'type' => 'MelisText',
+                                        'options' => array(
+                                            'label' => 'tr_melistoolprospects_prospects_common_pros_id',
+                                            'tooltip' => 'tr_melistoolprospects_prospects_theme_id tooltip',
+                                        ),
+                                        'attributes' => array(
+                                            'id' => 'pros_theme_id',
+                                            'value' => '',
+                                            'disabled' => 'disabled',
+                                        ),
+                                    ),
+                                ),
+                                array(
+                                    'spec' => array(
+                                        'name' => 'pros_theme_name',
+                                        'type' => 'MelisText',
+                                        'options' => array(
+                                            'label' => 'tr_melis_cms_prospects_theme_pros_theme_name',
+                                            'tooltip' => 'tr_melis_cms_prospects_theme_pros_theme_name tooltip',
+                                        ),
+                                        'attributes' => array(
+                                            'id' => 'pros_theme_name',
+                                            'value' => '',
+                                            'placeholder' => 'tr_melis_cms_prospects_theme_pros_theme_name',
+                                        ),
+                                    ),
+                                ),
+                            ),
+                            'input_filter' => array(
+                                'pros_theme_id' => array(
+                                    'name'     => 'pros_theme_id',
+                                    'required' => false,
+                                    'validators' => array(
+                                        array(
+                                            'name'    => 'IsInt',
+                                            'options' => array(
+                                                'messages' => array(
+                                                    \Zend\I18n\Validator\IsInt::NOT_INT => 'tr_melis_cms_prospects_theme_pros_theme_id_invalid',
+                                                    \Zend\I18n\Validator\IsInt::INVALID => 'tr_melis_cms_prospects_theme_pros_theme_id_invalid',
+                                                )
+                                            )
+                                        ),
+                                    ),
+                                    'filters' => array(
+                                        array('name' => 'StripTags'),
+                                        array('name' => 'StringTrim'),
+                                    ),
+                                ),
+                                'pros_theme_name' => array(
+                                    'name'     => 'pros_theme_name',
+                                    'required' => true,
+                                    'validators' => array(
+                                        array(
+                                            'name'    => 'StringLength',
+                                            'options' => array(
+                                                'encoding' => 'UTF-8',
+                                                //'min'      => 1,
+                                                'max'      => 45,
+                                                'messages' => array(
+                                                    \Zend\Validator\StringLength::TOO_LONG => 'tr_melis_cms_prospects_theme_name_long',
+                                                ),
+                                            ),
+                                        ),
+                                        array(
+                                            'name' => 'NotEmpty',
+                                            'options' => array(
+                                                'messages' => array(
+                                                    \Zend\Validator\NotEmpty::IS_EMPTY => 'tr_melis_cms_prospects_theme_name_empty',
+                                                ),
+                                            ),
+                                        ),
+                                    ),
+                                    'filters'  => array(
+                                        array('name' => 'StripTags'),
+                                        array('name' => 'StringTrim'),
+                                    ),
+                                ),
+                            )
+                        )
+                    )
+                ),
+                'melistoolprospects_tool_prospects_theme_items' => array(
+                    'conf' => array(
+                        'title' => 'tr_melis_cms_prospects_theme',
+                        'id' => 'id_melistoolprospects_tool_prospects_themes',
+                    ),
+                    // configure and control the view of the table if you want to use datatable
+                    'table' => array(
+                        // table ID
+                        'target' => '#tableToolProspectsThemeItems',
+                        'ajaxUrl' => '/melis/MelisCmsProspects/ProspectThemeItems/getItemData',
+                        'dataFunction' => 'setThemeId',
+                        'ajaxCallback' => '',
+                        'filters' => array(
+                            'left' => array(
+                                'tool-prospect-theme-items-limit' => array(
+                                    'module' => 'MelisCmsProspects',
+                                    'controller' => 'ProspectThemeItems',
+                                    'action' => 'limit'
+                                ),
+                            ),
+                            'center' => array(
+                                'tool-prospect-theme-items-search' => array(
+                                    'module' => 'MelisCmsProspects',
+                                    'controller' => 'ProspectThemeItems',
+                                    'action' => 'search'
+                                ),
+                            ),
+                            'right' => array(
+                                'tool-prospect-theme-items-refresh'=> array(
+                                    'module' => 'MelisCmsProspects',
+                                    'controller' => 'ProspectThemeItems',
+                                    'action' => 'refresh'
+                                ),
+                            ),
+                        ),
+                        'columns' => array(
+                            'pros_theme_item_id' => array(
+                                'text' => 'tr_melis_cms_prospects_theme_items_pros_theme_item_id',
+                                'css' => array('width' => '30%', 'padding-right' => '0'),
+                                'sortable' => true,
+
+                            ),
+//                             'pros_theme_item_code' => array(
+//                                 'text' => 'tr_melis_cms_prospects_theme_pros_theme_code',
+//                                 'css' => array('width' => '30%', 'padding-right' => '0'),
+//                                 'sortable' => true,
+
+//                             ),
+                           'item_trans_text' => array(
+                               'text' => 'tr_melis_cms_prospects_theme_items_pros_theme_item_text2',
+                               'css' => array('width' => '30%', 'padding-right' => '0'),
+                               'sortable' => true,
+
+                           ),
+                        ), // end columns
+
+                        // define what columns can be used in searching
+                        'searchables' => array('pros_theme_item_id', 'item_trans_text'),
+
+                        'actionButtons' => array(
+                            'edit' => array(
+                                'module' => 'MelisCmsProspects',
+                                'controller' => 'ProspectThemeItems',
+                                'action' => 'edit',
+                            ),
+                            'delete' => array(
+                                'module' => 'MelisCmsProspects',
+                                'controller' => 'ProspectThemeItems',
+                                'action' => 'delete',
+                            ),
+                        )
+                    ),
+                    'export' => array(),
+                    'forms' => array(
+                        'prospects_theme_item_form' => array(
+                            'attributes' => array(
+                                'name' => 'prospects_theme_item_form',
+                                'id' => 'prospects_theme_item_form',
+                                'method' => 'POST',
+                                'action' => '',
+                            ),
+                            'hydrator'  => 'Zend\Stdlib\Hydrator\ArraySerializable',
+                            'elements' => array(
+                                array(
+                                    'spec' => array(
+                                        'name' => 'item_trans_id',
+                                        'type' => 'hidden',
+                                        'options' => array(
+                                            'label' => '',
+                                        ),
+                                        'attributes' => array(),
+                                    ),
+                                ),
+                                array(
+                                    'spec' => array(
+                                        'name' => 'item_trans_text',
+                                        'type' => 'MelisText',
+                                        'options' => array(
+                                            'label' => 'tr_melis_cms_prospects_theme_items_pros_theme_item_text',
+                                            'tooltip' => 'tr_melis_cms_prospects_theme_items_pros_theme_item_text tooltip',
+                                        ),
+                                        'attributes' => array(
+                                            'id' => 'pros_theme_item_code',
+                                            'value' => '',
+                                            'placeholder' => '',
+                                        ),
+                                    ),
+                                ),
+                                array(
+                                    'spec' => array(
+                                        'name' => 'item_trans_theme_item_id',
+                                        'type' => 'hidden',
+                                        'options' => array(
+                                            'label' => '',
+                                        ),
+                                        'attributes' => array(
+                                        ),
+                                    ),
+                                ),
+                                array(
+                                    'spec' => array(
+                                        'name' => 'item_trans_lang_id',
+                                        'type' => 'hidden',
+                                        'options' => array(
+                                            'label' => '',
+                                        ),
+                                        'attributes' => array(
+                                        ),
+                                    ),
+                                ),
+                            )
+                        )
+                    )
+                ),
             ),
         ),
     ),

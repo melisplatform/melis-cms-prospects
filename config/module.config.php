@@ -59,19 +59,29 @@ return array(
         ),
         'factories' => array(
             'MelisProspectsService' => 'MelisCmsProspects\Service\Factory\MelisCmsProspectsServiceFactory',
-            
             'MelisCmsProspects\Model\Tables\MelisProspectTable' => 'MelisCmsProspects\Model\Tables\Factory\MelisProspectsTableFactory',
+            'MelisCmsProspectsThemeTable'     => 'MelisCmsProspects\Model\Tables\Factory\MelisCmsProspectsThemeTableFactory',
+            'MelisCmsProspectsThemeItemTable' => 'MelisCmsProspects\Model\Tables\Factory\MelisCmsProspectsThemeItemTableFactory',
+            'MelisCmsProspectsThemeItemTransTable' => 'MelisCmsProspects\Model\Tables\Factory\MelisCmsProspectsThemeItemTransTableFactory',
         ),
     ),
     'controllers' => array(
         'invokables' => array(
-            'MelisCmsProspects\Controller\ToolProspects' => 'MelisCmsProspects\Controller\ToolProspectsController',
-            'MelisCmsProspects\Controller\Dashboard' => 'MelisCmsProspects\Controller\DashboardController',
+            'MelisCmsProspects\Controller\Dashboard'        => 'MelisCmsProspects\Controller\DashboardController',
+            'MelisCmsProspects\Controller\ProspectThemes' => 'MelisCmsProspects\Controller\MelisCmsProspectsThemesController',
+            'MelisCmsProspects\Controller\ProspectThemeItems' => 'MelisCmsProspects\Controller\MelisCmsProspectsThemeItemsController',
+            'MelisCmsProspects\Controller\ToolProspects'    => 'MelisCmsProspects\Controller\ToolProspectsController',
         ),
     ),
     'controller_plugins' => array(
         'invokables' => array(
             'MelisCmsProspectsShowFormPlugin' => 'MelisCmsProspects\Controller\Plugin\MelisCmsProspectsShowFormPlugin'
+        ),
+    ),
+    'form_elements' => array(
+        'factories' => array(
+            'MelisCmsProspectThemeSelect' => 'MelisCmsProspects\Form\Factory\ProspectThemeSelectFactory',
+            'MelisCmsProspectThemeItemSelect' => 'MelisCmsProspects\Form\Factory\ProspectThemeItemSelectFactory',
         ),
     ),
     'view_manager' => array(
@@ -80,19 +90,14 @@ return array(
         'doctype'                  => 'HTML5',
         'template_map' => array(
             'MelisCmsProspects/prospects-form' => __DIR__ . '/../view/melis-cms-prospects/plugins/prospects-form.phtml',
+            'MelisCmsProspects/prospects-form/melis/form_tab1' => __DIR__ . '/../view/melis-cms-prospects/plugins/prospect-melis-modal-form-tab-1.phtml',
+            'MelisCmsProspects/prospects-form/melis/form_tab2' => __DIR__ . '/../view/melis-cms-prospects/plugins/prospect-melis-modal-form-tab-2.phtml',
         ),
         'template_path_stack' => array(
             __DIR__ . '/../view',
         ),
         'strategies' => array(
             'ViewJsonStrategy',
-        ),
-    ),
-    'asset_manager' => array(
-        'resolver_configs' => array(
-            'aliases' => array(
-                'MelisCmsProspects/' => __DIR__ . '/../public/',
-            ),
         ),
     ),
 );

@@ -22,6 +22,11 @@ return array(
 		        			    				'type' => '/MelisCmsProspects/interface/MelisCmsProspects_toolstree/interface/MelisCmsProspects_tool_conf',
 		        			    			),
 		        			    		),
+                                        'MelisCmsProspects_tool_prospects_themes' => array(
+                                            'conf' => array(
+                                                'type' => '/MelisCmsProspects/interface/MelisCmsProspects_toolstree/interface/MelisCmsProspectsThemes_tool_conf',
+                                            ),
+                                        ),
         			    			),
 								),
         			    	),
@@ -59,6 +64,7 @@ return array(
             'ressources' => array(
                 'js' => array(
                     '/MelisCmsProspects/js/tools/prospects.tool.js',
+                    '/MelisCmsProspects/js/tools/prospects.theme.tool.js',
                     // flot charts
                     '/MelisCore/assets/components/modules/admin/charts/flot/assets/lib/excanvas.js?v=v1.2.3',
                     '/MelisCore/assets/components/modules/admin/charts/flot/assets/lib/jquery.flot.js?v=v1.2.3',
@@ -91,6 +97,7 @@ return array(
                                 'melisKey' => 'MelisCmsProspects_tool_prospects',
                             	'icon' => 'fa-list-ol',
 								'rights_checkbox_disable' => true,
+                                'follow_regular_rendering' => false,
                             ),
                             'forward' => array(
                                 'module' => 'MelisCmsProspects',
@@ -114,22 +121,6 @@ return array(
                                         'jsdatas' => array()
                                     ),
                                     'interface' => array(
-
-//                                         'MelisCmsProspects_tool_prospects_header_indicators' => array( // tool header | usually buttons
-//                                             'conf' => array(
-//                                                 'id' => 'id_MelisCmsProspects_tool_prospects_header_indicators',
-//                                                 'name' => 'tr_MelisCmsProspects_tool_prospects_header_indicators',
-//                                                 'melisKey' => 'MelisCmsProspects_tool_prospects_header_indicators',
-//                                             ),
-//                                             'forward' => array(
-//                                                 'module' => 'MelisCmsProspects',
-//                                                 'controller' => 'ToolProspects',
-//                                                 'action' => 'render-tool-prospects-header-indicators',
-//                                                 'jscallback' => '',
-//                                                 'jsdatas' => array()
-//                                             ),
-//                                         ),
-                                        
 
                                     ),
                                 ),
@@ -242,40 +233,217 @@ return array(
                                         ),
                                     ),
                                 ),
-                                'MelisCmsProspects_tool_prospects_content_modal' => array( // modals
+                            ),
+                        ), // end prospects tool
+                        'MelisCmsProspectsThemes_tool_conf' => array(
+                            'conf' => array(
+                                'id' => 'id_MelisCmsProspects_tool_themes',
+                                'name' => 'tr_melis_cms_prospects_theme',
+                                'melisKey' => 'MelisCmsProspects_tool_themes',
+                                'icon' => 'fa-pencil',
+                                'rights_checkbox_disable' => true,
+                                'follow_regular_rendering' => false,
+                            ),
+                            'interface' => array(
+                                'MelisCmsProspects_tool_themes' => array(
                                     'conf' => array(
-                                        'id' => 'id_MelisCmsProspects_tool_prospects_modal',
-                                        'name' => 'tr_meliscore_tool_gen_modal',
-                                        'melisKey' => 'MelisCmsProspects_tool_prospects_modal',
+                                        'id' => 'id_MelisCmsProspects_tool_themes',
+                                        'name' => 'tr_melis_cms_prospects_theme',
+                                        'melisKey' => 'MelisCmsProspects_tool_themes',
                                     ),
                                     'forward' => array(
                                         'module' => 'MelisCmsProspects',
-                                        'controller' => 'ToolProspects',
-                                        'action' => 'render-tool-prospects-modal-container',
+                                        'controller' => 'ProspectThemes',
+                                        'action' => 'tool-container',
                                         'jscallback' => '',
                                         'jsdatas' => array()
                                     ),
-                                    'interface' => array( // handles the display and the rights of the modal
-                                        'MelisCmsProspects_tool_prospects_update_modal_content' => array(
+                                    'interface' => array(
+                                        'MelisCmsProspects_tool_themes_header' => array(
                                             'conf' => array(
-                                                'id' => 'id_MelisCmsProspects_tool_prospects_update_modal_content',
-                                                'name' => 'tr_meliscore_tool_gen_save',
-                                                'melisKey' => 'MelisCmsProspects_tool_prospects_update_modal_content',
+                                                'id' => 'id_MelisCmsProspects_tool_themes_header',
+                                                'name' => 'tr_melis_cms_prospects_theme_header',
+                                                'melisKey' => 'MelisCmsProspects_tool_themes_header',
                                             ),
                                             'forward' => array(
                                                 'module' => 'MelisCmsProspects',
-                                                'controller' => 'ToolProspects',
-                                                'action' => 'render-tool-prospects-modal-update-content',
+                                                'controller' => 'ProspectThemes',
+                                                'action' => 'tool-header',
                                                 'jscallback' => '',
                                                 'jsdatas' => array()
+                                            ),
+                                            'interface' => array(
+                                                'MelisCmsProspects_tool_themes_header_add' => array(
+                                                    'conf' => array(
+                                                        'id' => 'id_MelisCmsProspects_tool_themes_header_add',
+                                                        'name' => 'tr_melis_cms_prospects_theme_new',
+                                                        'melisKey' => 'MelisCmsProspects_tool_themes_header_add',
+                                                    ),
+                                                    'forward' => array(
+                                                        'module' => 'MelisCmsProspects',
+                                                        'controller' => 'ProspectThemes',
+                                                        'action' => 'tool-header-add',
+                                                        'jscallback' => '',
+                                                        'jsdatas' => array()
+                                                    ),
+                                                )
                                             )
                                         ),
-                        
+                                        'MelisCmsProspects_tool_themes_content' => array(
+                                            'conf' => array(
+                                                'id' => 'id_MelisCmsProspects_tool_themes_content',
+                                                'name' => 'tr_melis_cms_prospects_theme_content',
+                                                'melisKey' => 'MelisCmsProspects_tool_themes_content_themes_content',
+                                            ),
+                                            'forward' => array(
+                                                'module' => 'MelisCmsProspects',
+                                                'controller' => 'ProspectThemes',
+                                                'action' => 'tool-content',
+                                                'jscallback' => '',
+                                                'jsdatas' => array()
+                                            ),
+                                        ),
+                                        'MelisCmsProspects_tool_themes_modal_container' => array(
+                                            'conf' => array(
+                                                'id'   => 'id_MelisCmsProspects_tool_themes_modal_container',
+                                                'name' => 'tr_melis_cms_prospects_theme_modal',
+                                                'melisKey' => 'MelisCmsProspects_tool_themes_modal_container',
+                                            ),
+                                            'forward' => array(
+                                                'module' => 'MelisCmsProspects',
+                                                'controller' => 'ProspectThemes',
+                                                'action' => 'tool-modal-container',
+                                                'jscallback' => '',
+                                                'jsdatas' => array()
+                                            ),
+                                            'interface' => array(
+                                                'MelisCmsProspects_tool_themes_modal_content' => array(
+                                                    'conf' => array(
+                                                        'id' => 'id_MelisCmsProspects_tool_themes_modal_content',
+                                                        'melisKey' => 'MelisCmsProspects_tool_themes_modal_content',
+                                                        'name' => 'tr_melis_cms_prospects_theme_modal'
+                                                    ),
+                                                    'forward' => array(
+                                                        'module' => 'MelisCmsProspects',
+                                                        'controller' => 'ProspectThemes',
+                                                        'action' => 'tool-modal-content',
+                                                        'jscallback' => '',
+                                                        'jsdatas' => array()
+                                                    ),
+                                                )
+                                            )
+                                        ),
+                                    )
+                                ),
+                                // end theme tool
+                                'MelisCmsProspects_tool_theme_items' => array(
+                                    'conf' => array(
+                                        'id' => 'id_MelisCmsProspects_tool_theme_items',
+                                        'name' => 'tr_melis_cms_prospects_theme_items',
+                                        'melisKey' => 'MelisCmsProspects_tool_theme_items',
+                                    ),
+                                    'forward' => array(
+                                        'module' => 'MelisCmsProspects',
+                                        'controller' => 'ProspectThemeItems',
+                                        'action' => 'tool-container',
+                                        'jscallback' => '',
+                                        'jsdatas' => array()
+                                    ),
+                                    'interface' => array(
+                                        'MelisCmsProspects_tool_theme_items_header' => array(
+                                            'conf' => array(
+                                                'id' => 'id_MelisCmsProspects_tool_theme_items_header',
+                                                'name' => 'tr_melis_cms_prospects_theme_items_header',
+                                                'melisKey' => 'MelisCmsProspects_tool_theme_items_header',
+                                            ),
+                                            'forward' => array(
+                                                'module' => 'MelisCmsProspects',
+                                                'controller' => 'ProspectThemeItems',
+                                                'action' => 'tool-header',
+                                                'jscallback' => '',
+                                                'jsdatas' => array()
+                                            ),
+                                            'interface' => array(
+                                                'MelisCmsProspects_tool_themes_items_header_add' => array(
+                                                    'conf' => array(
+                                                        'id' => 'id_MelisCmsProspects_tool_themes_items_header_add',
+                                                        'name' => 'tr_melis_cms_prospects_theme_items_add',
+                                                        'melisKey' => 'MelisCmsProspects_tool_themes_items_header_add',
+                                                    ),
+                                                    'forward' => array(
+                                                        'module' => 'MelisCmsProspects',
+                                                        'controller' => 'ProspectThemeItems',
+                                                        'action' => 'tool-header-add',
+                                                        'jscallback' => '',
+                                                        'jsdatas' => array()
+                                                    ),
+                                                )
+                                            )
+                                        ),
+                                        'MelisCmsProspects_tool_theme_items_content' => array(
+                                            'conf' => array(
+                                                'id' => 'id_MelisCmsProspects_tool_theme_items_content',
+                                                'name' => 'tr_melis_cms_prospects_theme_items_header',
+                                                'melisKey' => 'MelisCmsProspects_tool_theme_items_content',
+                                            ),
+                                            'forward' => array(
+                                                'module' => 'MelisCmsProspects',
+                                                'controller' => 'ProspectThemeItems',
+                                                'action' => 'tool-content',
+                                                'jscallback' => '',
+                                                'jsdatas' => array()
+                                            ),
+                                        ),
                                     ),
                                 ),
-                        
+                                // end theme item tool
+
+                            )
+                        )
+                    ),
+                ),
+                'MelisCmsProspects_tool_prospects_content_modal' => array( // modals
+                    'conf' => array(
+                        'id' => 'id_MelisCmsProspects_tool_prospects_modal',
+                        'name' => 'tr_meliscore_tool_gen_modal',
+                        'melisKey' => 'MelisCmsProspects_tool_prospects_modal',
+                    ),
+                    'forward' => array(
+                        'module' => 'MelisCmsProspects',
+                        'controller' => 'ToolProspects',
+                        'action' => 'render-tool-prospects-modal-container',
+                        'jscallback' => '',
+                        'jsdatas' => array()
+                    ),
+                    'interface' => array( // handles the display and the rights of the modal
+                        'MelisCmsProspects_tool_prospects_update_modal_content' => array(
+                            'conf' => array(
+                                'id' => 'id_MelisCmsProspects_tool_prospects_update_modal_content',
+                                'name' => 'tr_meliscore_tool_gen_save',
+                                'melisKey' => 'MelisCmsProspects_tool_prospects_update_modal_content',
                             ),
-                        ), // end prospects tool
+                            'forward' => array(
+                                'module' => 'MelisCmsProspects',
+                                'controller' => 'ToolProspects',
+                                'action' => 'render-tool-prospect-update-form',
+                                'jscallback' => 'initProspectEditor();',
+                                'jsdatas' => array()
+                            )
+                        ),
+                        'MelisCmsProspects_tool_theme_items_modal_content' => array(
+                            'conf' => array(
+                                'id' => 'id_MelisCmsProspects_tool_theme_items_modal_content',
+                                'melisKey' => 'MelisCmsProspects_tool_theme_items_modal_content',
+                                'name' => 'tr_melis_cms_prospects_theme_items_modal_content'
+                            ),
+                            'forward' => array(
+                                'module' => 'MelisCmsProspects',
+                                'controller' => 'ProspectThemeItems',
+                                'action' => 'tool-modal-content',
+                                'jscallback' => '',
+                                'jsdatas' => array()
+                            ),
+                        ),
                     ),
                 ),
             ),

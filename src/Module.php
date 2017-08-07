@@ -29,24 +29,28 @@ class Module
         $moduleRouteListener = new ModuleRouteListener();
         $moduleRouteListener->attach($eventManager);
         
+        $moduleName = null;
+        
         $sm = $e->getApplication()->getServiceManager();
         $routeMatch = $sm->get('router')->match($sm->get('request'));
         
         if (!empty($routeMatch))
         {
             $routeName = $routeMatch->getMatchedRouteName();
-            $module = explode('/', $routeName);
+            $moduleName = explode('/', $routeName);
             
-            if (!empty($module[0]))
+            if (!empty($moduleName[0]))
 	        {
-	            $this->createTranslations($e, $module[0]);
+	            $this->createTranslations($e, $moduleName[0]);
 	            
-		        if ($module[0] == 'melis-backoffice')
+		        if ($moduleName[0] == 'melis-backoffice')
 		        {
                     $eventManager->attach(new MelisCmsProspectFlashMessengerListener());
                     
 		        }
 	        }
+        }else{
+            $this->createTranslations($e, $moduleName);
         }
     }
     
@@ -59,10 +63,16 @@ class Module
     	$config = array();
     	$configFiles = array(
 			include __DIR__ . '/../config/module.config.php',
+
+    	    // interface design Melis
 			include __DIR__ . '/../config/app.interface.php',
-			include __DIR__ . '/../config/diagnostic.config.php',
     	    include __DIR__ . '/../config/app.tools.php',
-    	    include __DIR__ . '/../config/app.plugins.php',
+    	    
+    	    // Tests
+			include __DIR__ . '/../config/diagnostic.config.php',
+    	    
+    	    // Templating plugins
+    	    include __DIR__ . '/../config/plugins/MelisCmsProspectsShowFormPlugin.config.php',
     	);
     	
     	foreach ($configFiles as $file) {

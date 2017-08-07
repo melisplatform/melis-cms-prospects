@@ -1,19 +1,43 @@
-<div id="prospectupdateformalert"></div>
-<span id="prosid" style="display:none"></span>
 <?php 
-$form = $this->melistoolprospects_tool_prospect_form;
-echo $this->form()->openTag($form);
-echo $this->melisFieldCollection($form);
-echo $this->form()->closeTag();
-?>
+$id = '';
+if (!empty($this->zoneconfig['conf']['id']))
+    $id = $this->zoneconfig['conf']['id'];
+    $data_melisKey = $this->melisKey;
 
+    ?>
 
-<?php 
-echo $this->melisModalInvoker()->render(
-    array(
-        'text' => '<i class="fa fa-times"></i> '.$this->translate('tr_melistoolprospects_common_close'),
-        'class' => 'btn btn-danger pull-left'
-    ), 'dismiss');
-?>
-
-<a href="#modal-template-manager-actions" class="btn btn-success pull-right" onclick="toolProspects.updateProspectData()" id="btnProspectUpdate"><i class="fa fa-save"></i>  <?= $this->translate('tr_tool_text_prospect_manager_update'); ?></a>
+<div class="modal-content">
+	<div class="modal-body padding-none">
+		<div class="wizard">
+			<div class="widget widget-tabs widget-tabs-double widget-tabs-responsive margin-none border-none">
+                <div class="widget-head">
+                	<ul class="nav nav-tabs">
+                		<li class="active"><a href="#<?php echo $this->zoneconfig['conf']['id'] ?>" class="glyphicons notes" data-toggle="tab" aria-expanded="true"><i></i><?php echo $this->title; ?>  
+                		</a></li>
+            		</ul>
+        		</div>
+        		<div class="widget-body innerAll inner-2x">
+        			<div class="tab-content">
+        				<div class="tab-pane active" id="<?= $id ?>">
+                            <div class="row">
+                            	<div class="col-md-12" id="prospectDetails">
+                            		<p class="modal-text-info"><?= $this->translate('tr_melistoolprospects_tool_prospects_modal_description'); ?></p>
+                                     	<?php 
+                                            $form = $this->form;
+                                            echo $this->form()->openTag($form);
+                                            echo $this->melisFieldCollection($form);
+                                            echo $this->form()->closeTag();
+                                        ?>
+                                 	<div align="right">
+                                 		<button data-dismiss="modal" class="btn btn-danger pull-left"><i class="fa fa-times"></i> <?php echo $this->translate('tr_melistoolprospects_common_close')?></button>
+                                 		<button class="btn btn-success" id="btnProspectUpdate" onclick="toolProspects.updateProspectData()" data-detailid="<?= $this->detailid?>"><i class="fa fa-save"></i>  <?php echo $this->translate('tr_tool_text_prospect_manager_update') ?></button>
+                                 	</div>                                 	
+                            	</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

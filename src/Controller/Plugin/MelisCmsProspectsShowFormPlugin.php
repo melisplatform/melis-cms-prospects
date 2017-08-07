@@ -10,22 +10,24 @@
 namespace MelisCmsProspects\Controller\Plugin;
 
 use MelisEngine\Controller\Plugin\MelisTemplatingPlugin;
-
+use Zend\View\Model\ViewModel;
+use Zend\View\Model\JsonModel;
+use Zend\Stdlib\ArrayUtils;
+use Zend\Session\Container;
 /**
  * This plugin implements the business logic of the
  * "prospectsForm" plugin.
- * 
+ *
  * Please look inside app.plugins.php for possible awaited parameters
  * in front and back function calls.
- * 
+ *
  * front() and back() are the only functions to create / update.
  * front() generates the website view
- * back() generates the plugin view in template edition mode (TODO)
- * 
+ *
  * Configuration can be found in $pluginConfig / $pluginFrontConfig / $pluginBackConfig
  * Configuration is automatically merged with the parameters provided when calling the plugin.
  * Merge detects automatically from the route if rendering must be done for front or back.
- * 
+ *
  * How to call this plugin without parameters:
  * $plugin = $this->MelisCmsProspectsShowFormPlugin();
  * $pluginView = $plugin->render();
@@ -36,18 +38,25 @@ use MelisEngine\Controller\Plugin\MelisTemplatingPlugin;
  *      'template_path' => 'MySiteTest/contactus/prospectsForm'
  * );
  * $pluginView = $plugin->render($parameters);
- * 
+ *
  * How to add to your controller's view:
  * $view->addChild($pluginView, 'prospectsForm');
- * 
+ *
  * How to display in your controller's view:
  * echo $this->prospectsForm;
  */
 class MelisCmsProspectsShowFormPlugin extends MelisTemplatingPlugin
 {
-    // the key of the configuration in the app.plugins.php
-    public $configPluginKey = 'meliscmsprospects';
-    
+
+
+    public function __construct($updatesPluginConfig = array())
+    {
+        $this->configPluginKey = 'meliscmsprospects';
+        $this->pluginXmlDbKey = 'melisCmsProspects';
+        parent::__construct($updatesPluginConfig);
+    }
+
+
     /**
      * This function gets the datas and create an array of variables
      * that will be associated with the child view generated.
@@ -55,56 +64,169 @@ class MelisCmsProspectsShowFormPlugin extends MelisTemplatingPlugin
     public function front()
     {
         $translator = $this->getServiceLocator()->get('translator');
-        
+
         $appConfigForm = (!empty($this->pluginFrontConfig['forms']['contact_us'])) ? $this->pluginFrontConfig['forms']['contact_us'] : array();
-        
-        $factory = new \Zend\Form\Factory();
+        $factory       = new \Zend\Form\Factory();
+
+        $config = $this->pluginFrontConfig;
+        $theme  = '';
+        if(!empty($config)) {
+            $fields    = $config['fields'] ? explode(',', $config['fields']) : array();
+            $theme     = $config['theme'];
+            $elements  = $appConfigForm['elements'];
+            $validator = $appConfigForm['input_filter'];
+
+            $tmpAppConfigForm = [];
+            foreach($elements as $spec => $element) {
+                $elName = $element['spec']['name'];
+                if(in_array($elName, $fields)) {
+                    $tmpAppConfigForm['elements'][] = $element;
+                }
+            }
+
+            foreach($validator as $input => $validation) {
+                if(in_array($input, $fields)) {
+                    $tmpAppConfigForm['input_filter'][$input] = $validation;
+                }
+            }
+
+            // rearrange fields
+            if(!empty($fields)) {
+                $tmp = [];
+                foreach($fields as $idx => $name) {
+                    foreach($tmpAppConfigForm['elements'] as $elIdx => $spec) {
+                        $elementName = $spec['spec']['name'];
+                        if($name == $elementName) {
+                            $tmp[] = $spec;
+                        }
+                    }
+                }
+                $tmpAppConfigForm['elements'] = $tmp;
+            }
+
+            $appConfigForm['elements']     = isset($tmpAppConfigForm['elements']) ? $tmpAppConfigForm['elements'] : $appConfigForm['elements'];
+            $appConfigForm['input_filter'] = isset($tmpAppConfigForm['input_filter']) ? $tmpAppConfigForm['input_filter'] : $appConfigForm['input_filter'];
+
+        }
+
         $formElements = $this->getServiceLocator()->get('FormElementManager');
         $factory->setFormElementManager($formElements);
         $prospectsForm = $factory->createForm($appConfigForm);
-        
-        // Get the parameters and config from $this->pluginFrontConfig (default > hardcoded > get > post)
-        $post = (!empty($this->pluginFrontConfig['post'])) ? $this->pluginFrontConfig['post'] : array();
-        
+
+        $themeItemTable = $this->getServiceLocator()->get('MelisCmsProspectsThemeItemTable');
+        $container = new Container('melisplugins');
+
+        /**
+         * Checking if the Theme field is included to Form Fields
+         */
+        if (in_array('pros_theme', $fields)){
+            $temp       =  $themeItemTable->getItemByThemeId($theme, (int) $container['melis-plugins-lang-id'], true);
+            $data = array();
+            foreach($temp as $item){
+                $i = $item;
+                if(empty($item->item_trans_text)){
+                    $i = $themeItemTable->getItemById(
+                        $item->pros_theme_item_id,
+                        null,
+                        true
+                        )->current();
+                }
+                $data[] = $i;
+            }
+            $prospectsForm->get('pros_theme')->loadValueOptions($data, true);
+        }
+
         $success = 0;
         $errors = array();
-        if (!empty($post))
-        {
-            $prospectsForm->setData($post);
-            if($prospectsForm->isValid())
+
+        // form submission
+        $request  = $this->getServiceLocator()->get('request');
+        
+        if($request->isPost()) {
+            
+            $post = get_object_vars($request->getPost());
+            
+            // to avoid conflict in melis edition mode
+            if (!empty($post))
             {
-                // Preparing the Datas that required for adding prospects
-                $post['pros_societe'] = $post['pros_company'];
-                $post['pros_contact_date'] = date('Y-m-d H:i:s');
-                $post['pros_theme'] = $translator->translate('tr_contactus_'.$post['pros_theme']);
-
-                unset($post['pros_company']);
-                unset($post['pros_country']);
-
-                // Saving the Prospects from Contactus form using the Prospects Service
-                $prospectService = $this->getServiceLocator()->get('MelisProspectsService');
-                $responseData = $prospectService->saveProspectsDatas($post);
-
-                $success = 1;
-            }
-            else
-            {
-                $errors = $prospectsForm->getMessages();
-                
-                $appConfigForm = $appConfigForm['elements'];
-                foreach ($errors as $keyError => $valueError)
+                /**
+                 * Checking if the posted fields are the same
+                 * with the fields set for plugin form
+                 * if arrays are match the action would be consider as
+                 * form submission from the front page
+                 */
+                $postedFields = array();
+                foreach ($post As $key => $val)
                 {
-                    foreach ($appConfigForm as $keyForm => $valueForm)
+                    array_push($postedFields, $key);
+                }
+                
+                if ($postedFields == $fields|| empty($fields))
+                {
+                    $prospectsForm->setData($post);
+                    
+                    $requiredFields = $this->pluginFrontConfig['required_fields'] ? explode(',', $this->pluginFrontConfig['required_fields']) : array();
+                    foreach ($prospectsForm->getElements() As $key => $val)
                     {
-                        if ($valueForm['spec']['name'] == $keyError && !empty($valueForm['spec']['options']['label']))
+                        if (!in_array($key, $requiredFields))
                         {
-                            $errors[$keyError]['label'] = $translator->translate($valueForm['spec']['options']['label']);
+                            $prospectsForm->getInputFilter()->remove($key);
                         }
                     }
                     
-                    foreach ($valueError As $evKey => $evVal)
+                    if($prospectsForm->isValid())
                     {
-                        $errors[$keyError][$evKey] = $translator->translate($evVal);
+                        $siteId = null;
+                        
+                        /**
+                         * Getting the current page id
+                         */
+                        $pageId = (!empty($this->getFormData()['pageId'])) ? $this->getFormData()['pageId'] :$this->getController()->params()->fromRoute('idpage');
+                        
+                        $pageTreeService = $this->getServiceLocator()->get('MelisEngineTree');
+                        $site = $pageTreeService->getSiteByPageId($pageId);
+                        
+                        if (!empty($site))
+                        {
+                            $siteId = $site->site_id;
+                        }
+                        
+                        // Preparing the Datas that required for adding prospects
+                        $post['pros_contact_date'] = date('Y-m-d H:i:s');
+                        $post['pros_site_id']      = $siteId;
+                        
+                        // Saving the Prospects from Contactus form using the Prospects Service
+                        $prospectService = $this->getServiceLocator()->get('MelisProspectsService');
+                        $responseData = $prospectService->saveProspectsDatas($post);
+                        
+                        // Resting form elements after saving prospects
+                        foreach ($prospectsForm->getElements() As $key => $val)
+                        {
+                            $val->setValue(null);
+                        }
+                        
+                        $success = 1;
+                    }
+                    else
+                    {
+                        $errors = $prospectsForm->getMessages();
+                        
+                        $appConfigForm = $appConfigForm['elements'];
+                        foreach ($errors as $keyError => $valueError)
+                        {
+                            foreach ($appConfigForm as $keyForm => $valueForm)
+                            {
+                                if ($valueForm['spec']['name'] == $keyError && !empty($valueForm['spec']['options']['label']))
+                                {
+                                    $errors[$keyError]['label'] = $translator->translate($valueForm['spec']['options']['label']);
+                                }
+                            }
+                            
+                            foreach ($valueError As $evKey => $evVal)
+                            {
+                                $errors[$keyError][$evKey] = $translator->translate($evVal);
+                            }
+                        }
                     }
                 }
             }
@@ -112,12 +234,269 @@ class MelisCmsProspectsShowFormPlugin extends MelisTemplatingPlugin
         
         // Create an array with the variables that will be available in the view
         $viewVariables = array(
+            'pluginId'      => $this->pluginFrontConfig['id'],
             'prospectsForm' => $prospectsForm,
-            'success' => $success,
-            'errors' => $errors
+            'success'       => $success,
+            'errors'        => $errors,
         );
         
-        // return the variable array and let the view be created
         return $viewVariables;
+    }
+
+    /**
+     * This function generates the form displayed when editing the parameters of the plugin
+     */
+    public function createOptionsForms()
+    {
+        // construct form
+        $factory = new \Zend\Form\Factory();
+        $formElements = $this->getServiceLocator()->get('FormElementManager');
+        $factory->setFormElementManager($formElements);
+        $formConfig = $this->pluginBackConfig['modal_form'];
+        $translator = $this->getServiceLocator()->get('translator');
+
+        $response = [];
+        $render   = [];
+        if (!empty($formConfig)) {
+            foreach ($formConfig as $formKey => $config) {
+                $form = $factory->createForm($config);
+                $request = $this->getServiceLocator()->get('request');
+                $parameters = $request->getQuery()->toArray();
+
+                if (!isset($parameters['validate'])) {
+
+                    $form->setData($this->getFormData());
+                    $viewModelTab = new ViewModel();
+                    $viewModelTab->setTemplate($config['tab_form_layout']);
+                    $viewModelTab->modalForm   = $form;
+                    $viewModelTab->cbElements  = $this->getFormElements();
+                    
+                    if ($formKey == 'plugin_prospect_tab_02')
+                    {
+                        $this->pluginFrontConfig['fields'] = !empty($this->pluginFrontConfig['fields']) ? explode(',', $this->pluginFrontConfig['fields']) : ['pros_name', 'pros_company', 'pros_country', 'pros_telephone', 'pros_email', 'pros_theme', 'pros_message'];
+                        $this->pluginFrontConfig['required_fields'] = $this->pluginFrontConfig['required_fields'] ? explode(',', $this->pluginFrontConfig['required_fields']) : array();
+                    }
+                    
+                    $viewModelTab->frontConfig = $this->pluginFrontConfig;
+
+                    $viewRender = $this->getServiceLocator()->get('ViewRenderer');
+                    $html = $viewRender->render($viewModelTab);
+                    array_push($render, [
+                            'name' => $config['tab_title'],
+                            'icon' => $config['tab_icon'],
+                            'html' => $html
+                        ]
+                    );
+                }
+                else 
+                {
+                    // validate the forms and send back an array with errors by tabs
+                    $post = get_object_vars($request->getPost());
+                    $success = false;
+                    $errors = array();
+                    
+                    if ($formKey == 'plugin_prospect_tab_02')
+                    {
+                        /**
+                         * Checking if has field set as mandatory 
+                         */
+                        if (empty($post['required_fields']))
+                        {
+                            $errors['fields'] = array(
+                                'label' => $translator->translate('tr_melis_cms_prospects_plugin_config_fields'),
+                                'noMandatoryField' => $translator->translate('tr_melis_cms_prospects_plugin_config_no_mandatory'),
+                            );
+                        }
+                        
+                        /**
+                         * Checking if has field shown atleast one
+                         */
+                        if (empty($post['fields']))
+                        {
+                            $err = array(
+                                'label' => $translator->translate('tr_melis_cms_prospects_plugin_config_fields'),
+                                'noMandatoryField' => $translator->translate('tr_melis_cms_prospects_plugin_config_no_field'),
+                            );
+                            
+                            if (!isset($errors['fields']))
+                            {
+                                $errors['fields'] = $err;
+                            }
+                            else 
+                            {
+                                $errors['fields']['noShownField'] = $translator->translate('tr_melis_cms_prospects_plugin_config_no_field');
+                            }
+                        }
+                    }
+                    elseif ($formKey == 'plugin_prospect_tab_03')
+                    {
+                        /**
+                         * Removing validation on theme field if the
+                         * field is set to Hide status
+                         */
+                        if (!empty($post['fields']))
+                        {
+                            if (!in_array('pros_theme', $post['fields']))
+                            {
+                                $form->getInputFilter()->remove('theme');
+                            }
+                        }
+                    }
+                    
+                    $form->setData($post);
+                    
+                    if ($form->isValid()) 
+                    {
+                        if (empty($errors))
+                        {
+                            $elements = isset($post['elements']) ? $post['elements'] : null;
+                            if(!empty($elements)) {
+                                
+                                $tmpEl = '';
+                                foreach($elements as $elementKey => $status) {
+                                    $tmpEl .= $elementKey . '|';
+                                }
+                                $tmpEl    = substr($tmpEl, 0, strlen($tmpEl)-1);
+                                $elements = $tmpEl;
+                                
+                                $success = true;
+                                array_push($response, [
+                                    'name' => $this->pluginBackConfig['modal_form'][$formKey]['tab_title'],
+                                    'success' => $success,
+                                ]);
+                            }
+                        }
+                    } 
+                    else 
+                    {
+                        if (!empty($errors))
+                        {
+                            $errors = ArrayUtils::merge($errors, $form->getMessages());
+                        }
+                        else 
+                        {
+                            $errors = $form->getMessages();
+                        }
+                        
+                        foreach ($errors as $keyError => $valueError) {
+                            foreach ($config['elements'] as $keyForm => $valueForm) {
+                                if ($valueForm['spec']['name'] == $keyError &&
+                                    !empty($valueForm['spec']['options']['label'])
+                                )
+                                    $errors[$keyError]['label'] = $valueForm['spec']['options']['label'];
+                            }
+                        }
+                    }
+                    
+                    if (!empty($errors))
+                    {
+                        array_push($response, [
+                            'name' => $this->pluginBackConfig['modal_form'][$formKey]['tab_title'],
+                            'success' => $success,
+                            'errors' => $errors,
+                            'message' => '',
+                        ]);
+                    }
+                }
+            }
+        }
+
+        if (!isset($parameters['validate'])) 
+        {
+            return $render;
+        }
+        else 
+        {
+            return $response;
+        }
+
+    }
+
+    public function getFormElements()
+    {
+        $form       = $this->pluginFrontConfig['forms']['contact_us'];
+        $elements   = [];
+        $translator = $this->getServiceLocator()->get('translator');
+        foreach($form['elements'] as $spec) {
+            $element = $spec['spec']['name'];
+            $elements[$element] = $translator->translate($spec['spec']['options']['label']);
+        }
+
+        // reconstruct based on their arrangement
+        $frontConfig = $this->pluginFrontConfig;
+        $fields      = $frontConfig['fields'] ? : [];
+
+
+        if(!empty($fields)) {
+            $tmp = [];
+            foreach($fields as $idx => $name) {
+                $tmp[$name] = $elements[$name];
+            }
+            $elements = ArrayUtils::merge($tmp, $elements);
+        }
+
+
+        return $elements;
+    }
+
+    /**
+     * Returns the data to populate the form inside the modals when invoked
+     * @return array|bool|null
+     */
+    public function getFormData()
+    {
+        $data = parent::getFormData();
+        return $data;
+    }
+
+    /**
+     * This method will decode the XML in DB to make it in the form of the plugin config file
+     * so it can overide it. Only front key is needed to update.
+     * The part of the XML corresponding to this plugin can be found in $this->pluginXmlDbValue
+     */
+    public function loadDbXmlToPluginConfig()
+    {
+        $configValues = array();
+        
+        $xml = simplexml_load_string($this->pluginXmlDbValue);
+        if ($xml)
+        {
+            if (!empty($xml->template_path))
+                $configValues['template_path'] = (string)$xml->template_path;
+            if (!empty($xml->fields))
+                $configValues['fields'] = (string)$xml->fields;
+            if (!empty($xml->required_fields))
+                $configValues['required_fields'] = (string)$xml->required_fields;
+            if (!empty($xml->theme))
+                $configValues['theme'] = (string)$xml->theme;
+        }
+        
+        return $configValues;
+    }
+
+    /**
+     * This method saves the XML version of this plugin in DB, for this pageId
+     * Automatically called from savePageSession listenner in PageEdition
+     */
+    public function savePluginConfigToXml($parameters)
+    {
+        $xmlValueFormatted = '';
+        
+        // template_path is mendatory for all plugins
+        if (!empty($parameters['template_path']))
+            $xmlValueFormatted .= "\t\t" . '<template_path><![CDATA[' . $parameters['template_path'] . ']]></template_path>';
+        if(!empty($parameters['fields']))
+            $xmlValueFormatted .= "\t\t" . '<fields><![CDATA['   . implode(',', $parameters['fields']). ']]></fields>';
+        if(!empty($parameters['required_fields']))
+            $xmlValueFormatted .= "\t\t" . '<required_fields><![CDATA['   . implode(',', $parameters['required_fields']) . ']]></required_fields>';
+        if(!empty($parameters['theme']))
+            $xmlValueFormatted .= "\t\t" . '<theme><![CDATA['   . $parameters['theme'] . ']]></theme>';
+        
+        // Something has been saved, let's generate an XML for DB
+        $xmlValueFormatted = "\t" . '<' . $this->pluginXmlDbKey . ' id="' . $parameters['melisPluginId'] . '">' .
+            $xmlValueFormatted .
+            "\t" . '</' . $this->pluginXmlDbKey . '>' . "\n";
+        
+        return $xmlValueFormatted;
     }
 }

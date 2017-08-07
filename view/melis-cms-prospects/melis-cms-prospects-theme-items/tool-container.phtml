@@ -1,0 +1,18 @@
+<?php
+$id = '';
+$themeId = isset($this->theme->pros_theme_id) ? (int) $this->theme->pros_theme_id : null;
+if (!empty($this->zoneconfig['conf']['id']))
+    $id = $themeId . '_' . $this->zoneconfig['conf']['id'];
+
+?>
+<div id="<?= $id; ?>"  class="tab-pane container-level-a" data-melisKey='<?= $this->melisKey; ?>' data-themeId="<?= $themeId; ?>">
+    <?php
+
+    if(!empty($this->zoneconfig['interface'])) {
+        foreach($this->zoneconfig['interface'] as $keyConfig => $menuConfig) {
+            echo $this->$keyConfig;
+        }
+    }
+
+    ?>
+</div>

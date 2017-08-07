@@ -26,7 +26,14 @@ class MelisCmsProspectFlashMessengerListener extends MelisCoreGeneralListener im
         
         $callBackHandler = $sharedEvents->attach(
         	'MelisCmsProspects',
-        	array('meliscmsprospects_toolprospects_save_end', 'meliscmsprospects_toolprospects_delete_end'),
+        	array(
+            'meliscmsprospects_toolprospects_save_end',
+            'meliscmsprospects_toolprospects_delete_end',
+            'meliscmsprospects_theme_save_end',
+            'meliscmsprospects_theme_delete_end',
+            'meliscmsprospects_theme_item_save_end',
+            'meliscmsprospects_theme_code_save_end',
+            'meliscmsprospects_theme_delete_end'),
         	function($e){
 
         		$sm = $e->getTarget()->getServiceLocator();

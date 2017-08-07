@@ -82,11 +82,6 @@ var toolProspects = {
 		
 		updateProspectData: function() {
     		var datastring = $("#idformprospectdata").serializeArray();
-    		
-    		datastring.push({
-    			name: "pros_id", 
-    			value: $("#prosid").html(),
-    		});
 
     		datastring = $.param(datastring);
     		melisCoreTool.pending("#btnProspectUpdate");
@@ -99,7 +94,7 @@ var toolProspects = {
     	    }).done(function(data){
     	    	if(data.success) {
     	    		toolProspects.refreshTable();
-    	    		$('#modal-prospect').modal('hide');
+    	    		$(".modal").modal("hide");
     	    		melisCoreTool.resetLabels("#idformprospectdata");
     	    		melisHelper.melisOkNotification(data.textTitle, data.textMessage);
     	    	} 
@@ -144,25 +139,36 @@ var toolProspects = {
     		});
     	},
     	
+//    	getProspectDataById: function(id) {
+//    		melisCoreTool.resetLabels("#idformprospectdata");
+//    		$.ajax({
+//    	        type        : 'GET', 
+//    	        url         : '/melis/MelisCmsProspects/ToolProspects/retrieveProspectDataById?id='+id,
+//    	        dataType    : 'json',
+//    	        encode		: true,
+//    	        success		: function(data){
+//	    	    	if(data) {
+//	    	    		$.each(data, function(index, values){
+//	    	    			$("form#idformprospectdata input, form#idformprospectdata select, form#idformprospectdata textarea").each(function(index) {
+//	    	    				var name = $(this).attr('name');
+//	    	    				$("#prosid").html(values['pros_id']);
+//	    	    				$("#" + $(this).attr('id')).val(values[name]);
+//	    	    				tinymce.activeEditor.setContent(values['pros_message']);
+//	    	    			});
+//	    	    		});
+//	    	    	}
+//    	        }
+//    	    });
+//    	},
+    	
     	getProspectDataById: function(id) {
-    		melisCoreTool.resetLabels("#idformprospectdata");
-    		$.ajax({
-    	        type        : 'GET', 
-    	        url         : '/melis/MelisCmsProspects/ToolProspects/retrieveProspectDataById?id='+id,
-    	        dataType    : 'json',
-    	        encode		: true,
-    	        success		: function(data){
-	    	    	if(data) {
-	    	    		$.each(data, function(index, values){
-	    	    			$("form#idformprospectdata input, form#idformprospectdata select, form#idformprospectdata textarea").each(function(index) {
-	    	    				var name = $(this).attr('name');
-	    	    				$("#prosid").html(values['pros_id']);
-	    	    				$("#" + $(this).attr('id')).val(values[name]);
-	    	    				tinymce.activeEditor.setContent(values['pros_message']);
-	    	    			});
-	    	    		});
-	    	    	}
-    	        }
-    	    });
-    	},
+    		
+    		// initialation of local variable
+    		zoneId = 'id_MelisCmsProspects_tool_prospects_update_modal_content';
+    		melisKey = 'MelisCmsProspects_tool_prospects_update_modal_content';
+    		modalUrl = 'melis/MelisCmsProspects/ToolProspects/renderToolProspectsModalContainer';
+    		// requesitng to create modal and display after
+        	melisHelper.createModal(zoneId, melisKey, false, {'prospectId': id}, modalUrl, function(){
+        	});
+    	}
 }

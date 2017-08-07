@@ -1,15 +1,23 @@
 <?php 
 	return array( 
 	    'tr_melistoolprospects_tool_prospects' => 'Prospect',
+	    'tr_melistoolprospects_tool_prospects_description' => 'Cet outil permet de gérer les prospects issus des formulaires de contact.',
+	    'tr_melistoolprospects_tool_prospects_modal_description' => 'Ce formulaire permet d&#39;actualiser les informations de prospect existant.',
 	    'tr_melistoolprospects_prospects_pros_id' => 'ID',
 	    'tr_melistoolprospects_prospects_pros_type' => 'Contact',
 	    'tr_melistoolprospects_prospects_pros_theme' => 'Thème ',
+	    'tr_melistoolprospects_prospects_pros_theme tooltip' => 'Thème choisi par l&#39;utilisateur ',
 	    'tr_melistoolprospects_prospects_pros_name' => 'Nom',
+	    'tr_melistoolprospects_prospects_pros_name tooltip' => 'Nom du prospect',
 	    'tr_melistoolprospects_prospects_pros_email' => 'Email',
+	    'tr_melistoolprospects_prospects_pros_email tooltip' => 'Email du prospect',
 	    'tr_melistoolprospects_prospects_pros_telephone' => 'Téléphone',
+	    'tr_melistoolprospects_prospects_pros_telephone tooltip' => 'Téléphone du prospect',
 	    'tr_melistoolprospects_prospects_pros_societe' => 'Societe',
 	    'tr_melistoolprospects_prospects_pros_message' => 'Message',
+	    'tr_melistoolprospects_prospects_pros_message tooltip' => 'Message écrit par l&#39;utilisateur',
 	    'tr_melistoolprospects_prospects_pros_contact_date' => 'Date',
+	    'tr_melistoolprospects_prospects_pros_contact_date tooltip' => 'Date d&#39;enregistrement du prospect',
 	    
 	    // Prospects
 	    'tr_prospect_manager_fm_delete_data_title' => 'Effacer un prospect',
@@ -55,6 +63,9 @@
 	    'tr_melistoolprospects_common_refresh' => 'Rafraichir',
 	    'tr_melistoolprospects_common_close' => 'Annuler',
 	    'tr_melistoolprospects_prospects_common_pros_id' => 'ID',
+	    'tr_melistoolprospects_prospects_common_pros_id tooltip' => 'Identifiant du prospect',
+	    
+	    'tr_melistoolprospects_prospects_theme_id tooltip' => 'Identifiant du thème',
 			
 	    // widgets
 	    'tr_melistoolprospects_tool_prospects_widgets' => 'Widgets',
@@ -81,7 +92,7 @@
         'tr_contactus_email' => 'Adresse email',
         'tr_contactus_phone' => 'Téléphone',
         'tr_contactus_society' => 'Société',
-        'tr_contactus_subject' => 'Sujet',
+        'tr_contactus_subject' => 'Thème',
         'tr_contactus_message' => 'Message',
         'tr_contactus_send_msg' => 'Envoyer le message',
         
@@ -111,5 +122,109 @@
         'tr_contactus_subj_opt_3' => 'Espace presse',
         'tr_contactus_subj_opt_4' => 'Postuler',
         'tr_contactus_subj_opt_5' => 'Autre',
-	);
-?>
+
+	    // Plugins
+	    'tr_melis_cms_prospects_theme_plugin_modal_theme' => 'Theme',
+	    'tr_melis_cms_prospects_theme_plugin_modal_theme tooltip' => 'Si le champ thème est affiché vous devez alors le choisir parmi ceux créés dans l&#39;outil thème',
+	    
+	    // tabs
+	    'tr_prospects_plugin_tab_properties' => 'Propriétés',
+	    
+        'tr_MelisCmsProspectsShowFormPlugin_select_fields' => 'Choisissez les champs à afficher',
+        'tr_MelisCmsProspectsShowFormPlugin_show' => 'Afficher',
+        'tr_MelisCmsProspectsShowFormPlugin_hide' => 'Cacher',
+        'tr_MelisCmsProspectsShowFormPlugin_drag_info' => 'Glisser les éléments pour arranger l\'ordre',
+	    'tr_PluginSection_meliscmsprospects' => 'Melis Cms Prospectss',
+	    'tr_MelisCmsProspectsShowFormPlugin_Name' => 'Formulaire contact',
+	    'tr_MelisCmsProspectsShowFormPlugin_Description' => 'Le plugin formulaire de contact affiche le formulaire et prend en charge la sauvegarde des prospects.',
+        'tr_MelisCmsProspectsShowFormPlugin_Select_fields' => 'Choisissez les champs :',
+        'tr_MelisCmsProspectsShowFormPlugin_modal_fields' => 'Liste des champs',
+        'tr_MelisCmsProspectsShowFormPlugin_modal_fields_description' => 'Organisez le formulaire en sélectionnant les champs à afficher, leur ordre par glisser-déposer et s&#39;ils sont obligatoires ou non.',
+        'tr_MelisCmsProspectsShowFormPlugin_modal_Template' => 'Template',
+
+        'tr_MelisCmsProspectsShowFormPlugin_form_submit_button' => 'Valider',
+
+        // PROSPECT theme TOOL
+        'tr_melis_cms_prospects_theme' => 'Thèmes',
+	    'tr_melis_cms_prospects_theme edit' => 'Editer thèmes',
+        'tr_melis_cms_prospects_theme_title' => 'Thèmes Prospect',
+        'tr_melis_cms_prospects_theme_title_description' => 'Cet outil permet de gérer les différents thèmes des formulaires de contact.',
+        'tr_melis_cms_prospects_theme_header' => 'Thèmes Header',
+        'tr_melis_cms_prospects_theme_content' => 'Thèmes Content',
+        'tr_melis_cms_prospects_theme_modal' => 'Thèmes Modal',
+        'tr_melis_cms_prospects_theme_items' => 'Items',
+
+        // columns
+        'tr_melis_cms_prospects_theme_pros_theme_id' => 'ID',
+        'tr_melis_cms_prospects_theme_pros_theme_code' => 'Code',
+        'tr_melis_cms_prospects_theme_pros_theme_code tooltip' => 'Code',
+        'tr_melis_cms_prospects_theme_pros_theme_name' => 'Nom',
+        'tr_melis_cms_prospects_theme_pros_theme_name tooltip' => 'Nom du thème',
+
+        // buttons
+        'tr_melis_cms_prospects_theme_new' => 'Ajouter un theme',
+        'tr_melis_cms_prospects_theme_new_title' => 'Nouveau theme',
+        'tr_melis_cms_prospects_theme_edit_title' => 'Editer le theme',
+
+        // validations
+        'tr_melis_cms_prospects_theme_pros_theme_id_invalid' => 'ID invalide',
+
+        'tr_melis_cms_prospects_theme_code_empty' => 'Entrer le code',
+        'tr_melis_cms_prospects_theme_code_long' => 'Code trop long, 45 caractères maximum',
+
+        'tr_melis_cms_prospects_theme_name_empty' => 'Entrer le nom',
+        'tr_melis_cms_prospects_theme_name_long' => 'Nom trop long, 45 caractères maximum',
+
+        'tr_melis_cms_prospects_theme_code_exists' => 'Ce code existe déjà',
+        'tr_melis_cms_prospects_theme_success' => 'Theme sauvegardé',
+        'tr_melis_cms_prospects_theme_failed' => 'Impossible de sauvegarder le thème',
+
+        'tr_melis_cms_prospects_theme_delete_success' => 'Theme supprimé',
+        'tr_melis_cms_prospects_theme_delete_failed' => 'Impossible de supprimer le thème',
+        'tr_melis_cms_prospects_theme_delete_confirm' => 'Êtes-vous sur de vouloir supprimer ce thème ?',
+
+        // Theme ITEM TOOL
+        'tr_melis_cms_prospects_theme_items' => 'Theme Items',
+        'tr_melis_cms_prospects_theme_items_tooltip' => 'Renommer',
+        'tr_melis_cms_prospects_theme_items_header' => 'Theme Items Header',
+        'tr_melis_cms_prospects_theme_items_content' => 'Theme Items Content',
+        'tr_melis_cms_prospects_theme_items_modal_container' => 'Theme Items Modal Container',
+        'tr_melis_cms_prospects_theme_items_modal_content' => 'Theme Items Modal Content',
+
+        'tr_melis_cms_prospects_theme_items_header_title' => 'Themes / %s',
+        'tr_melis_cms_prospects_theme_items_header_title_description' => 'Administrez ici la liste des éléments de ce thème.',
+
+        'tr_melis_cms_prospects_theme_items_pros_theme_item_id' => 'ID',
+        'tr_melis_cms_prospects_theme_items_pros_theme_item_text' => 'Nom',
+        'tr_melis_cms_prospects_theme_items_pros_theme_item_text2' => 'Nom de l&#39;élément',
+        'tr_melis_cms_prospects_theme_items_pros_theme_item_text tooltip' => 'Nom de l&#39;élément',
+        'tr_melis_cms_prospects_theme_items_pros_theme_item_lang_id' => 'ID Langue',
+        'tr_melis_cms_prospects_theme_items_pros_theme_item_theme_id' => 'ID Thème',
+
+        'tr_melis_cms_prospects_theme_items_add' => 'Ajouter un élément',
+        'tr_melis_cms_prospects_theme_items_add_title' => 'Ajout éléments au thème',
+        'tr_melis_cms_prospects_theme_items_edit_title' => 'Editer les éléments du thème',
+
+        'tr_melis_cms_prospects_theme_item_code_title' => 'Code élément',
+        'tr_melis_cms_prospects_theme_item_code_new_title' => 'Nouveau code élément',
+        'tr_melis_cms_prospects_theme_item_code_edit_title' => 'Editer code élément',
+        'tr_melis_cms_prospects_theme_item_code_save_success' => 'Code élément sauvegardé',
+        'tr_melis_cms_prospects_theme_item_code_save_failed' => 'Impossible de sauvegardé le code élément',
+        'tr_melis_cms_prospects_theme_item_code_save_exists' => 'Le code élément existe déjà',
+
+        'tr_melis_cms_prospects_theme_items_edit' => '%s éléments thème',
+        'tr_melis_cms_prospects_theme_items_save_success' => 'Eléments sauvegardés',
+        'tr_melis_cms_prospects_theme_items_save_failed' => 'Impossible de sauvegarder les éléments',
+
+        'tr_melis_cms_prospects_theme_item_delete_success' => 'Eléments supprimés',
+        'tr_melis_cms_prospects_theme_item_delete_failed' => 'Impossible de supprimer les éléments',
+        'tr_melis_cms_prospects_theme_item_delete_confirm' => 'Êtes-vous sur de vouloir supprimer cet élément?',
+
+	    'tr_melis_cms_prospects_plugin_config_fields' => 'Champs',
+	    'tr_melis_cms_prospects_plugin_config_status' => 'Statut',
+	    'tr_melis_cms_prospects_plugin_config_mandatory' => 'Obligatoire',
+	    
+	    'tr_melis_cms_prospects_plugin_config_no_mandatory' => 'Au moins un champ obligatoire est requis',
+	    'tr_melis_cms_prospects_plugin_config_no_field' => 'Au moins un champ doit être affiché',
+	    'tr_melis_cms_prospects_plugin_config_no_theme' => 'Veuillez choisir un theme',
+    );
