@@ -23,15 +23,21 @@ return array(
 							array(
 								'spec' => array(
 									'name' => 'widgetId',
-									'type' => 'Text',
+									'type' => 'Select',
 									'options' => array(
 										'label' => 'Widget Id',
+										'value_options' => array(
+											'numPropects' => 'numPropects',
+											'numPropectsMonth' => 'numPropectsMonth',
+											'numPropectsMonthAvg' => 'numPropectsMonthAvg',
+										),
 									),
 									'attributes' => array(
 										'id' => 'widgetId',
 										'value' => '',
 										'class' => '',
 										'placeholder' => 'Enter widgetId',
+										'style' 	=> 'width : 10%'
 									),
 								),
 							),
@@ -74,15 +80,21 @@ return array(
 							array(
 								'spec' => array(
 									'name' => 'type',
-									'type' => 'Text',
+									'type' => 'Select',
 									'options' => array(
 										'label' => 'Type',
+										'value_options' => array(
+											'daily' => 'daily',
+											'monthly' => 'monthly',
+											'yearly' => 'yearly',
+										),
 									),
 									'attributes' => array(
 										'id' => 'type',
 										'value' => '',
 										'class' => '',
 										'placeholder' => 'Enter type',
+										'style' => 'width: 10%' 
 									),
 								),
 							),
@@ -157,15 +169,20 @@ return array(
 							array(
 								'spec' => array(
 									'name' => 'identifier',
-									'type' => 'Text',
+									'type' => 'Select',
 									'options' => array(
 										'label' => 'Identifier',
+										'value_options' => array(
+											'curMonth' => 'curMonth',
+											'avgMonth' => 'avgMonth',
+										),
 									),
 									'attributes' => array(
 										'id' => 'identifier',
 										'value' => '',
 										'class' => '',
 										'placeholder' => 'Enter identifier',
+										'style' => 'width: 10%' 
 									),
 								),
 							),
