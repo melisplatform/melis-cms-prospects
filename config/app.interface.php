@@ -26,7 +26,7 @@ return array(
                                             'conf' => array(
                                                 'type' => '/MelisCmsProspects/interface/MelisCmsProspects_toolstree/interface/MelisCmsProspectsThemes_tool_conf',
                                             ),
-                                        ),
+                                        ), 
         			    			),
 								),
         			    	),
