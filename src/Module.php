@@ -67,6 +67,7 @@ class Module
     	    // interface design Melis
 			include __DIR__ . '/../config/app.interface.php',
     	    include __DIR__ . '/../config/app.tools.php',
+    	    include __DIR__ . '/../config/app.microservice.php',
     	    
     	    // Tests
 			include __DIR__ . '/../config/diagnostic.config.php',
