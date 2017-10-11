@@ -89,7 +89,6 @@
 	    'tr_contactus_country' => 'Country',
 	    'tr_contactus_email' => 'Email address',
 	    'tr_contactus_phone' => 'Phone number',
-	    'tr_contactus_society' => 'Society',
 	    'tr_contactus_subject' => 'Theme',
 	    'tr_contactus_message' => 'Message',
 	    'tr_contactus_send_msg' => 'Send message',
