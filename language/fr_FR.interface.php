@@ -5,7 +5,7 @@
 	    'tr_melistoolprospects_tool_prospects_modal_description' => 'Ce formulaire permet d&#39;actualiser les informations de prospect existant.',
 	    'tr_melistoolprospects_prospects_pros_id' => 'ID',
 	    'tr_melistoolprospects_prospects_pros_type' => 'Contact',
-	    'tr_melistoolprospects_prospects_pros_theme' => 'Thème ',
+	    'tr_melistoolprospects_prospects_pros_theme' => 'Thème',
 	    'tr_melistoolprospects_prospects_pros_theme tooltip' => 'Thème choisi par l&#39;utilisateur ',
 	    'tr_melistoolprospects_prospects_pros_name' => 'Nom',
 	    'tr_melistoolprospects_prospects_pros_name tooltip' => 'Nom du prospect',
@@ -184,12 +184,12 @@
         'tr_melis_cms_prospects_theme_delete_confirm' => 'Êtes-vous sur de vouloir supprimer ce thème ?',
 
         // Theme ITEM TOOL
-        'tr_melis_cms_prospects_theme_items' => 'Theme Items',
+        'tr_melis_cms_prospects_theme_items' => 'Thème élément',
         'tr_melis_cms_prospects_theme_items_tooltip' => 'Renommer',
-        'tr_melis_cms_prospects_theme_items_header' => 'Theme Items Header',
-        'tr_melis_cms_prospects_theme_items_content' => 'Theme Items Content',
-        'tr_melis_cms_prospects_theme_items_modal_container' => 'Theme Items Modal Container',
-        'tr_melis_cms_prospects_theme_items_modal_content' => 'Theme Items Modal Content',
+        'tr_melis_cms_prospects_theme_items_header' => 'En-tête éléments thème',
+        'tr_melis_cms_prospects_theme_items_content' => 'Contenu éléments thème',
+        'tr_melis_cms_prospects_theme_items_modal_container' => 'Modal conteneur éléments thème',
+        'tr_melis_cms_prospects_theme_items_modal_content' => 'Modal contenu éléments thème',
 
         'tr_melis_cms_prospects_theme_items_header_title' => 'Themes / %s',
         'tr_melis_cms_prospects_theme_items_header_title_description' => 'Administrez ici la liste des éléments de ce thème.',
