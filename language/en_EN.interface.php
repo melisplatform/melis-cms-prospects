@@ -133,7 +133,7 @@
         'tr_MelisCmsProspectsShowFormPlugin_drag_info' => 'Drag the field list to rearrange the order',
 	    'tr_PluginSection_meliscmsprospects' => 'Melis Cms Prospects',
 	    'tr_MelisCmsProspectsShowFormPlugin_Name' => 'Contact Form',
-	    'tr_MelisCmsProspectsShowFormPlugin_Description' => 'The contact form plugin displays the form and handles prospect saving.',
+	    'tr_MelisCmsProspectsShowFormPlugin_Description' => 'The contact form plugin displays the form and handles prospect saving',
         'tr_MelisCmsProspectsShowFormPlugin_Select_fields' => 'Select fields:',
         'tr_MelisCmsProspectsShowFormPlugin_modal_fields' => 'Field list',
         'tr_MelisCmsProspectsShowFormPlugin_modal_fields_description' => 'Organize the form by selecting the fields to display, their order by drag and drop and if they are mandatory or not.',
