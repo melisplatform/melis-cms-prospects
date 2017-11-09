@@ -196,6 +196,12 @@ class MelisCmsProspectsThemesController extends AbstractActionController
         return new JsonModel($response);
     }
 
+
+    public function searchAllAction()
+    {
+        return new ViewModel();
+    }
+    
     /**
      * Save event for theme tool
      * @return JsonModel
@@ -394,4 +400,6 @@ class MelisCmsProspectsThemesController extends AbstractActionController
         $form = $this->tool()->getForm('prospects_theme_form');
         return $form;
     }
+
+
 }
