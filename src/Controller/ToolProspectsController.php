@@ -583,5 +583,17 @@ class ToolProspectsController extends AbstractActionController
     
         return $isAccessible;
     }
-    
+    public function removeAllProspectDataAction()
+    {
+        $response = array();
+        $this->getEventManager()->trigger('meliscmsprospects_toolprospects_delete_start', $this, $response);
+
+        $translator = $this->getServiceLocator()->get('translator');
+        $prospectTable = $this->getServiceLocator()->get('MelisProspects');
+        $id = $this->params()->fromRoute('id', $this->params()->fromQuery('id', ''));
+
+
+
+        return new JsonModel($response);
+    }
 }

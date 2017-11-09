@@ -260,6 +260,11 @@ class MelisCmsProspectsThemeItemsController extends AbstractActionController
     }
 
 
+    public function updateAction()
+    {
+        return new ViewModel();
+    }
+
     public function getItemDataAction()
     {
         $itemTable = $this->getServiceLocator()->get('MelisCmsProspectsThemeItemTable');
@@ -364,6 +369,7 @@ class MelisCmsProspectsThemeItemsController extends AbstractActionController
         return new ViewModel();
     }
 
+
     /**
      * @return ViewModel
      */
@@ -461,4 +467,5 @@ class MelisCmsProspectsThemeItemsController extends AbstractActionController
     {
        return $this->getServiceLocator()->get('MelisCmsProspectsThemeItemTransTable');
     }
+
 }
