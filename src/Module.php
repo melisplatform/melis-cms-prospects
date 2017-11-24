@@ -21,6 +21,12 @@ use MelisCmsProspects\Model\MelisProspects;
 use MelisCmsProspects\Model\Tables\MelisProspectTable;
 use MelisCmsProspects\Listener\MelisCmsProspectFlashMessengerListener;
 
+/**
+ * Class Module
+ * @package MelisCmsNews
+ * @require melis-core|melis-cms
+ */
+
 class Module
 {
     public function onBootstrap(MvcEvent $e)
