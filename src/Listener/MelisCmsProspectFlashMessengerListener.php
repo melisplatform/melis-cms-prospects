@@ -33,7 +33,7 @@ class MelisCmsProspectFlashMessengerListener extends MelisCoreGeneralListener im
             'meliscmsprospects_theme_delete_end',
             'meliscmsprospects_theme_item_save_end',
             'meliscmsprospects_theme_code_save_end',
-            'meliscmsprospects_theme_delete_end'),
+            ),
         	function($e){
 
         		$sm = $e->getTarget()->getServiceLocator();

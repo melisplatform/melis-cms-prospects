@@ -25,7 +25,7 @@ return array(
 									'name' => 'widgetId',
 									'type' => 'Select',
 									'options' => array(
-										'label' => 'Widget Id',
+										'label' => 'widgetId',
 										'value_options' => array(
 											'numPropects' => 'numPropects',
 											'numPropectsMonth' => 'numPropectsMonth',
@@ -82,7 +82,7 @@ return array(
 									'name' => 'type',
 									'type' => 'Select',
 									'options' => array(
-										'label' => 'Type',
+										'label' => 'type',
 										'value_options' => array(
 											'daily' => 'daily',
 											'monthly' => 'monthly',
@@ -103,13 +103,14 @@ return array(
 									'name' => 'date',
 									'type' => 'Text',
 									'options' => array(
-										'label' => 'Date',
+										'label' => 'date',
 									),
 									'attributes' => array(
 										'id' => 'date',
 										'value' => '',
 										'class' => '',
-										'placeholder' => 'Enter Date',
+										'placeholder' => '2017-03-24',
+										'data-type' => 'date'
 									),
 								),
 							),
@@ -171,7 +172,7 @@ return array(
 									'name' => 'identifier',
 									'type' => 'Select',
 									'options' => array(
-										'label' => 'Identifier',
+										'label' => 'identifier',
 										'value_options' => array(
 											'curMonth' => 'curMonth',
 											'avgMonth' => 'avgMonth',

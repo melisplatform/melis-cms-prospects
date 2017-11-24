@@ -172,7 +172,7 @@ class ToolProspectsController extends AbstractActionController
         
         $columns = $melisTool->getColumns();
         // pre-add Action Columns
-        $columns['actions'] = array('text' => $translator->translate('tr_meliscms_action'), 'width' => '10%');
+        $columns['actions'] = array('text' => $translator->translate('tr_meliscore_global_action'), 'width' => '10%');
 
         $view = new ViewModel();
         $view->melisKey = $melisKey;
@@ -583,5 +583,17 @@ class ToolProspectsController extends AbstractActionController
     
         return $isAccessible;
     }
-    
+    public function removeAllProspectDataAction()
+    {
+        $response = array();
+        $this->getEventManager()->trigger('meliscmsprospects_toolprospects_delete_start', $this, $response);
+
+        $translator = $this->getServiceLocator()->get('translator');
+        $prospectTable = $this->getServiceLocator()->get('MelisProspects');
+        $id = $this->params()->fromRoute('id', $this->params()->fromQuery('id', ''));
+
+
+
+        return new JsonModel($response);
+    }
 }
