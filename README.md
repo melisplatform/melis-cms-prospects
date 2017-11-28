@@ -19,6 +19,14 @@ Run the composer command:
 composer require melisplatform/melis-cms-prospects
 ```
 
+### Database    
+
+Database model is accessible on the MySQL Workbench file:  
+/melis-cms-prospects/install/sql/model  
+Database will be installed through composer and its hooks.  
+In case of problems, SQL files are located here:  
+/melis-cms-prospects/install/sql  
+
 ## Tools & Elements provided
 
 * Prospects Tool
