@@ -21,6 +21,11 @@ use MelisCmsProspects\Model\MelisProspects;
 use MelisCmsProspects\Model\Tables\MelisProspectTable;
 use MelisCmsProspects\Listener\MelisCmsProspectFlashMessengerListener;
 use Zend\Mvc\Router\Http\RouteMatch;
+/**
+ * Class Module
+ * @package MelisCmsProspects
+ * @require melis-core|melis-cms
+ */
 class Module
 {
     public function onBootstrap(MvcEvent $e)
