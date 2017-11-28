@@ -57,31 +57,31 @@ return array(
 
 			// Form key
 			'forms' => array(
-
+	
 				// MelisCmsProspects update form
 				'melistoolprospects_tool_prospects_update' => array(
 					'attributes' => array(
-                        'name' => 'prospectmanager',
-                        'id' => 'idformprospectdata',
-                        'method' => 'POST',
-                        'action' => '',
+						'name' => 'prospectmanager',
+						'id' => 'idformprospectdata',
+						'method' => 'POST',
+						'action' => '',
 					),
 					'hydrator'  => 'Zend\Stdlib\Hydrator\ArraySerializable',
 					'elements' => array(  
 						array(
 							'spec' => array(
-									...
+								...
 							),
 						),
 					),
 					'input_filter' => array(      
 						'pros_id' => array(
-								...
+							...
 						),   
 					),
 				),
 			), 
-		),
+		), 
 	),
 ),
 ``` 
