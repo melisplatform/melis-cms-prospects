@@ -302,6 +302,7 @@ class ToolProspectsController extends AbstractActionController
         $view = new ViewModel();
         $view->melisKey = $melisKey;
         $view->form = $form;
+        $view->title = "tr_prospect_manager_fm_delete_update_title";
         return $view;
     }
     
