@@ -159,6 +159,8 @@ $(function() {
                 melisHelper.melisKoNotification(data.textTitle, data.textMessage, data.errors, 0);
                 melisCoreTool.highlightErrors(data.success, data.errors, "prospects_theme_item_form");
             }
+            
+            melisCore.flashMessenger();
         });
     });
 

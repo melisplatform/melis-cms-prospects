@@ -256,6 +256,21 @@ return array(
                                 ),
                                 array(
                                     'spec' => array(
+                                        'name' => 'pros_company',
+                                        'type' => 'MelisText',
+                                        'options' => array(
+                                            'label' => 'tr_contactus_company',
+                                            'tooltip' => 'tr_contactus_company',
+                                        ),
+                                        'attributes' => array(
+                                            'id' => 'id_pros_company',
+                                            'value' => '',
+                                            'class' => 'form-control',
+                                        ),
+                                    ),
+                                ),
+                                array(
+                                    'spec' => array(
                                         'name' => 'pros_message',
                                         'type' => 'TextArea',
                                         'options' => array(

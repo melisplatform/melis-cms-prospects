@@ -20,7 +20,12 @@ use Zend\Session\Container;
 use MelisCmsProspects\Model\MelisProspects;
 use MelisCmsProspects\Model\Tables\MelisProspectTable;
 use MelisCmsProspects\Listener\MelisCmsProspectFlashMessengerListener;
-
+use Zend\Mvc\Router\Http\RouteMatch;
+/**
+ * Class Module
+ * @package MelisCmsProspects
+ * @require melis-core|melis-cms
+ */
 class Module
 {
     public function onBootstrap(MvcEvent $e)
@@ -36,12 +41,14 @@ class Module
         
         if (!empty($routeMatch))
         {
+            $this->createTranslations($e, $routeMatch);
+            
             $routeName = $routeMatch->getMatchedRouteName();
             $moduleName = explode('/', $routeName);
             
             if (!empty($moduleName[0]))
 	        {
-	            $this->createTranslations($e, $moduleName[0]);
+	            
 	            
 		        if ($moduleName[0] == 'melis-backoffice')
 		        {
@@ -49,8 +56,6 @@ class Module
                     
 		        }
 	        }
-        }else{
-            $this->createTranslations($e, $moduleName);
         }
     }
     
@@ -94,10 +99,11 @@ class Module
         );
     }
     
-    public function createTranslations($e, $module)
+    public function createTranslations($e, $routeMatch)
     {
+        $param = $routeMatch->getParams();
         // Checking if the Request is from Melis-BackOffice or Front
-        if ($module == 'melis-backoffice')
+        if ($param['renderMode'] = 'melis')
         {
             $container = new Container('meliscore');
             $locale = $container['melis-lang-locale'];
