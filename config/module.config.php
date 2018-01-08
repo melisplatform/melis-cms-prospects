@@ -72,6 +72,7 @@ return array(
             'MelisCmsProspects\Controller\ProspectThemes' => 'MelisCmsProspects\Controller\MelisCmsProspectsThemesController',
             'MelisCmsProspects\Controller\ProspectThemeItems' => 'MelisCmsProspects\Controller\MelisCmsProspectsThemeItemsController',
             'MelisCmsProspects\Controller\ToolProspects'    => 'MelisCmsProspects\Controller\ToolProspectsController',
+            'MelisCmsProspects\Controller\MelisSetup' => 'MelisCmsProspects\Controller\MelisSetupController',
         ),
     ),
     'controller_plugins' => array(
