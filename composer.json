@@ -15,7 +15,8 @@
     "module"
   ],
   "extra": {
-    "module-name": "MelisCmsProspects"
+    "module-name": "MelisCmsProspects",
+    "dbdeploy": true
   },
   "require": {
     "php": "^5.5 || ^7.0"
