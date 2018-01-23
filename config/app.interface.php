@@ -63,8 +63,8 @@ return array(
             ),
             'ressources' => array(
                 'js' => array(
-                    '/MelisCmsProspects/assets/components/modules/admin/charts/flot/assets/custom/js/flotchart-simple.init.js?v=v1.2.3',
-                    '/MelisCmsProspects/assets/components/modules/admin/charts/flot/assets/custom/js/flotchart-simple-bars.init.js?v=v1.2.3',
+                    '/MelisCmsProspects/assets/flotchart/flotchart-simple.init.js?v=v1.2.3',
+                    '/MelisCmsProspects/assets/flotchart/flotchart-simple-bars.init.js?v=v1.2.3',
                     '/MelisCmsProspects/js/tools/prospects.tool.js',
                     '/MelisCmsProspects/js/tools/prospects.theme.tool.js',
                 ),
