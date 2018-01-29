@@ -341,6 +341,28 @@ class ToolProspectsController extends AbstractActionController
     }
 
     /**
+     * renders the coupon list content prospects filter site
+     * @return \Zend\View\Model\ViewModel
+     */
+    public function renderToolProspectsContentFiltersSiteAction()
+    {
+        $tableSite = $this->getServiceLocator()->get('MelisEngineTableSite');
+        $translator = $this->getServiceLocator()->get('translator');
+        $sites = $tableSite->fetchAll();
+        $siteId = $this->getRequest()->getPost('cnews_site_id');
+
+        $options = '<option  value="">'.$translator->translate('tr_meliscmsliderdetails_common_label_choose').'</option>';
+        foreach($sites as $site){
+            $selected  = ($site->site_id == $siteId)? 'selected' : '';
+            $options .= '<option value="'.$site->site_id.'" '.$selected.'>'.$site->site_name .'</option>';
+        }
+
+        $view =  new ViewModel();
+        $view->options = $options;
+        return $view;
+    }
+
+    /**
      * Returns all prospect data in JSON format
      * @return \Zend\View\Model\JsonModel
      */

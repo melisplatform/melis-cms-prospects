@@ -20,6 +20,7 @@
 	    'tr_melistoolprospects_prospects_pros_contact_date tooltip' => 'Registration date of the prospect',
 	    'tr_melistoolprospects_prospects_pros_site_id tooltip' => 'Site from which the prospect registered',
 	    'tr_melistoolprospects_prospects_pros_site_id' => 'Site name',
+	    'tr_melistoolprospects_prospects_pros_filter_site' => 'Site',
 
         // Prospects
 	    'tr_prospect_manager_fm_delete_data_title' => 'Prospect delete.',

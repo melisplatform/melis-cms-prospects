@@ -19,7 +19,8 @@
 	    'tr_melistoolprospects_prospects_pros_contact_date' => 'Date',
 	    'tr_melistoolprospects_prospects_pros_contact_date tooltip' => 'Date d&#39;enregistrement du prospect',
         'tr_melistoolprospects_prospects_pros_site_id tooltip' => 'Site depuis lequel a été enregistré le prospect',
-        'tr_melistoolprospects_prospects_pros_site_id' => 'Site name',
+        'tr_melistoolprospects_prospects_pros_site_id' => 'Nom du site',
+        'tr_melistoolprospects_prospects_pros_filter_site' => 'Site',
 	    
 	    // Prospects
 	    'tr_prospect_manager_fm_delete_data_title' => 'Effacer un prospect',

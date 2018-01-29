@@ -33,6 +33,11 @@ return array(
                                     'controller' => 'ToolProspects',
                                     'action' => 'render-tool-prospects-content-filters-date'
                                 ),
+                                'toolprospect-site-filter' => array(
+                                    'module' => 'MelisCmsProspects',
+                                    'controller' => 'ToolProspects',
+                                    'action' => 'render-tool-prospects-content-filters-site'
+                                ),
                             ),
                             'center' => array(
                                 'toolprospect-search' => array(
@@ -186,7 +191,6 @@ return array(
                                         'attributes' => array(
                                             'id' => 'id_pros_site_id',
                                             'value' => '',
-                                            'required' => 'required',
                                         ),
                                     ),
                                 ),
