@@ -457,6 +457,15 @@ class ToolProspectsController extends AbstractActionController
             
         $searched = $this->getRequest()->getQuery('filter');
         $columns  = $melisTool->getSearchableColumns();
+
+        //remove the sitename from the where clause to avoid error since it doesn't exist in the template table
+        for($i = 0; $i < sizeof($columns); $i++)
+        {
+            if($columns[$i] == 'site_name'){
+                unset($columns[$i]);
+            }
+        }
+
         $data = $prospectTable->getDataForExport($searched, $columns);
 
         return $melisTool->exportDataToCsv($data->toArray());
