@@ -61,6 +61,12 @@ return array(
                                 'sortable' => true,
                                 
                             ),
+                            'site_name' => array(
+                                'text' => 'tr_meliscms_tool_site_site_name',
+                                'css' => array('width' => '15%', 'padding-right' => '0'),
+                                'sortable' => true,
+
+                            ),
                             'pros_name' => array(
                                 'text' => 'tr_melistoolprospects_prospects_pros_name',
                                 'css' => array('width' => '15%', 'padding-right' => '0'),
@@ -100,7 +106,7 @@ return array(
                         ), // end columns
                         
                         // define what columns can be used in searching
-                        'searchables' => array('pros_id', 'pros_name', 'pros_email', 'pros_telephone', 'pros_contact_date', 'pros_theme', 'pros_message'),
+                        'searchables' => array('pros_id','site_name', 'pros_name', 'pros_email', 'pros_telephone', 'pros_contact_date', 'pros_theme', 'pros_message'),
                         
                         'actionButtons' => array(
                             'edit' => array(
@@ -166,6 +172,21 @@ return array(
                                             'id' => 'id_pros_id',
                                             'value' => '',
                                             'readonly' => 'readonly',
+                                        ),
+                                    ),
+                                ),
+                                array(
+                                    'spec' => array(
+                                        'name' => 'pros_site_id',
+                                        'type' => 'MelisCoreSiteSelect',
+                                        'options' => array(
+                                            'label' => 'tr_melistoolprospects_prospects_pros_site_id',
+                                            'tooltip' => 'tr_melistoolprospects_prospects_pros_site_id tooltip',
+                                        ),
+                                        'attributes' => array(
+                                            'id' => 'id_pros_site_id',
+                                            'value' => '',
+                                            'required' => 'required',
                                         ),
                                     ),
                                 ),

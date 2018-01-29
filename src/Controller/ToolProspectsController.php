@@ -377,25 +377,8 @@ class ToolProspectsController extends AbstractActionController
             $search = $search['value'];
             
             $dataCount = $prospectTable->getTotalData();
-            
-            $getData = $prospectTable->getPagedData(array(
-                'where' => array(
-                    'key' => 'pros_id',
-                    'value' => $search,
-                ),
-                'order' => array(
-                    'key' => $selCol,
-                    'dir' => $sortOrder,
-                ),
-                'start' => $start,
-                'limit' => $length,
-                'columns' => $melisTool->getSearchableColumns(),
-                'date_filter' => array(
-                    'key' => 'pros_contact_date',
-                    'startDate' => $melisTool->formatToQueryDate($this->getRequest()->getPost('startDate'), '/'),
-                    'endDate' =>  $melisTool->formatToQueryDate($this->getRequest()->getPost('endDate'), '/')
-                )
-            ));
+
+            $getData = $prospectTable->getData($search, $melisTool->getSearchableColumns(), $selCol, $sortOrder, $start, $length);
 
             $themeItemTable = $this->getServiceLocator()->get('MelisCmsProspectsThemeItemTable');
             
