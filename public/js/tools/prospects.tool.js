@@ -3,33 +3,34 @@
  */
 
 $(document).ready(function() {
-		
+
+	var body = $("body");
 	// for edit button
-	$("body").on("click", '.btnEditProspect', function() {
+    body.on("click", '.btnEditProspect', function() {
 		var id = $(this).parents("tr").attr("id");
 		melisCoreTool.hideAlert("#prospectupdateformalert");
 		toolProspects.getProspectDataById(id);
 	});
-	
-	$("body").on("click", '.btnProspectDelete', function() {
+
+    body.on("click", '.btnProspectDelete', function() {
 		var id = $(this).parents("tr").attr("id");
 		toolProspects.deleteProspectData(id);
 	});
-	
-	$("body").on('apply.daterangepicker', "#dt_bsdatepicker", function(ev, picker) {
+
+    body.on('apply.daterangepicker', "#dt_bsdatepicker", function(ev, picker) {
 		// reload table
 		fntableToolProspectinit();
 	});
-	
-	$("body").on("click", ".btnMelisProspectExport", function() {
+
+    body.on("click", ".btnMelisProspectExport", function() {
 		var searched = $("input[type='search'][aria-controls='tableToolProspect']").val();
 		if(!melisCoreTool.isTableEmpty("tableToolProspect")) {
 			melisCoreTool.exportData('/melis/MelisCmsProspects/ToolProspects/exportToCsv?filter='+searched);
 		}
 		
 	});
-	
-	$("body").on("click", "#id_MelisCmsProspects_tool_prospects_modal .tooltabmodal .mce-btn", function(){
+
+    body.on("click", "#id_MelisCmsProspects_tool_prospects_modal .tooltabmodal .mce-btn", function(){
 		var mcePopUp = $("#mce-modal-block").length;
 		
 		if(mcePopUp){
@@ -62,6 +63,13 @@ window.initDatePickerFilter = function(d) {
     	dStartDate = ""; dEndDate = ""; //clear date when Prospects page is reloaded
     });
 
+    initSiteList(d);
+}
+
+window.initSiteList = function(data){
+    if($('#prosSiteSelect').length){
+        data.pros_site_id = $('#prosSiteSelect').val();
+    }
 }
 
 var toolProspects = {
@@ -72,7 +80,6 @@ var toolProspects = {
 		
 		initTool: function() {
 			melisCoreTool.initTable(toolProspects.table());
-			console.log('test');
 		},
 		
 		refreshTable: function() {

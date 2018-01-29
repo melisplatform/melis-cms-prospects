@@ -84,7 +84,7 @@ class MelisProspectTable extends MelisGenericTable
         return $resultData;
     }
 
-    public function getData($search = '', $searchableColumns = [], $orderBy = '', $orderDirection = 'ASC', $start = 0, $limit = null)
+    public function getData($search = '', $prosSiteId = null,  $searchableColumns = [], $orderBy = '', $orderDirection = 'ASC', $start = 0, $limit = null)
     {
         $select = $this->tableGateway->getSql()->select();
         $select->columns(array('*'));
@@ -97,6 +97,9 @@ class MelisProspectTable extends MelisGenericTable
             }
         }
 
+        if(!empty($prosSiteId) && !is_null($prosSiteId)){
+            $select->where->equalTo("pros_site_id", $prosSiteId);
+        }
 
         if(!empty($orderBy)) {
             $select->order($orderBy . ' ' . $orderDirection);

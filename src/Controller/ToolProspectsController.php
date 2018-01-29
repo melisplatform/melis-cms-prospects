@@ -349,7 +349,7 @@ class ToolProspectsController extends AbstractActionController
         $tableSite = $this->getServiceLocator()->get('MelisEngineTableSite');
         $translator = $this->getServiceLocator()->get('translator');
         $sites = $tableSite->fetchAll();
-        $siteId = $this->getRequest()->getPost('cnews_site_id');
+        $siteId = $this->getRequest()->getPost('pros_site_id');
 
         $options = '<option  value="">'.$translator->translate('tr_meliscmsliderdetails_common_label_choose').'</option>';
         foreach($sites as $site){
@@ -383,7 +383,10 @@ class ToolProspectsController extends AbstractActionController
         if($this->getRequest()->isPost())
         {
             $colId = array_keys($melisTool->getColumns());
-            
+
+            $pros_site_id = $this->getRequest()->getPost('pros_site_id');
+            $pros_site_id = !empty($pros_site_id)? $pros_site_id : null;
+
             $sortOrder = $this->getRequest()->getPost('order');
             $sortOrder = $sortOrder[0]['dir'];
             
@@ -400,7 +403,7 @@ class ToolProspectsController extends AbstractActionController
             
             $dataCount = $prospectTable->getTotalData();
 
-            $getData = $prospectTable->getData($search, $melisTool->getSearchableColumns(), $selCol, $sortOrder, $start, $length);
+            $getData = $prospectTable->getData($search, $pros_site_id, $melisTool->getSearchableColumns(), $selCol, $sortOrder, $start, $length);
 
             $themeItemTable = $this->getServiceLocator()->get('MelisCmsProspectsThemeItemTable');
             
@@ -435,7 +438,7 @@ class ToolProspectsController extends AbstractActionController
 
             }
         }
-        
+
         return new JsonModel(array(
             'draw' => (int) $draw,
             'recordsTotal' => $dataCount,
