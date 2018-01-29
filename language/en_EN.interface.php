@@ -25,7 +25,7 @@
         // Prospects
 	    'tr_prospect_manager_fm_delete_data_title' => 'Prospect delete.',
 	    'tr_prospect_manager_fm_delete_data_content' => 'Prospect has been deleted successfully.',
-	    'tr_prospect_manager_fm_delete_update_title' => 'Prospect update',
+	    'tr_prospect_manager_fm_delete_update_title' => 'Edit update',
 	    'tr_prospect_manager_fm_update_data_content' => 'Prospect has been updated.',
 	    'tr_prospect_manager_fm_update_data_content_error' => 'Unable to update prospect please check the form for more info.',
 	    'tr_tool_text_prospect_manager_update' => 'Save',

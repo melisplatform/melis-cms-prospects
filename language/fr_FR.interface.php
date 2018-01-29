@@ -25,7 +25,7 @@
 	    // Prospects
 	    'tr_prospect_manager_fm_delete_data_title' => 'Effacer un prospect',
 	    'tr_prospect_manager_fm_delete_data_content' => 'Prospect supprimé avec succès',   
-	    'tr_prospect_manager_fm_delete_update_title' => 'Données prospect mises à jour',
+	    'tr_prospect_manager_fm_delete_update_title' => 'Editer prospect',
 	    'tr_prospect_manager_fm_update_data_content' => 'Données prospect mises à jour.',
 	    'tr_prospect_manager_fm_update_data_content_error' => 'Impossible de mettre à jour les données prospect',
 	    'tr_tool_text_prospect_manager_update' => 'Sauvegarder',
