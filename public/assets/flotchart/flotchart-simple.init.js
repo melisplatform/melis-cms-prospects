@@ -94,12 +94,42 @@ $(document).ready(function(){
 		    dataType 	: 'json',
 		    encode		: true
 		}).success(function(data){
-			// plot the chart
+			// plot the chartvar tmpData = data.values;
+
+            var tmpData = data.values;
+            var tmpdataLength  = tmpData.length;
+            var finalData = [];
+            var curTime = null;
+
+            for(var i = 0; i < tmpdataLength ; i++)
+            {
+                var newDate = new Date(tmpData[i][0]);
+                var tmpDate = new Date();
+
+                var m = newDate.getMonth() ;
+                var y = newDate.getFullYear();
+                var newMonth = new Date(y, m, 1.5 );
+                var newYear = new Date(y,0, 2);
+
+
+                if(chartFor == 'daily'){
+                    curTime = newDate.getTime();
+                }
+                else if (chartFor == 'monthly'){
+                    curTime = newMonth.getTime();
+                }
+                else if (chartFor == 'yearly'){
+                    curTime = newYear.getTime();
+
+                }
+
+                finalData.push([ curTime , tmpData[i][1]]);
+            }
 			charts.chart_simple.plot = $.plot(
 				$(charts.chart_simple.placeholder),
 	           	[{
 	    			label: "Prospects", 
-	    			data: data.values,
+	    			data: finalData,
 	    			color: successColor,
 	    			lines: { fill: 0.2 },
 	    			points: { fillColor: "#fff"}

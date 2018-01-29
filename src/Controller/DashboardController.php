@@ -114,17 +114,17 @@ class DashboardController extends AbstractActionController
 		        // Checking type of report
 		        switch ($chartFor) {
 		            case 'daily':
-		                $values[] = array(strtotime($curdate) * 1000, $nb);
+		                $values[] = array($curdate, $nb);
 		                // Deduct 1 Day every loop
 		                $curdate = date('Y-m-d',strtotime($curdate.' -1 days'));
 		                break;
 		            case 'monthly':
-		                $values[] = array(strtotime($curdate)* 1000, $nb);
+		                $values[] = array($curdate, $nb);
 		                // Deduct 1 Month every loop
 		                $curdate = date('Y-m-d',strtotime($curdate.' -1 months'));
 		                break;
 		            case 'yearly':
-		                $values[] = array(strtotime($curdate)* 1000, $nb);
+		                $values[] = array($curdate, $nb);
 		                // Deduct 1 Year every loop
 		                $curdate = date('Y-m-d',strtotime($curdate.' -1 years'));
 		                break;
