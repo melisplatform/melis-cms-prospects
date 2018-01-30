@@ -141,11 +141,11 @@ class MelisCmsProspectsShowFormPlugin extends MelisTemplatingPlugin
 
         // form submission
         $request  = $this->getServiceLocator()->get('request');
-        
+
         if($request->isPost()) {
             
             $post = get_object_vars($request->getPost());
-            
+
             // to avoid conflict in melis edition mode
             if (!empty($post))
             {
@@ -160,7 +160,7 @@ class MelisCmsProspectsShowFormPlugin extends MelisTemplatingPlugin
                 {
                     array_push($postedFields, $key);
                 }
-                
+
                 if ($postedFields == $fields|| empty($fields))
                 {
                     $prospectsForm->setData($post);
@@ -177,18 +177,23 @@ class MelisCmsProspectsShowFormPlugin extends MelisTemplatingPlugin
                     if($prospectsForm->isValid())
                     {
                         $siteId = null;
-                        
+
                         /**
                          * Getting the current page id
                          */
                         $pageId = (!empty($this->getFormData()['pageId'])) ? $this->getFormData()['pageId'] :$this->getController()->params()->fromRoute('idpage');
-                        
-                        $pageTreeService = $this->getServiceLocator()->get('MelisEngineTree');
-                        $site = $pageTreeService->getSiteByPageId($pageId);
-                        
-                        if (!empty($site))
+                        $selectedSiteId = (!empty(($this->getFormData()['pros_site_id']))) ? $this->getFormData()['pros_site_id'] : null;
+
+                        if(is_null($selectedSiteId) && empty($selectedSiteId))
                         {
-                            $siteId = $site->site_id;
+                            $pageTreeService = $this->getServiceLocator()->get('MelisEngineTree');
+                            $site = $pageTreeService->getSiteByPageId($pageId);
+
+                            if (!empty($site)) {
+                                $siteId = $site->site_id;
+                            }
+                        }else{
+                            $siteId = $selectedSiteId;
                         }
                         
                         // Preparing the Datas that required for adding prospects
@@ -463,6 +468,8 @@ class MelisCmsProspectsShowFormPlugin extends MelisTemplatingPlugin
         {
             if (!empty($xml->template_path))
                 $configValues['template_path'] = (string)$xml->template_path;
+            if (!empty($xml->pros_site_id))
+                $configValues['pros_site_id'] = (string)$xml->pros_site_id;
             if (!empty($xml->fields))
                 $configValues['fields'] = (string)$xml->fields;
             if (!empty($xml->required_fields))
@@ -485,6 +492,8 @@ class MelisCmsProspectsShowFormPlugin extends MelisTemplatingPlugin
         // template_path is mendatory for all plugins
         if (!empty($parameters['template_path']))
             $xmlValueFormatted .= "\t\t" . '<template_path><![CDATA[' . $parameters['template_path'] . ']]></template_path>';
+        if (!empty($parameters['pros_site_id']))
+            $xmlValueFormatted .= "\t\t" . '<pros_site_id><![CDATA[' . $parameters['pros_site_id'] . ']]></pros_site_id>';
         if(!empty($parameters['fields']))
             $xmlValueFormatted .= "\t\t" . '<fields><![CDATA['   . implode(',', $parameters['fields']). ']]></fields>';
         if(!empty($parameters['required_fields']))

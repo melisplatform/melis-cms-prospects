@@ -21,6 +21,7 @@
         'tr_melistoolprospects_prospects_pros_site_id tooltip' => 'Site depuis lequel a été enregistré le prospect',
         'tr_melistoolprospects_prospects_pros_site_id' => 'Nom du site',
         'tr_melistoolprospects_prospects_pros_filter_site' => 'Site',
+        'tr_melistoolprospects_prospects_pros_site tooltip' => 'Choisissez le site correspondant',
 	    
 	    // Prospects
 	    'tr_prospect_manager_fm_delete_data_title' => 'Effacer un prospect',
