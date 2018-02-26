@@ -5,9 +5,19 @@
   "license": "OSL-3.0",
   "homepage": "https://github.com/melisplatform/melis-cms-prospects",
   "support": {
+	"email": "contact@melistechnology.com",
     "source": "https://github.com/melisplatform/melis-cms-prospects",
-    "issues": "https://github.com/melisplatform/melis-cms-prospects/issues"
+    "issues": "https://github.com/melisplatform/melis-cms-prospects/issues",
+	"docs": "https://www.melistechnology.com/melistechnology/resources/download-documentation/id/17#documentation"
   },
+  "authors": [
+	{
+		"name": "Melis Technology",
+		"email": "contact@melistechnology.com",
+		"homepage": "https://www.melistechnology.com",
+		"role": "Developer"
+	}
+  ],
   "keywords": [
     "cms",
     "melis",
@@ -19,7 +29,15 @@
     "dbdeploy": true
   },
   "require": {
-    "php": "^5.5 || ^7.0"
+    "php": "^5.5 || ^7.0",
+    "ext-openssl": "*",
+    "ext-json": "*",
+    "ext-pdo_mysql": "*",
+    "melisplatform/melis-core": "~2.2.7",
+    "melisplatform/melis-engine": "~2.2.1",
+    "melisplatform/melis-front": "~2.2.1",
+    "melisplatform/melis-cms": "~2.2.1",
+    "justinrainbow/json-schema": "5.2.1"
   },
   "require-dev": {
     "phpunit/phpunit": "~4.8"

@@ -18,11 +18,15 @@
 	    'tr_melistoolprospects_prospects_pros_message tooltip' => 'Message écrit par l&#39;utilisateur',
 	    'tr_melistoolprospects_prospects_pros_contact_date' => 'Date',
 	    'tr_melistoolprospects_prospects_pros_contact_date tooltip' => 'Date d&#39;enregistrement du prospect',
+        'tr_melistoolprospects_prospects_pros_site_id tooltip' => 'Site depuis lequel a été enregistré le prospect',
+        'tr_melistoolprospects_prospects_pros_site_id' => 'Nom du site',
+        'tr_melistoolprospects_prospects_pros_filter_site' => 'Site',
+        'tr_melistoolprospects_prospects_pros_site tooltip' => 'Choisissez le site correspondant',
 	    
 	    // Prospects
 	    'tr_prospect_manager_fm_delete_data_title' => 'Effacer un prospect',
 	    'tr_prospect_manager_fm_delete_data_content' => 'Prospect supprimé avec succès',   
-	    'tr_prospect_manager_fm_delete_update_title' => 'Données prospect mises à jour',
+	    'tr_prospect_manager_fm_delete_update_title' => 'Editer prospect',
 	    'tr_prospect_manager_fm_update_data_content' => 'Données prospect mises à jour.',
 	    'tr_prospect_manager_fm_update_data_content_error' => 'Impossible de mettre à jour les données prospect',
 	    'tr_tool_text_prospect_manager_update' => 'Sauvegarder',

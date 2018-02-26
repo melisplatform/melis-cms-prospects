@@ -12,6 +12,8 @@ return array(
                     'front' => array(
                         'template_path' => array('MelisCmsProspects/prospects-form'),
                         'id' => 'showform',
+                        // Site id of Prospects
+                        'pros_site_id' => null,
                         // Fields to display
                         'fields' => '',
                         // Required fields
@@ -381,6 +383,23 @@ return array(
                                             ),
                                         ),
                                     ),
+                                    array(
+                                        'spec' => array(
+                                            'name' => 'pros_site_id',
+                                            'type' => 'MelisCmsPluginSiteSelect',
+                                            'options' => array(
+                                                'label' => 'tr_melistoolprospects_prospects_pros_filter_site',
+                                                'tooltip' => 'tr_melistoolprospects_prospects_pros_site tooltip',
+                                                'empty_option' => 'tr_melis_Plugins_Choose',
+                                                'disable_inarray_validator' => true,
+                                            ),
+                                            'attributes' => array(
+                                                'id' => 'pros_site_id',
+                                                'class' => 'form-control',
+                                                'required' => 'required',
+                                            ),
+                                        ),
+                                    ),
                                 ),
                                 'input_filter' => array(
                                     'template_path' => array(
@@ -392,6 +411,22 @@ return array(
                                                 'options' => array(
                                                     'messages' => array(
                                                         \Zend\Validator\NotEmpty::IS_EMPTY => 'tr_front_template_path_empty',
+                                                    ),
+                                                ),
+                                            ),
+                                        ),
+                                        'filters'  => array(
+                                        ),
+                                    ),
+                                    'pros_site_id' => array(
+                                        'name'     => 'pros_site_id',
+                                        'required' => true,
+                                        'validators' => array(
+                                            array(
+                                                'name' => 'NotEmpty',
+                                                'options' => array(
+                                                    'messages' => array(
+                                                        \Zend\Validator\NotEmpty::IS_EMPTY => 'tr_front_common_input_empty',
                                                     ),
                                                 ),
                                             ),

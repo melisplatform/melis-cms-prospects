@@ -18,11 +18,15 @@
 	    'tr_melistoolprospects_prospects_pros_message tooltip' => 'Message written by the user',
 	    'tr_melistoolprospects_prospects_pros_contact_date' => 'Date',
 	    'tr_melistoolprospects_prospects_pros_contact_date tooltip' => 'Registration date of the prospect',
-	    
+	    'tr_melistoolprospects_prospects_pros_site_id tooltip' => 'Site from which the prospect registered',
+	    'tr_melistoolprospects_prospects_pros_site_id' => 'Site name',
+	    'tr_melistoolprospects_prospects_pros_filter_site' => 'Site',
+	    'tr_melistoolprospects_prospects_pros_site tooltip' => 'Select the corresponding site',
+
         // Prospects
 	    'tr_prospect_manager_fm_delete_data_title' => 'Prospect delete.',
 	    'tr_prospect_manager_fm_delete_data_content' => 'Prospect has been deleted successfully.',
-	    'tr_prospect_manager_fm_delete_update_title' => 'Prospect update',
+	    'tr_prospect_manager_fm_delete_update_title' => 'Edit prospect',
 	    'tr_prospect_manager_fm_update_data_content' => 'Prospect has been updated.',
 	    'tr_prospect_manager_fm_update_data_content_error' => 'Unable to update prospect please check the form for more info.',
 	    'tr_tool_text_prospect_manager_update' => 'Save',

@@ -58,6 +58,34 @@ class DashboardController extends AbstractActionController
 		return $view;
 	}
 
+    public function getDashboardLastStatsAction()
+    {
+        // Graph Range X-Axis Limit to this value
+        $limit = 10;
+        $success = 1;
+        // Values hanler
+        $values = array();
+
+        if($this->getRequest()->isPost()) {
+
+            $chartFor = get_object_vars($this->getRequest()->getPost());
+            $chartFor = isset($chartFor['chartFor']) ? $chartFor['chartFor'] : 'monthly';
+
+            $melisProspectsService = $this->getServiceLocator()->get('MelisProspectsService');
+
+            // Last Date/value of the Graph will be the Current Date
+            $curdate = date('Y-m-d');
+
+        }
+
+        return new JsonModel(array(
+            'date' => date('Y-m-d'),
+            'success' => $curdate,
+            'values' => $values,
+        ));
+
+    }
+
 	/**
 	 * Returns JSon datas for the graphs on the dashboard
 	 */
@@ -86,17 +114,17 @@ class DashboardController extends AbstractActionController
 		        // Checking type of report
 		        switch ($chartFor) {
 		            case 'daily':
-		                $values[] = array(strtotime($curdate) * 1000, $nb);
+		                $values[] = array($curdate, $nb);
 		                // Deduct 1 Day every loop
 		                $curdate = date('Y-m-d',strtotime($curdate.' -1 days'));
 		                break;
 		            case 'monthly':
-		                $values[] = array(strtotime($curdate)* 1000, $nb);
+		                $values[] = array($curdate, $nb);
 		                // Deduct 1 Month every loop
 		                $curdate = date('Y-m-d',strtotime($curdate.' -1 months'));
 		                break;
 		            case 'yearly':
-		                $values[] = array(strtotime($curdate)* 1000, $nb);
+		                $values[] = array($curdate, $nb);
 		                // Deduct 1 Year every loop
 		                $curdate = date('Y-m-d',strtotime($curdate.' -1 years'));
 		                break;
@@ -114,4 +142,5 @@ class DashboardController extends AbstractActionController
 		));
 		
 	}
+
 }

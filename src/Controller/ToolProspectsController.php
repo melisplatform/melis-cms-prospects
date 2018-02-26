@@ -302,6 +302,7 @@ class ToolProspectsController extends AbstractActionController
         $view = new ViewModel();
         $view->melisKey = $melisKey;
         $view->form = $form;
+        $view->title = "tr_prospect_manager_fm_delete_update_title";
         return $view;
     }
     
@@ -340,6 +341,28 @@ class ToolProspectsController extends AbstractActionController
     }
 
     /**
+     * renders the coupon list content prospects filter site
+     * @return \Zend\View\Model\ViewModel
+     */
+    public function renderToolProspectsContentFiltersSiteAction()
+    {
+        $tableSite = $this->getServiceLocator()->get('MelisEngineTableSite');
+        $translator = $this->getServiceLocator()->get('translator');
+        $sites = $tableSite->fetchAll();
+        $siteId = $this->getRequest()->getPost('pros_site_id');
+
+        $options = '<option  value="">'.$translator->translate('tr_meliscmsliderdetails_common_label_choose').'</option>';
+        foreach($sites as $site){
+            $selected  = ($site->site_id == $siteId)? 'selected' : '';
+            $options .= '<option value="'.$site->site_id.'" '.$selected.'>'.$site->site_name .'</option>';
+        }
+
+        $view =  new ViewModel();
+        $view->options = $options;
+        return $view;
+    }
+
+    /**
      * Returns all prospect data in JSON format
      * @return \Zend\View\Model\JsonModel
      */
@@ -360,7 +383,10 @@ class ToolProspectsController extends AbstractActionController
         if($this->getRequest()->isPost())
         {
             $colId = array_keys($melisTool->getColumns());
-            
+
+            $pros_site_id = $this->getRequest()->getPost('pros_site_id');
+            $pros_site_id = !empty($pros_site_id)? $pros_site_id : null;
+
             $sortOrder = $this->getRequest()->getPost('order');
             $sortOrder = $sortOrder[0]['dir'];
             
@@ -376,25 +402,8 @@ class ToolProspectsController extends AbstractActionController
             $search = $search['value'];
             
             $dataCount = $prospectTable->getTotalData();
-            
-            $getData = $prospectTable->getPagedData(array(
-                'where' => array(
-                    'key' => 'pros_id',
-                    'value' => $search,
-                ),
-                'order' => array(
-                    'key' => $selCol,
-                    'dir' => $sortOrder,
-                ),
-                'start' => $start,
-                'limit' => $length,
-                'columns' => $melisTool->getSearchableColumns(),
-                'date_filter' => array(
-                    'key' => 'pros_contact_date',
-                    'startDate' => $melisTool->formatToQueryDate($this->getRequest()->getPost('startDate'), '/'),
-                    'endDate' =>  $melisTool->formatToQueryDate($this->getRequest()->getPost('endDate'), '/')
-                )
-            ));
+
+            $getData = $prospectTable->getData($search, $pros_site_id, $melisTool->getSearchableColumns(), $selCol, $sortOrder, $start, $length);
 
             $themeItemTable = $this->getServiceLocator()->get('MelisCmsProspectsThemeItemTable');
             
@@ -429,7 +438,7 @@ class ToolProspectsController extends AbstractActionController
 
             }
         }
-        
+
         return new JsonModel(array(
             'draw' => (int) $draw,
             'recordsTotal' => $dataCount,
@@ -448,6 +457,15 @@ class ToolProspectsController extends AbstractActionController
             
         $searched = $this->getRequest()->getQuery('filter');
         $columns  = $melisTool->getSearchableColumns();
+
+        //remove the sitename from the where clause to avoid error since it doesn't exist in the template table
+        for($i = 0; $i < sizeof($columns); $i++)
+        {
+            if($columns[$i] == 'site_name'){
+                unset($columns[$i]);
+            }
+        }
+
         $data = $prospectTable->getDataForExport($searched, $columns);
 
         return $melisTool->exportDataToCsv($data->toArray());
@@ -583,5 +601,17 @@ class ToolProspectsController extends AbstractActionController
     
         return $isAccessible;
     }
-    
+    public function removeAllProspectDataAction()
+    {
+        $response = array();
+        $this->getEventManager()->trigger('meliscmsprospects_toolprospects_delete_start', $this, $response);
+
+        $translator = $this->getServiceLocator()->get('translator');
+        $prospectTable = $this->getServiceLocator()->get('MelisProspects');
+        $id = $this->params()->fromRoute('id', $this->params()->fromQuery('id', ''));
+
+
+
+        return new JsonModel($response);
+    }
 }
