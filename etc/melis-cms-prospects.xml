@@ -1,0 +1,52 @@
+<melis-cms-prospects>
+	<package_info>
+		<mp_title>Melis Cms Prospects</mp_title>
+		<mp_subtitle>The module that brings a prospect management system to your website.</mp_subtitle>
+		<mp_description>
+			This module adds 2 different tools and 1 plugin:<br />
+			- the prospect tool where prospect are added from a contact form on websites, will allow to see all prospects and to export them<br />
+			- the theme tool will allow to create a question and answers in multiple languages, in order to fill a dropdown (ex: Who are you? Teacher, Student, Employee, etc)<br />
+			The plugin will allow to drag'n'drop a contact form on a template and edit its parameters.<br />
+			The plugin also allows to configure the form to the needs of the project by allowing to reorder fields, make mandatory ones or even disable those unused.<br />
+		</mp_description>
+		<mp_maintainers>melisplatform</mp_maintainers>
+		<mp_group>Melis Cms</mp_group>
+	</package_info>
+	<package_images>
+		<img_1>
+			<mpi_image_title>MelisCmsProspects' tool</mpi_image_title>
+			<mpi_image_file>melis-prospects_1.JPG</mpi_image_file>
+			<mpi_image_main>0</mpi_image_main>
+		</img_1>
+		<img_2>
+			<mpi_image_title>MelisCmsProspects' prospect edition</mpi_image_title>
+			<mpi_image_file>melis-prospects_2.JPG</mpi_image_file>
+			<mpi_image_main>0</mpi_image_main>
+		</img_2>
+		<img_3>
+			<mpi_image_title>MelisCmsProspects' plugin</mpi_image_title>
+			<mpi_image_file>melis-prospects_3.JPG</mpi_image_file>
+			<mpi_image_main>1</mpi_image_main>
+		</img_3>
+		<img_4>
+			<mpi_image_title>MelisCmsProspects' plugin parameter</mpi_image_title>
+			<mpi_image_file>melis-prospects_4.JPG</mpi_image_file>
+			<mpi_image_main>0</mpi_image_main>
+		</img_4>
+		<img_5>
+			<mpi_image_title>MelisCmsProspects' plugin theme selection</mpi_image_title>
+			<mpi_image_file>melis-prospects_5.JPG</mpi_image_file>
+			<mpi_image_main>0</mpi_image_main>
+		</img_5>
+		<img_6>
+			<mpi_image_title>MelisCmsProspects' theme tool</mpi_image_title>
+			<mpi_image_file>melis-prospects_6.JPG</mpi_image_file>
+			<mpi_image_main>0</mpi_image_main>
+		</img_6>
+		<img_7>
+			<mpi_image_title>MelisCmsProspects' theme multilingual edition</mpi_image_title>
+			<mpi_image_file>melis-prospects_7.JPG</mpi_image_file>
+			<mpi_image_main>0</mpi_image_main>
+		</img_7>
+	</package_images>
+</melis-cms-prospects>
