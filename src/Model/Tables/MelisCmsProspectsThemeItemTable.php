@@ -168,8 +168,6 @@ class MelisCmsProspectsThemeItemTable extends MelisGenericTable
         }
         $select->where->and->nest->equalTo('pros_theme_id', (int) $themeId)->unnest;
         
-//         $select->where->equalTo('melis_cms_prospects_theme_items_trans.item_trans_lang_id', $langId);
-        
         $select->order($order . ' ' . $orderDir);
          
         $getCount = $this->tableGateway->selectWith($select);
@@ -184,7 +182,6 @@ class MelisCmsProspectsThemeItemTable extends MelisGenericTable
         
         $sql = $this->tableGateway->getSql();
         $raw = $sql->getSqlstringForSqlObject($select);
-//                 echo $raw; die();
         return $resultSet;
     }
 

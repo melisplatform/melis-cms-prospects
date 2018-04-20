@@ -130,28 +130,6 @@ return array(
                         'csvFileName' => 'prospect_export.csv',
                     ),
                     'modals' => array( // handles the contents of the modals
-//                         'melistoolprospects_tool_prospects_update_modal' => array(
-//                             'id' => 'id_melistoolprospects_tool_prospects_update',
-//                             'class' => 'glyphicons pencil',
-//                             'tab-header' => '',
-//                             'tab-text' => 'tr_melistoolprospects_tool_prospects',
-//                             'content' => array(
-//                                 'module' => 'MelisCmsProspects',
-//                                 'controller' => 'ToolProspects',
-//                                 'action' => 'render-tool-prospect-update-form',
-//                             ),
-//                         ),
-//                         'melistoolprospects_tool_prospects_empty_modal' => array(
-//                             'id' => 'id_melistoolprospects_tool_prospects_empty_modal',
-//                             'class' => 'glyphicons user',
-//                             'tab-header' => '',
-//                             'tab-text' => 'tr_tool_text_prospect_manager_empty_modal',
-//                             'content' => array(
-//                                 'module' => 'MelisCmsProspects',
-//                                 'controller' => 'ToolProspects',
-//                                 'action' => 'render-tool-prospects-modal-empty-content'
-//                             ),
-//                         ),
                 
                     ), // end modals
                     'forms' => array(
