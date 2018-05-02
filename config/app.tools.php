@@ -130,28 +130,6 @@ return array(
                         'csvFileName' => 'prospect_export.csv',
                     ),
                     'modals' => array( // handles the contents of the modals
-//                         'melistoolprospects_tool_prospects_update_modal' => array(
-//                             'id' => 'id_melistoolprospects_tool_prospects_update',
-//                             'class' => 'glyphicons pencil',
-//                             'tab-header' => '',
-//                             'tab-text' => 'tr_melistoolprospects_tool_prospects',
-//                             'content' => array(
-//                                 'module' => 'MelisCmsProspects',
-//                                 'controller' => 'ToolProspects',
-//                                 'action' => 'render-tool-prospect-update-form',
-//                             ),
-//                         ),
-//                         'melistoolprospects_tool_prospects_empty_modal' => array(
-//                             'id' => 'id_melistoolprospects_tool_prospects_empty_modal',
-//                             'class' => 'glyphicons user',
-//                             'tab-header' => '',
-//                             'tab-text' => 'tr_tool_text_prospect_manager_empty_modal',
-//                             'content' => array(
-//                                 'module' => 'MelisCmsProspects',
-//                                 'controller' => 'ToolProspects',
-//                                 'action' => 'render-tool-prospects-modal-empty-content'
-//                             ),
-//                         ),
                 
                     ), // end modals
                     'forms' => array(
@@ -251,20 +229,6 @@ return array(
                                         ),
                                     ),
                                 ),
-//                                 array(
-//                                     'spec' => array(
-//                                         'name' => 'pros_theme',
-//                                         'type' => 'MelisText',
-//                                         'options' => array(
-//                                             'label' => 'tr_melistoolprospects_prospects_pros_theme',
-//                                             'tooltip' => 'tr_melistoolprospects_prospects_pros_theme tooltip',
-//                                         ),
-//                                         'attributes' => array(
-//                                             'id' => 'id_pros_theme',
-//                                             'value' => '',
-//                                         ),
-//                                     ),
-//                                 ),
                                 array(
                                     'spec' => array(
                                         'name' => 'pros_theme',
@@ -468,7 +432,6 @@ return array(
                                         
                                     ),
                                     'filters'  => array(
-                                        //array('name' => 'StripTags'),
                                         array('name' => 'StringTrim'),
                                     ),
                                 ),
@@ -519,12 +482,6 @@ return array(
                                 'sortable' => true,
 
                             ),
-//                             'pros_theme_code' => array(
-//                                 'text' => 'tr_melis_cms_prospects_theme_pros_theme_code',
-//                                 'css' => array('width' => '30%', 'padding-right' => '0'),
-//                                 'sortable' => true,
-
-//                             ),
                             'pros_theme_name' => array(
                                 'text' => 'tr_melis_cms_prospects_theme_pros_theme_name',
                                 'css' => array('width' => '30%', 'padding-right' => '0'),
@@ -691,12 +648,6 @@ return array(
                                 'sortable' => true,
 
                             ),
-//                             'pros_theme_item_code' => array(
-//                                 'text' => 'tr_melis_cms_prospects_theme_pros_theme_code',
-//                                 'css' => array('width' => '30%', 'padding-right' => '0'),
-//                                 'sortable' => true,
-
-//                             ),
                            'item_trans_text' => array(
                                'text' => 'tr_melis_cms_prospects_theme_items_pros_theme_item_text2',
                                'css' => array('width' => '30%', 'padding-right' => '0'),
