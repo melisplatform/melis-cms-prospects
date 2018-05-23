@@ -79,6 +79,8 @@ class Module
     	    
     	    // Templating plugins
     	    include __DIR__ . '/../config/plugins/MelisCmsProspectsShowFormPlugin.config.php',
+    	    
+    	    include __DIR__ . '/../config/dashboard-plugins/MelisCmsProspectsStatisticsPlugin.config.php',
     	);
     	
     	foreach ($configFiles as $file) {

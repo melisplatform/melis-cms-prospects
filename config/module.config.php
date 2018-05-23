@@ -68,7 +68,6 @@ return array(
     ),
     'controllers' => array(
         'invokables' => array(
-            'MelisCmsProspects\Controller\Dashboard'        => 'MelisCmsProspects\Controller\DashboardController',
             'MelisCmsProspects\Controller\ProspectThemes' => 'MelisCmsProspects\Controller\MelisCmsProspectsThemesController',
             'MelisCmsProspects\Controller\ProspectThemeItems' => 'MelisCmsProspects\Controller\MelisCmsProspectsThemeItemsController',
             'MelisCmsProspects\Controller\ToolProspects'    => 'MelisCmsProspects\Controller\ToolProspectsController',
@@ -76,7 +75,9 @@ return array(
     ),
     'controller_plugins' => array(
         'invokables' => array(
-            'MelisCmsProspectsShowFormPlugin' => 'MelisCmsProspects\Controller\Plugin\MelisCmsProspectsShowFormPlugin'
+            'MelisCmsProspectsShowFormPlugin' => 'MelisCmsProspects\Controller\Plugin\MelisCmsProspectsShowFormPlugin',
+            // Dashboard plugins
+            'MelisCmsProspectsStatisticsPlugin' => 'MelisCmsProspects\Controller\DashboardPlugins\MelisCmsProspectsStatisticsPlugin'
         ),
     ),
     'form_elements' => array(
@@ -93,6 +94,8 @@ return array(
             'MelisCmsProspects/prospects-form' => __DIR__ . '/../view/melis-cms-prospects/plugins/prospects-form.phtml',
             'MelisCmsProspects/prospects-form/melis/form_tab1' => __DIR__ . '/../view/melis-cms-prospects/plugins/prospect-melis-modal-form-tab-1.phtml',
             'MelisCmsProspects/prospects-form/melis/form_tab2' => __DIR__ . '/../view/melis-cms-prospects/plugins/prospect-melis-modal-form-tab-2.phtml',
+            
+            'melis-cmsprospects/dashboard/prospects-statistics' => __DIR__ . '/../view/melis-cms-prospects/dashboard-plugins/prospects-statistics.phtml',
         ),
         'template_path_stack' => array(
             __DIR__ . '/../view',

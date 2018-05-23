@@ -78,6 +78,7 @@
 		// Dashboard
 	    'tr_melistoolprospects_dashboard_Statistics' => 'Statistics',
 	    'tr_melistoolprospects_dashboard_Prospects Statistics' => 'Prospects statistics',
+	    'tr_melistoolprospects_dashboard_Prospects Statistics description' => 'This plugin display statistics of prospects entries',
 	    'tr_melistoolprospects_dashboard_Prospects Statistics_daily' => 'Daily',
 	    'tr_melistoolprospects_dashboard_Prospects Statistics_monthly' => 'Monthly',
 	    'tr_melistoolprospects_dashboard_Prospects Statistics_yearly' => 'Yearly',

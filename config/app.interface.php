@@ -35,26 +35,6 @@ return array(
                 ),
             ),
         ),
-		'meliscore_dashboard' => array(
-			'interface' => array(
-				'MelisCmsProspects_dashboard_statistics' => array(
-                	'conf' => array(
-                    	'id' => 'id_MelisCmsProspects_dashboard_statistics',
-                    	'name' => 'tr_melistoolprospects_dashboard_Statistics',
-                    	'melisKey' => 'MelisCmsProspects_dashboard_statistics',
-                     	'width' => 6,
-                    	'height' => 'dashboard-large',
-                	),
-                    'forward' => array(
-                        'module' => 'MelisCmsProspects',
-                        'controller' => 'Dashboard',
-                        'action' => 'dashboardStatistics',
-                        'jscallback' => 'simpleChartInit();',
-                        'jsdatas' => array()
-                     ),
-                ),
-			),
-		),
         'MelisCmsProspects' => array(
             'conf' => array(
                 'id' => '',
@@ -63,8 +43,6 @@ return array(
             ),
             'ressources' => array(
                 'js' => array(
-                    '/MelisCmsProspects/assets/flotchart/flotchart-simple.init.js?v=v1.2.3',
-                    '/MelisCmsProspects/assets/flotchart/flotchart-simple-bars.init.js?v=v1.2.3',
                     '/MelisCmsProspects/js/tools/prospects.tool.js',
                     '/MelisCmsProspects/js/tools/prospects.theme.tool.js',
                 ),

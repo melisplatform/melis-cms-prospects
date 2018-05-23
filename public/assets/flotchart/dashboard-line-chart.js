@@ -1,13 +1,13 @@
 $(document).ready(function(){
 	
-	$("body").on("change", '.dashchartline', function() {
-		simpleChartInit($(this).val());
+	$("body").on("change", '.cms-pros-dash-chart-line', function() {
+		cmsProsDashLineGraphInit($(this));
 	});
 	
 	if (typeof charts == 'undefined') 
 		return;
 
-	charts.chart_simple = 
+	charts.cmsProsDashLineGraph = 
 	{
 		// data
 		data: 
@@ -47,8 +47,8 @@ $(document).ready(function(){
 	        },
 	        xaxis: {
 	        	mode: 'time',
-//	            timeformat: '%b %d',
-//	            tickSize: [1, 'day'],
+	            /*timeformat: '%b %d',
+	            tickSize: [1, 'day'],*/
 	            tickColor: '#eee',
 			},
 			yaxis: {
@@ -70,26 +70,39 @@ $(document).ready(function(){
 			}
 		},
 		
-		placeholder: "#chart_simple",
+		placeholder: ".cms-pros-dash-chart-line-graph",
 
 		// initialize
 		init: function()
 		{
 			if (this.plot == null){
 				// hook the init function for plotting the chart
-				simpleChartInit();
+				cmsProsDashLineGraphInit();
 			}
 		}
 	};
 	
 	
 	// INIT PLOTTING FUNCTION [also used as callback in the app.interface for when we refresh the chart]
-	window.simpleChartInit = function(chartFor){
-		if(typeof chartFor === "undefined") chartFor = 'daily';
+	window.cmsProsDashLineGraphInit = function(target){
+		
+		if(typeof target === "undefined"){
+			chartFor = 'daily';
+			if(melisDashBoardDragnDrop.getCurrentPlugin() == null){
+				placeholder = charts.cmsProsDashLineGraph.placeholder;
+			}else{
+				placeholder = "#"+melisDashBoardDragnDrop.getCurrentPlugin().find(".cms-pros-dash-chart-line-graph").attr("id");
+			}
+			
+		}else{
+			chartFor = target.val();
+			placeholder = "#"+target.closest(".tab-pane").find(".cms-pros-dash-chart-line-graph").attr("id");
+		}
+		
 		// get the statistics data
 		$.ajax({
 			type        : 'POST',
-		    url         : '/melis/MelisCmsProspects/Dashboard/getDashboardStats',
+		    url         : '/melis/dashboard-plugin/MelisCmsProspectsStatisticsPlugin/getDashboardStats',
 		    data		: {chartFor : chartFor},
 		    dataType 	: 'json',
 		    encode		: true
@@ -125,35 +138,28 @@ $(document).ready(function(){
 
                 finalData.push([ curTime , tmpData[i][1]]);
             }
-			charts.chart_simple.plot = $.plot(
-				$(charts.chart_simple.placeholder),
-	           	[{
-	    			label: "Prospects", 
-	    			data: finalData,
-	    			color: successColor,
-	    			lines: { fill: 0.2 },
-	    			points: { fillColor: "#fff"}
-	    		}], charts.chart_simple.options);
+            
+            $(placeholder).each(function(){
+            	charts.cmsProsDashLineGraph.plot = $.plot(
+    				$(this),
+    	           	[{
+    	    			label: translations.tr_melistoolprospects_tool_prospects, 
+    	    			data: finalData,
+    	    			color: successColor,
+    	    			lines: { fill: 0.2 },
+    	    			points: { fillColor: "#fff"}
+    	    		}], 
+    	    		charts.cmsProsDashLineGraph.options
+        		);
+            });
+			
 			
 		}).error(function(xhr, textStatus, errorThrown){
-			alert("ERROR !! Status = "+ textStatus + "\n Error = "+ errorThrown + "\n xhr = "+ xhr.statusText);
+			console.log("ERROR !! Status = "+ textStatus + "\n Error = "+ errorThrown + "\n xhr = "+ xhr.statusText);
 		});
-	}
+	 }
 	
+	 // Init Cms prospects dashboard line graph
 	
-	
-	 // uncomment to init on load
-	 charts.chart_simple.init();
-
-	 // use with tabs
-	 $('a[href="#chart-simple-lines"]').on('shown.bs.tab', function(){
-	 	if (charts.chart_simple.plot == null)
-	 		charts.chart_simple.init();
-	 });
-	 
-	 $('body').on('click', '.btn-group a[href="#chart-simple-lines"]', function(){
-		$(this).parent().find('[data-toggle]').removeClass('active');
-		$(this).addClass('active');
-	 });
-
+	setTimeout(function(){ cmsProsDashLineGraphInit(); }, 3000);
 });
