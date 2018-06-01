@@ -26,8 +26,6 @@
                                     'module' => 'MelisCmsProspects',
                                     'plugin' => 'MelisCmsProspectsStatisticsPlugin',
                                     'function' => 'prospectsStatistics',
-                                    'jscallback' => '',
-                                    'jsdatas' => array()
                                 ),
                             ),
                         ),
