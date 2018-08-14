@@ -11,6 +11,7 @@ namespace MelisCmsProspects\Model\Tables;
 
 use MelisEngine\Model\Tables\MelisGenericTable;
 use Zend\Db\TableGateway\TableGateway;
+use Zend\Db\Metadata\Metadata;
 
 class MelisProspectTable extends MelisGenericTable 
 {
@@ -93,7 +94,21 @@ class MelisProspectTable extends MelisGenericTable
 
         if(!empty($searchableColumns) && !empty($search)) {
             foreach($searchableColumns as $column) {
-                $select->where->or->like($column, '%'.$search.'%');
+                if(!empty($search) && is_array($search)) {
+                    $moreThanOneInput = true;
+                    foreach($search as $searchItem){
+                        if($searchItem != '') {
+                            if($moreThanOneInput) {
+                                $select->where->like($column, '%' . $searchItem . '%');
+                                $moreThanOneInput = false;
+                            }
+                            else
+                                $select->where->or->like($column, '%' . $searchItem . '%');
+                        }
+                    }
+                }else {
+                    $select->where->or->like($column, '%' . $search . '%');
+                }
             }
         }
 
@@ -117,8 +132,62 @@ class MelisProspectTable extends MelisGenericTable
             $select->offset( (int) $start);
         }
 
+
         $resultSet = $this->tableGateway->selectWith($select);
         return $resultSet;
     }
 
+    /**
+     *
+     */
+    public function getDataForGdpr($searchArray = [], $notIncludedColumnsInQuery = [])
+    {
+        //this will get all the columns of a specific table
+        $columns = $this->getTableColumns();
+
+        $select = $this->tableGateway->getSql()->select();
+        $select->columns(array('*'));
+        $select->join('melis_cms_site', 'melis_cms_site.site_id = melis_cms_prospects.pros_site_id',
+            array('site_name'), $select::JOIN_LEFT);
+
+        //this will check the number of inputs that has a value
+        $numberOfNotEmptyIndexInArray = count(array_filter($searchArray));
+
+        //this will form the query dynamically based on the $columns
+        foreach($columns as $column) {
+            //check if the column is not in the $notincludedColumns array
+            if(!in_array($column, $notIncludedColumnsInQuery))
+            {
+                if (is_array($searchArray))
+                {
+                    if($numberOfNotEmptyIndexInArray > 1)
+                    {
+                        $moreThanOneInput = true;
+                    }
+                    else
+                    {
+                        $moreThanOneInput = false;
+                    }
+                    foreach ($searchArray as $searchItem)
+                    {
+
+                        if ($searchItem != ''){
+                            if ($moreThanOneInput)
+                            {
+                                $select->where->like($column, '%' . $searchItem . '%');
+                                $moreThanOneInput = false;
+                            }
+                            else
+                            {
+                                $select->where->or->like($column, '%' . $searchItem . '%');
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        $resultSet = $this->tableGateway->selectWith($select);
+        return $resultSet;
+    }
 }

@@ -232,4 +232,11 @@
 	    'tr_melis_cms_prospects_plugin_config_no_mandatory' => 'Au moins un champ obligatoire est requis',
 	    'tr_melis_cms_prospects_plugin_config_no_field' => 'Au moins un champ doit être affiché',
 	    'tr_melis_cms_prospects_plugin_config_no_theme' => 'Veuillez choisir un theme',
+
+        //GDPR
+        'tr_melis_cms_prospects_gdpr_column_email' => 'Email',
+        'tr_melis_cms_prospects_gdpr_column_name' => 'Name',
+        'tr_melis_cms_prospects_gdpr_column_company' => 'Company',
+        'tr_melis_cms_prospects_gdpr_column_country' => 'Country',
+        'tr_melis_cms_prospects_gdpr_column_site' => 'Site',
     );
