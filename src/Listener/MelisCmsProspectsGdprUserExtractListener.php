@@ -31,36 +31,11 @@ class MelisCmsProspectsGdprUserExtractListener extends MelisCoreGeneralListener 
             ),
             function($e){
                 $moduleName = $this->getModuleName($this);
-
+                $melisCoreConfig = $e->getTarget()->getServiceLocator()->get('config');
                 $prospectsTable = $e->getTarget()->getServiceLocator()->get('MelisProspects');
                 $parameters = $e->getParams();
 
-                $columns = [
-                    'pros_id' => [
-                        'text' => 'id'
-                    ],
-                    'pros_name' => [
-                        'text' => 'name'
-                    ],
-                    'pros_email' => [
-                        'text' => 'email'
-                    ],
-                    'pros_telephone' => [
-                        'text' => 'telephone'
-                    ],
-                    'pros_message' => [
-                        'text' => 'message'
-                    ],
-                    'pros_company' => [
-                        'text' => 'company'
-                    ],
-                    'pros_country' => [
-                        'text' => 'country'
-                    ],
-                    'pros_contact_date' => [
-                        'text' => 'contact_date'
-                    ]
-                ];
+                $columns = $melisCoreConfig['plugins'][$moduleName]['gdpr']['export']['columns'];
 
                 if (isset($parameters['selected'][$moduleName])) {
                     $xmlDoc = new \DOMDocument();
@@ -69,16 +44,18 @@ class MelisCmsProspectsGdprUserExtractListener extends MelisCoreGeneralListener 
                     $root = $xmlDoc->appendChild($xmlDoc->createElement('xml'));
                     $module = $root->appendChild($xmlDoc->createElement($moduleName));
 
-                    foreach ($parameters['selected'][$moduleName] as $id) {
-                        $dataArray = $prospectsTable->getEntryById($id)->toArray();
-                        $moduleId = $module->appendChild($xmlDoc->createElement("pros_" . $id));
-                        foreach ($dataArray[0] as $key => $value) {
-                            if (isset($columns[$key])) {
-                                $newKey = $columns[$key]['text'];
-                                $moduleId->appendChild($xmlDoc->createElement($newKey, $value));
+                    $prospects = $prospectsTable->getEntryByField('pros_id', $parameters['selected'][$moduleName])->toArray();
+
+                    foreach ($prospects as $prospect) {
+                        $moduleId = $module->appendChild($xmlDoc->createElement("prospect_" . $prospect['pros_id']));
+                        foreach ($prospect as $prospectColumn => $prospectValue) {
+                            if (isset($columns[$prospectColumn])) {
+                                $newKey = $columns[$prospectColumn]['text'];
+                                $moduleId->appendChild($xmlDoc->createElement($newKey, $prospectValue));
                             }
                         }
                     }
+
 
                     $parameters['results'][$moduleName] = $xmlDoc->saveXML();
                 }

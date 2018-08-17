@@ -22,57 +22,31 @@ class MelisCmsProspectsGdprUserInfoListener extends MelisCoreGeneralListener imp
 
         $callBackHandler = $sharedEvents->attach(
             '*',
-            array(
+            [
                 'melis_core_gdpr_user_info_event',
-            ),
+            ],
             function($e)
             {
                 $moduleName = $this->getModuleName($this);
                 $prospectsTable = $e->getTarget()->getServiceLocator()->get('MelisProspects');
-
+                $melisCoreConfig = $e->getTarget()->getServiceLocator()->get('config');
                 $parameters = $e->getParams();
 
-                $dataConfig = array(
-                    'icon' => 'fa fa-user-plus',
-                    'moduleName' => $moduleName,
+                $dataConfig = $melisCoreConfig['plugins'][$moduleName]['gdpr']['getUserInfo'];
 
-                    'values' => array(
-                        'columns' => array(
-                            'pros_email' => array(
-                                'id' => 'meliscmsprospects_pros_email',
-                                'text' => 'tr_melis_cms_prospects_gdpr_column_email'
-                            ),
-                            'pros_name' => array(
-                                'id' => 'meliscmsprospects_pros_name',
-                                'text' => 'tr_melis_cms_prospects_gdpr_column_name'
-                            ),
-                            'pros_company' => array(
-                                'id' => 'meliscmsprospects_pros_company',
-                                'text' => 'tr_melis_cms_prospects_gdpr_column_company'
-                            ),
-                            'pros_country' => array(
-                                'id' => 'meliscmsprospects_pros_country',
-                                'text' => 'tr_melis_cms_prospects_gdpr_column_country'
-                            ),
-                            'site_name' => array(
-                                'id' => 'meliscmsprospects_pros_site',
-                                'text' => 'tr_melis_cms_prospects_gdpr_column_site'
-                            ),
-                        ),
-                    ),
-                );
                 //get all keys of columns
                 $tableColumns = array_keys($dataConfig['values']['columns']);
-                //column in database we don't want to use in querying
-                $notIncludedColumnsInQuery = array(
-                    'pros_telephone', 'pros_contact_date', 'pros_id'
-                );
 
-                $arrayDatas = $prospectsTable->getDataForGdpr($parameters['search'], $notIncludedColumnsInQuery)->toArray();
+                $searchableColumns = [
+                    'user_name' => 'pros_name',
+                    'user_email' => 'pros_email',
+                    'site_id' => 'site_name'
+                ];
+
+                $arrayDatas = $prospectsTable->getDataForGdpr($parameters['search'], $searchableColumns)->toArray();
                 //module should stay silent if no data mataches
-                if(!empty($arrayDatas)){
+                if (!empty($arrayDatas)) {
                     $dataConfig['values']['datas'] = $this->structureDatasArray($arrayDatas, $tableColumns, $dataConfig);
-                    //send data back
                     $parameters['results'][$moduleName] = $dataConfig;
                 }
             });
@@ -105,7 +79,7 @@ class MelisCmsProspectsGdprUserInfoListener extends MelisCoreGeneralListener imp
             foreach($tableColumns as $columnKey => $columnValue) {
                 foreach ($arrayData as $dataKey => $dataValue) {
                     if ($columnValue == $dataKey) {
-                        $datasArray[$arrayData['pros_id']] = $datasArray[$arrayData['pros_id']] + array($dataKey => $dataValue);
+                        $datasArray[$arrayData['pros_id']] = $datasArray[$arrayData['pros_id']] + [$dataKey => $dataValue];
                         break;
                     }
                 }

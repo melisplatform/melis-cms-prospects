@@ -83,6 +83,9 @@ class Module
     	    
     	    // Templating plugins
     	    include __DIR__ . '/../config/plugins/MelisCmsProspectsShowFormPlugin.config.php',
+
+            //gdpr
+            include __DIR__ . '/../config/app.gdpr.php'
     	);
     	
     	foreach ($configFiles as $file) {
