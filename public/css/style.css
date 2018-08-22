@@ -15,7 +15,7 @@
     transform: translate(-50%, -50%)
 }
 
-#prosSiteSelect{
+#prosSiteSelect, #prosTypeSelect{
 	width: 100px;
 }
 

@@ -22,6 +22,8 @@
         'tr_melistoolprospects_prospects_pros_site_id' => 'Nom du site',
         'tr_melistoolprospects_prospects_pros_filter_site' => 'Site',
         'tr_melistoolprospects_prospects_pros_site tooltip' => 'Choisissez le site correspondant',
+        'tr_melistoolprospects_prospects_pros_filter_type' => 'Type',
+        'tr_melistoolprospects_prospects_common_choose_label' => 'Choisir',
 	    
 	    // Prospects
 	    'tr_prospect_manager_fm_delete_data_title' => 'Effacer un prospect',
