@@ -597,7 +597,7 @@ class ToolProspectsController extends AbstractActionController
         $melisCoreRights = $this->getServiceLocator()->get('MelisCoreRights');
         $xmlRights = $melisCoreAuth->getAuthRights();
     
-        $isAccessible = $melisCoreRights->isAccessible($xmlRights, MelisCoreRightsService::MELISCORE_PREFIX_TOOLS, $key);
+        $isAccessible = $melisCoreRights->isAccessiblecanAccess($key);
     
         return $isAccessible;
     }
