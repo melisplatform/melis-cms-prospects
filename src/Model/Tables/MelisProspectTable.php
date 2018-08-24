@@ -140,47 +140,23 @@ class MelisProspectTable extends MelisGenericTable
     /**
      *
      */
-    public function getDataForGdpr($searchArray = [], $notIncludedColumnsInQuery = [])
+    public function getDataForGdpr($searchInputs = [], $searchableColumns = [])
     {
-        //this will get all the columns of a specific table
-        $columns = $this->getTableColumns();
-
         $select = $this->tableGateway->getSql()->select();
-        $select->columns(array('*'));
+        $select->columns(['*']);
         $select->join('melis_cms_site', 'melis_cms_site.site_id = melis_cms_prospects.pros_site_id',
-            array('site_name'), $select::JOIN_LEFT);
+            ['site_name'], $select::JOIN_LEFT);
 
-        //this will check the number of inputs that has a value
-        $numberOfNotEmptyIndexInArray = count(array_filter($searchArray));
-
-        //this will form the query dynamically based on the $columns
-        foreach($columns as $column) {
-            //check if the column is not in the $notincludedColumns array
-            if(!in_array($column, $notIncludedColumnsInQuery))
-            {
-                if (is_array($searchArray))
-                {
-                    if($numberOfNotEmptyIndexInArray > 1)
-                    {
-                        $moreThanOneInput = true;
-                    }
-                    else
-                    {
-                        $moreThanOneInput = false;
-                    }
-                    foreach ($searchArray as $searchItem)
-                    {
-
-                        if ($searchItem != ''){
-                            if ($moreThanOneInput)
-                            {
-                                $select->where->like($column, '%' . $searchItem . '%');
-                                $moreThanOneInput = false;
+        if (! empty($searchInputs)) {
+            foreach ($searchInputs as $searchInputKey => $searchInputValue) {
+                if ($searchInputValue != '') {
+                    if (isset($searchableColumns[$searchInputKey])) {
+                        if (is_array($searchableColumns[$searchInputKey])) {
+                            foreach ($searchableColumns[$searchInputKey] as $search) {
+                                $select->where->or->like($search, '%' . $searchInputValue . '%');
                             }
-                            else
-                            {
-                                $select->where->or->like($column, '%' . $searchItem . '%');
-                            }
+                        } else {
+                            $select->where->like($searchableColumns[$searchInputKey], '%' . $searchInputValue . '%');
                         }
                     }
                 }

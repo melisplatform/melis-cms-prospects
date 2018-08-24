@@ -85,6 +85,9 @@ class Module
     	    include __DIR__ . '/../config/plugins/MelisCmsProspectsShowFormPlugin.config.php',
     	    
     	    include __DIR__ . '/../config/dashboard-plugins/MelisCmsProspectsStatisticsPlugin.config.php',
+
+            //gdpr
+            include __DIR__ . '/../config/app.gdpr.php'
     	);
     	
     	foreach ($configFiles as $file) {
