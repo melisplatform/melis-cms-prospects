@@ -1,1 +1,49 @@
-.prospectHeaderWidget{font-weight:700;-webkit-transform:translateZ(0);transform:translateZ(0);-webkit-font-smoothing:antialiased;min-width:100%}.widget .widget-head>h3.prospectHeaderWidget{font-size:16px;margin:0;position:absolute;top:50%;left:50%;margin-right:-50%;transform:translate(-50%,-50%)}#prosSiteSelect{width:100px}@media (min-width:1600px) and (max-width:1840px){.pros-dash-lbl{overflow:hidden;white-space:nowrap;text-overflow:ellipsis;max-width:119px}.pros-dash-tbl>tbody>tr>td{padding-left:10px}}@media (min-width:1200px) and (max-width:1600px){.dashboard-prospects-label{font-size:17px}.pros-dash-lbl{overflow:hidden;white-space:nowrap;text-overflow:ellipsis;max-width:90px}.pros-dash-tbl>tbody>tr>td{padding-left:0}}
+.prospectHeaderWidget{ 
+	font-weight:bold;
+	-webkit-transform: translateZ(0);
+	transform: translateZ(0);
+	-webkit-font-smoothing: antialiased;
+	min-width:100%;
+}
+.widget .widget-head > h3.prospectHeaderWidget{
+	font-size: 16px;
+	margin: 0;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    margin-right: -50%;
+    transform: translate(-50%, -50%)
+}
+
+#prosSiteSelect{
+	width: 100px;
+}
+
+@CHARSET "ISO-8859-1";
+
+@media (min-width: 1600px) and (max-width: 1840px) {
+	.pros-dash-lbl {
+	    overflow: hidden;
+	    white-space: nowrap;
+	    text-overflow: ellipsis;
+	    max-width: 119px;
+	}
+	.pros-dash-tbl>tbody>tr>td{
+		padding-left: 10px;
+	}
+}
+
+@media (min-width: 1200px) and (max-width: 1600px) {
+	.dashboard-prospects-label {
+	    font-size: 17px;
+	}
+	.pros-dash-lbl {
+	    overflow: hidden;
+	    white-space: nowrap;
+	    text-overflow: ellipsis;
+	    max-width: 90px;
+	}
+	.pros-dash-tbl>tbody>tr>td{
+		padding-left: 0px;
+	}
+}
