@@ -140,18 +140,15 @@ class MelisProspectTable extends MelisGenericTable
     /**
      *
      */
-    public function getDataForGdpr($searchArray = [], $searchableColumns= [])
+    public function getDataForGdpr($searchInputs = [], $searchableColumns = [])
     {
         $select = $this->tableGateway->getSql()->select();
-        $select->columns(array('*'));
+        $select->columns(['*']);
         $select->join('melis_cms_site', 'melis_cms_site.site_id = melis_cms_prospects.pros_site_id',
-            array('site_name'), $select::JOIN_LEFT);
+            ['site_name'], $select::JOIN_LEFT);
 
-        //this will check the number of inputs that has a value
-        $numberOfNotEmptyIndexInArray = count(array_filter($searchArray));
-
-        if (!empty($searchInput)) {
-            foreach ($searchInput as $searchInputKey => $searchInputValue) {
+        if (! empty($searchInputs)) {
+            foreach ($searchInputs as $searchInputKey => $searchInputValue) {
                 if ($searchInputValue != '') {
                     if (isset($searchableColumns[$searchInputKey])) {
                         if (is_array($searchableColumns[$searchInputKey])) {
