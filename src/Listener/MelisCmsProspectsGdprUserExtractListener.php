@@ -30,14 +30,15 @@ class MelisCmsProspectsGdprUserExtractListener extends MelisCoreGeneralListener 
                 'melis_core_gdpr_user_extract_event',
             ),
             function($e){
-                $moduleName = $this->getModuleName($this);
-                $melisCoreConfig = $e->getTarget()->getServiceLocator()->get('config');
-                $prospectsTable = $e->getTarget()->getServiceLocator()->get('MelisProspects');
                 $parameters = $e->getParams();
-
-                $columns = $melisCoreConfig['plugins'][$moduleName]['gdpr']['export']['columns'];
+                $moduleName = 'MelisCmsProspects';
 
                 if (isset($parameters['selected'][$moduleName])) {
+                    $melisCoreConfig = $e->getTarget()->getServiceLocator()->get('config');
+                    $prospectsTable = $e->getTarget()->getServiceLocator()->get('MelisProspects');
+
+                    $columns = $melisCoreConfig['plugins'][$moduleName]['gdpr']['export']['columns'];
+
                     $xmlDoc = new \DOMDocument();
                     $xmlDoc->formatOutput = true;
 
@@ -56,23 +57,9 @@ class MelisCmsProspectsGdprUserExtractListener extends MelisCoreGeneralListener 
                         }
                     }
 
-
                     $parameters['results'][$moduleName] = $xmlDoc->saveXML();
                 }
             });
         $this->listeners[] = $callBackHandler;
-    }
-
-    /**
-     * This will get the module name of the class
-     * @param Class
-     * @return String = module name
-     */
-    public function getModuleName($class)
-    {
-        $controllerClass = get_class($this);
-        $moduleName = substr($controllerClass, 0, strpos($controllerClass, '\\'));
-
-        return $moduleName;
     }
 }

@@ -40,7 +40,7 @@ class MelisCmsProspectsGdprUserInfoListener extends MelisCoreGeneralListener imp
                 $searchableColumns = [
                     'user_name' => 'pros_name',
                     'user_email' => 'pros_email',
-                    'site_id' => 'site_name'
+                    'site_id' => 'pros_site_id'
                 ];
 
                 $arrayDatas = $prospectsTable->getDataForGdpr($parameters['search'], $searchableColumns)->toArray();

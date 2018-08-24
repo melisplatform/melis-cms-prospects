@@ -41,7 +41,6 @@ class MelisCmsProspectsGdprUserDeleteListener extends MelisCoreGeneralListener i
                     $countOfDeletedProspects = $prospectsTable->deleteByField('pros_id', $ids);
 
                     $noErrors = ($countOfDeletedProspects == count($ids)) ? true : false;
-
                     $parameters['results'][$moduleName] = $noErrors;
                 }
             });
