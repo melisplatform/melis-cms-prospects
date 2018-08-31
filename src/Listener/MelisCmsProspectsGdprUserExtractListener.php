@@ -37,7 +37,7 @@ class MelisCmsProspectsGdprUserExtractListener extends MelisCoreGeneralListener 
                     $melisCoreConfig = $e->getTarget()->getServiceLocator()->get('config');
                     $prospectsTable = $e->getTarget()->getServiceLocator()->get('MelisProspects');
 
-                    $columns = $melisCoreConfig['plugins'][$moduleName]['gdpr']['export']['columns'];
+                    $columns = $melisCoreConfig['plugins'][$moduleName]['gdpr']['extract']['columns'];
 
                     $xmlDoc = new \DOMDocument();
                     $xmlDoc->formatOutput = true;
