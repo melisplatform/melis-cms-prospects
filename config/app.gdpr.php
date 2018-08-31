@@ -31,7 +31,7 @@
                             ],
                         ],
                     ],
-                    'export' => [
+                    'extract' => [
                         'columns' => [
                             'pros_id' => [
                                 'text' => 'id'
