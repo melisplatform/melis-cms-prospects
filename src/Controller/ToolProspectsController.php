@@ -368,6 +368,7 @@ class ToolProspectsController extends AbstractActionController
      */
     public function getToolProspectDataAction()
     {
+        /** @var \MelisCmsProspects\Model\Tables\MelisProspectTable $prospectTable */
         $prospectTable = $this->getServiceLocator()->get('MelisProspects');
         $translator = $this->getServiceLocator()->get('translator');
         $melisTool = $this->getServiceLocator()->get('MelisCoreTool');
@@ -384,12 +385,13 @@ class ToolProspectsController extends AbstractActionController
         {
             $colId = array_keys($melisTool->getColumns());
             $post = $this->getRequest()->getPost()->toArray();
-//            $pros_site_id = $post['prosSiteSelect'];
-            $pros_site_id = !empty($pros_site_id)? $pros_site_id : null;
+
+            $pros_site_id = empty($post['pros_site_id']) ? null : $post['pros_site_id'];
+            $startDate = empty($post['startDate']) ? null : $post['startDate'];
+            $endDate = empty($post['endDate']) ? null : $post['endDate'];
 
             $sortOrder = $post['order'];
             $sortOrder = $sortOrder[0]['dir'];
-            
             $selCol = $post['order'];
             $selCol = $colId[$selCol[0]['column']];
             
@@ -400,9 +402,6 @@ class ToolProspectsController extends AbstractActionController
             
             $search = $post['search'];
             $search = $search['value'];
-
-            $startDate = $post['startDate'];
-            $endDate = $post['endDate'];
 
             $dataCount = $prospectTable->getTotalData();
 

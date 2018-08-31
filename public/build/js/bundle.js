@@ -38,6 +38,14 @@ $(document).ready(function() {
 			$(".mce-floatpanel.mce-window").css('z-index', 1060);
 		}
 	});
+
+    /**
+     * Site filter functionality
+     */
+    body.on("change", "select[name=pros_site_id]", function () {
+        var tableId = $(this).parents().eq(6).find('table').attr('id');
+        $("#" + tableId).DataTable().ajax.reload();
+    });
 });
 
 
