@@ -383,27 +383,40 @@ class ToolProspectsController extends AbstractActionController
         if($this->getRequest()->isPost())
         {
             $colId = array_keys($melisTool->getColumns());
-
-            $pros_site_id = $this->getRequest()->getPost('pros_site_id');
+            $post = $this->getRequest()->getPost()->toArray();
+//            $pros_site_id = $post['prosSiteSelect'];
             $pros_site_id = !empty($pros_site_id)? $pros_site_id : null;
 
-            $sortOrder = $this->getRequest()->getPost('order');
+            $sortOrder = $post['order'];
             $sortOrder = $sortOrder[0]['dir'];
             
-            $selCol = $this->getRequest()->getPost('order');
+            $selCol = $post['order'];
             $selCol = $colId[$selCol[0]['column']];
             
-            $draw = $this->getRequest()->getPost('draw');
+            $draw = $post['draw'];
             
-            $start = $this->getRequest()->getPost('start');
-            $length =  $this->getRequest()->getPost('length');
+            $start = $post['start'];
+            $length =  $post['length'];
             
-            $search = $this->getRequest()->getPost('search');
+            $search = $post['search'];
             $search = $search['value'];
-            
+
+            $startDate = $post['startDate'];
+            $endDate = $post['endDate'];
+
             $dataCount = $prospectTable->getTotalData();
 
-            $getData = $prospectTable->getData($search, $pros_site_id, $melisTool->getSearchableColumns(), $selCol, $sortOrder, $start, $length);
+            $getData = $prospectTable->getData(
+                $search,
+                $pros_site_id,
+                $melisTool->getSearchableColumns(),
+                $selCol,
+                $sortOrder,
+                $start,
+                $length,
+                $startDate,
+                $endDate
+            );
 
             $themeItemTable = $this->getServiceLocator()->get('MelisCmsProspectsThemeItemTable');
             

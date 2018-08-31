@@ -33,7 +33,7 @@ class MelisProspectTable extends MelisGenericTable
     public function getNumberProspectsPerDay($maxDays = 30)
     {
     	$select = $this->tableGateway->getSql()->select();
-    
+
     	$select->columns(array(new \Zend\Db\Sql\Expression('COUNT("pros_id") AS nb'), "pros_contact_date"));
     	$select->group("pros_contact_date");
     	$select->limit($maxDays);
@@ -85,55 +85,74 @@ class MelisProspectTable extends MelisGenericTable
         return $resultData;
     }
 
-    public function getData($search = '', $prosSiteId = null,  $searchableColumns = [], $orderBy = '', $orderDirection = 'ASC', $start = 0, $limit = null)
-    {
+    public function getData(
+        $search = '',
+        $prosSiteId = null,
+        $searchableColumns = [],
+        $orderBy = '',
+        $orderDirection = 'ASC',
+        $start = 0,
+        $limit = null,
+        $startDate = null,
+        $endDate = null
+    ) {
+        /** @var \Zend\Db\Sql\Select $select */
         $select = $this->tableGateway->getSql()->select();
         $select->columns(array('*'));
         $select->join('melis_cms_site', 'melis_cms_site.site_id = melis_cms_prospects.pros_site_id',
             array('site_name'), $select::JOIN_LEFT);
 
-        if(!empty($searchableColumns) && !empty($search)) {
-            foreach($searchableColumns as $column) {
-                if(!empty($search) && is_array($search)) {
+        if (!empty($searchableColumns) && !empty($search)) {
+            foreach ($searchableColumns as $column) {
+                if (!empty($search) && is_array($search)) {
                     $moreThanOneInput = true;
-                    foreach($search as $searchItem){
-                        if($searchItem != '') {
-                            if($moreThanOneInput) {
+                    foreach ($search as $searchItem) {
+                        if ($searchItem != '') {
+                            if ($moreThanOneInput) {
                                 $select->where->like($column, '%' . $searchItem . '%');
                                 $moreThanOneInput = false;
-                            }
-                            else
+                            } else
                                 $select->where->or->like($column, '%' . $searchItem . '%');
                         }
                     }
-                }else {
+                } else {
                     $select->where->or->like($column, '%' . $search . '%');
                 }
             }
         }
 
-        if(!empty($prosSiteId) && !is_null($prosSiteId)){
+        if (!empty($prosSiteId) && !is_null($prosSiteId)) {
             $select->where->equalTo("pros_site_id", $prosSiteId);
         }
 
-        if(!empty($orderBy)) {
+        if (!empty($orderBy)) {
             $select->order($orderBy . ' ' . $orderDirection);
+        }
+
+        /**
+         *  Applying Start Date & End Date filters
+         */
+         if (!empty($startDate) && !empty($endDate)) {
+            //select entries >= startDate && <= endDate
+            $select->where->nest()->greaterThanOrEqualTo('pros_contact_date', date_format(date_create($startDate), "Y-m-d H:i:s"))
+                ->and->lessThanOrEqualTo('pros_contact_date', date_format(date_create($endDate . '23:59:59'), "Y-m-d H:i:s"))
+                ->unnest();
         }
 
         $getCount = $this->tableGateway->selectWith($select);
         // set current data count for pagination
-        $this->setCurrentDataCount((int) $getCount->count());
+        $this->setCurrentDataCount((int)$getCount->count());
 
-        if(!empty($limit)) {
-            $select->limit( (int) $limit);
+        if (!empty($limit)) {
+            $select->limit((int)$limit);
         }
 
-        if(!empty($start)) {
-            $select->offset( (int) $start);
+        if (!empty($start)) {
+            $select->offset((int)$start);
         }
-
 
         $resultSet = $this->tableGateway->selectWith($select);
+
         return $resultSet;
     }
 
