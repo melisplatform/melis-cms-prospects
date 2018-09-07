@@ -234,8 +234,8 @@
 
         //GDPR
         'tr_melis_cms_prospects_gdpr_column_email' => 'Email',
-        'tr_melis_cms_prospects_gdpr_column_name' => 'Name',
-        'tr_melis_cms_prospects_gdpr_column_company' => 'Company',
-        'tr_melis_cms_prospects_gdpr_column_country' => 'Country',
+        'tr_melis_cms_prospects_gdpr_column_name' => 'Nom',
+        'tr_melis_cms_prospects_gdpr_column_company' => 'Entreprise',
+        'tr_melis_cms_prospects_gdpr_column_country' => 'Pays',
         'tr_melis_cms_prospects_gdpr_column_site' => 'Site',
     );
