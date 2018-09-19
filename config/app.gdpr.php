@@ -11,7 +11,7 @@
                                 'pros_email' => [
                                     'id' => 'meliscmsprospects_pros_email',
                                     'class' => '',
-                                    'style' => 'width:1%;padding-left:65px !important;',
+                                    'style' => 'width:1%;',
                                     'text' => 'tr_melis_cms_prospects_gdpr_column_email',
                                     'sorting' => false
                                 ],
