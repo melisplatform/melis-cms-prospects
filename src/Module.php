@@ -103,7 +103,7 @@ class Module
     {
         $param = $routeMatch->getParams();
         // Checking if the Request is from Melis-BackOffice or Front
-        if ($param['renderMode'] = 'melis')
+        if ($param['renderMode'] == 'melis')
         {
             $container = new Container('meliscore');
             $locale = $container['melis-lang-locale'];
