@@ -163,8 +163,12 @@ class MelisProspectTable extends MelisGenericTable
     {
         $select = $this->tableGateway->getSql()->select();
         $select->columns(['*']);
-        $select->join('melis_cms_site', 'melis_cms_site.site_id = melis_cms_prospects.pros_site_id',
-            ['site_name'], $select::JOIN_LEFT);
+        $select->join(
+            'melis_cms_site', 
+            'melis_cms_site.site_id = melis_cms_prospects.pros_site_id',
+            ['site_name'], 
+            $select::JOIN_LEFT
+        );
 
         if (! empty($searchInputs)) {
             foreach ($searchInputs as $searchInputKey => $searchInputValue) {
@@ -172,10 +176,10 @@ class MelisProspectTable extends MelisGenericTable
                     if (isset($searchableColumns[$searchInputKey])) {
                         if (is_array($searchableColumns[$searchInputKey])) {
                             foreach ($searchableColumns[$searchInputKey] as $search) {
-                                $select->where->or->like($search, '%' . $searchInputValue . '%');
+                                $select->where->or->literal('LOWER(' . $search . ') = ' . "'" . strtolower($searchInputValue) . "'");
                             }
                         } else {
-                            $select->where->like($searchableColumns[$searchInputKey], '%' . $searchInputValue . '%');
+                            $select->where->literal('LOWER(' . $searchableColumns[$searchInputKey] . ') = ' . "'" . strtolower($searchInputValue) . "'");
                         }
                     }
                 }
