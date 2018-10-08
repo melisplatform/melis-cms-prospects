@@ -7,21 +7,21 @@ return array(
             'interface' => array(
                 'meliscore_leftmenu' => array(
                     'interface' => array(
-        			    'meliscore_toolstree' =>  array(
-        			    	'interface' => array(
-								'melisprospects_tools_section' => array(
-									'conf' => array(
-											'id' => 'id_melisprospects_tools_section',
-											'name' => 'tr_melistoolprospects_tool_prospects',
-											'icon' => 'fa-user-plus',
-											'rights_checkbox_disable' => true,
-									),
-        			    			'interface' => array( 
-		        			    		'MelisCmsProspects_tool_prospects' => array(
-		        			    			'conf' => array(
-		        			    				'type' => '/MelisCmsProspects/interface/MelisCmsProspects_toolstree/interface/MelisCmsProspects_tool_conf',
-		        			    			),
-		        			    		),
+                        'melismarketing_toolstree_section' =>  array(
+                            'interface' => array(
+                                'melisprospects_tools_section' => array(
+                                    'conf' => array(
+                                        'id' => 'id_melisprospects_tools_section',
+                                        'name' => 'tr_melistoolprospects_tool_prospects',
+                                        'icon' => 'fa-user-plus',
+                                        'rights_checkbox_disable' => true,
+                                    ),
+                                    'interface' => array(
+                                        'MelisCmsProspects_tool_prospects' => array(
+                                            'conf' => array(
+                                                'type' => '/MelisCmsProspects/interface/MelisCmsProspects_toolstree/interface/MelisCmsProspects_tool_conf',
+                                            ),
+                                        ),
                                         'MelisCmsProspects_tool_prospects_themes' => array(
                                             'conf' => array(
                                                 'type' => '/MelisCmsProspects/interface/MelisCmsProspects_toolstree/interface/MelisCmsProspectsThemes_tool_conf',

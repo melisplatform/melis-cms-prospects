@@ -38,6 +38,11 @@ return array(
                                     'controller' => 'ToolProspects',
                                     'action' => 'render-tool-prospects-content-filters-site'
                                 ),
+                                'toolprospect-type-filter' => array(
+                                    'module' => 'MelisCmsProspects',
+                                    'controller' => 'ToolProspects',
+                                    'action' => 'render-tool-prospects-content-filters-pros-type'
+                                ),
                             ),
                             'center' => array(
                                 'toolprospect-search' => array(
@@ -83,6 +88,12 @@ return array(
                                 'css' => array('width' => '15%', 'padding-right' => '0'),
                                 'sortable' => true,
                                 
+                            ),
+                            'pros_type' => array(
+                                'text' => 'tr_melistoolprospects_prospects_pros_filter_type',
+                                'css' => array('width' => '15%', 'padding-right' => '0'),
+                                'sortable' => true,
+
                             ),
                             'pros_telephone' => array(
                                 'text' => 'tr_melistoolprospects_prospects_pros_telephone',
