@@ -161,6 +161,19 @@ class MelisCmsProspectsShowFormPlugin extends MelisTemplatingPlugin
                     array_push($postedFields, $key);
                 }
 
+                /**
+                 * check if pros_type is included in the post
+                 * to include it in the fields so that
+                 * fields will match with the post fields
+                 *
+                 * we will put the pros_type at the beginning of the
+                 * fields array, so we assume that the pros_type is also
+                 * at the beginning of the post fields
+                 */
+                if(isset($post['pros_type'])){
+                    array_unshift($fields, 'pros_type');
+                }
+
                 if ($postedFields == $fields|| empty($fields))
                 {
                     $prospectsForm->setData($post);
@@ -209,8 +222,12 @@ class MelisCmsProspectsShowFormPlugin extends MelisTemplatingPlugin
                         {
                             $val->setValue(null);
                         }
-                        
-                        $success = 1;
+
+                        if($responseData){
+                            $melisEngineGeneralService = $this->getServiceLocator()->get('MelisEngineGeneralService');
+                            $melisEngineGeneralService->sendEvent('meliscms_prospects_plugin_save', $post);
+                            $success = 1;
+                        }
                     }
                     else
                     {

@@ -1,0 +1,104 @@
+<div class="widget widget-tabs widget-tabs-responsive">
+    <!-- Tabs Heading -->
+    <div class="widget-head">
+        <ul>
+            <li class="active">
+            	<a class="glyphicons stats" href="#chart-simple-lines-<?php echo $this->pluginConfig['plugin_id']?>" data-toggle="tab"><i></i></a>
+            </li>
+            <li class="">
+            	<a class="glyphicons charts chart-simple-lines-tab" href="#chart-simple-bars-<?php echo $this->pluginConfig['plugin_id']?>" data-toggle="tab"><i></i></a>
+            </li>
+        </ul>
+    </div>
+    <!-- // Tabs Heading END -->
+</div>
+
+
+<div class="row row-merge">
+	<div class="col-sm-12 bg-white">
+		<div class="innerAll">
+			<div class="tab-content">
+				<div class="tab-pane active" id="chart-simple-lines-<?php echo $this->pluginConfig['plugin_id']?>">
+					<div class="btn-group pull-right" data-toggle="buttons">
+                      	<label class="btn btn-default btn-sm active">
+                        	<input type="radio" class="cms-pros-dash-chart-line" name="cms-pros-dash-chart-line" value="daily"><?php echo $this->translate('tr_melistoolprospects_dashboard_Prospects Statistics_daily')?>
+                      	</label>
+                      	<label class="btn btn-default btn-sm">
+                        	<input type="radio" class="cms-pros-dash-chart-line" name="cms-pros-dash-chart-line" value="monthly"><?php echo $this->translate('tr_melistoolprospects_dashboard_Prospects Statistics_monthly')?>
+                      	</label>
+                      	<label class="btn btn-default btn-sm">
+                        	<input type="radio" class="cms-pros-dash-chart-line" name="cms-pros-dash-chart-line" value="yearly"><?php echo $this->translate('tr_melistoolprospects_dashboard_Prospects Statistics_yearly')?>
+                      	</label>
+                    </div>
+                    <div class="separator bottom"></div>
+	            	<div class="flotchart-holder cms-pros-dash-chart-line-graph" id="cms-pros-dash-chart-line-graph-<?php echo $this->pluginConfig['plugin_id']?>"></div>
+				</div>
+				<div class="tab-pane" id="chart-simple-bars-<?php echo $this->pluginConfig['plugin_id']?>">
+					<div class="btn-group pull-right" data-toggle="buttons">
+                      	<label class="btn btn-default btn-sm active">
+                        	<input type="radio" class="cms-pros-dash-chart-bar" name="cms-pros-dash-chart-bar" value="daily"><?php echo $this->translate('tr_melistoolprospects_dashboard_Prospects Statistics_daily')?>
+                      	</label>
+                      	<label class="btn btn-default btn-sm">
+                        	<input type="radio" class="cms-pros-dash-chart-bar" name="cms-pros-dash-chart-bar" value="monthly"><?php echo $this->translate('tr_melistoolprospects_dashboard_Prospects Statistics_monthly')?>
+                      	</label>
+                      	<label class="btn btn-default btn-sm">
+                        	<input type="radio" class="cms-pros-dash-chart-bar" name="cms-pros-dash-chart-bar" value="yearly"><?php echo $this->translate('tr_melistoolprospects_dashboard_Prospects Statistics_yearly')?>
+                      	</label>
+                    </div>
+                    <div class="separator bottom"></div>
+	    			<div class="flotchart-holder cms-pros-dash-chart-bar-graph" id="cms-pros-dash-chart-bar-graph-<?php echo $this->pluginConfig['plugin_id']?>"></div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<div class="row row-merge">
+	<div class="col-sm-3 bg-white">
+		<div class="text-center innerAll border-bottom">
+			<div class="separator bottom"></div>
+			<i class="icon-graph-up-1 fa-4x text-primary"></i>
+			<div class="separator bottom"></div>
+			<p class="lead"><span class="text-large text-regular"><?php echo $this->numPropects ?></span> <span class="text-primary dashboard-prospects-label"><?php echo $this->translate('tr_melistoolprospects_tool_prospects') ?> </span></p>
+		</div>
+	</div>
+	<div class="col-sm-9 bg-white">
+		<div class="overflow-x ">
+			<table class="table table-condensed border-top margin-none pros-dash-tbl">
+				<!-- Table heading -->
+				<thead class="bg-primary">
+					<tr>
+						<th class="center"><?php echo $this->translate('tr_melistoolprospects_dashboard_Prospects Statistics_id')?></th>
+						<th><?php echo $this->translate('tr_melistoolprospects_dashboard_Prospects Statistics_name')?></th>
+						<th><?php echo $this->translate('tr_melistoolprospects_dashboard_Prospects Statistics_email')?></th>
+						<th><?php echo $this->translate('tr_melistoolprospects_dashboard_Prospects Statistics_date')?></th>
+					</tr>
+				</thead>
+				<!-- // Table heading END -->
+				<!-- Table body -->
+				<tbody>
+					<?php if (!empty($this->recentPropects)) :?>
+					
+						<?php $recentData = $this->recentPropects ?>
+						<!-- Table row -->
+						<?php for($i = 0; $i < count($recentData); $i++){ ?>
+    						<tr>
+    							<td class="center"><?php echo $recentData[$i]['pros_id']?> </td>
+    							<td><div class="pros-dash-lbl"><?php echo $this->escapeHtml($recentData[$i]['pros_name']); ?></div></td>
+    							<td><div class="pros-dash-lbl"><?php echo $this->escapeHtml($recentData[$i]['pros_email']); ?></div></td>
+    							<td><?php echo date($this->dateFormat, strtotime($recentData[$i]['pros_contact_date']))?></td>
+    						</tr>
+						<?php } ?>
+					<?php else: ?>
+						<tr>
+							<td class="center" colspan="3">No Data</td>
+    					</tr>
+					<?php endif;?>
+					<!-- // Table row END -->
+				</tbody>
+				<!-- // Table body END -->
+			</table>
+			<!-- // Table END -->
+			
+		</div>
+	</div>
+</div>

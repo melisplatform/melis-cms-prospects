@@ -1,4 +1,4 @@
-<?php
+<?php 
 
 return array(
     'plugins' => array(
@@ -7,7 +7,7 @@ return array(
             'interface' => array(
                 'meliscore_leftmenu' => array(
                     'interface' => array(
-                        'meliscore_toolstree' =>  array(
+                        'melismarketing_toolstree_section' =>  array(
                             'interface' => array(
                                 'melisprospects_tools_section' => array(
                                     'conf' => array(
@@ -26,31 +26,11 @@ return array(
                                             'conf' => array(
                                                 'type' => '/MelisCmsProspects/interface/MelisCmsProspects_toolstree/interface/MelisCmsProspectsThemes_tool_conf',
                                             ),
-                                        ),
-                                    ),
-                                ),
-                            ),
-                        ),
-                    ),
-                ),
-            ),
-        ),
-        'meliscore_dashboard' => array(
-            'interface' => array(
-                'MelisCmsProspects_dashboard_statistics' => array(
-                    'conf' => array(
-                        'id' => 'id_MelisCmsProspects_dashboard_statistics',
-                        'name' => 'tr_melistoolprospects_dashboard_Statistics',
-                        'melisKey' => 'MelisCmsProspects_dashboard_statistics',
-                        'width' => 6,
-                        'height' => 'dashboard-large',
-                    ),
-                    'forward' => array(
-                        'module' => 'MelisCmsProspects',
-                        'controller' => 'Dashboard',
-                        'action' => 'dashboardStatistics',
-                        'jscallback' => 'simpleChartInit();',
-                        'jsdatas' => array()
+                                        ), 
+        			    			),
+								),
+        			    	),
+        			    ),
                     ),
                 ),
             ),
@@ -63,12 +43,10 @@ return array(
             ),
             'ressources' => array(
                 'js' => array(
-                    '/MelisCmsProspects/assets/flotchart/flotchart-simple.init.js?v=v1.2.3',
-                    '/MelisCmsProspects/assets/flotchart/flotchart-simple-bars.init.js?v=v1.2.3',
                     '/MelisCmsProspects/js/tools/prospects.tool.js',
                     '/MelisCmsProspects/js/tools/prospects.theme.tool.js',
                 ),
-
+                
                 'css' => array(
                     '/MelisCmsProspects/css/style.css',
                 ),
@@ -88,7 +66,7 @@ return array(
                 ]
             ),
             'datas' => array(
-
+                
             ),
             'interface' => array(
                 'MelisCmsProspects_toolstree' => array(
@@ -102,8 +80,8 @@ return array(
                                 'id' => 'id_MelisCmsProspects_tool_prospects',
                                 'name' => 'tr_melistoolprospects_tool_prospects',
                                 'melisKey' => 'MelisCmsProspects_tool_prospects',
-                                'icon' => 'fa-list-ol',
-                                'rights_checkbox_disable' => true,
+                            	'icon' => 'fa-list-ol',
+								'rights_checkbox_disable' => true,
                                 'follow_regular_rendering' => false,
                             ),
                             'forward' => array(
@@ -132,7 +110,7 @@ return array(
                                     ),
                                 ),
                                 // Prospects Widgets
-                                'MelisCmsProspects_tool_prospects_widgets' => array(
+                                'MelisCmsProspects_tool_prospects_widgets' => array( 
                                     'conf' => array(
                                         'id' => 'id_MelisCmsProspects_tool_prospects_widgets',
                                         'name' => 'tr_melistoolprospects_tool_prospects_widgets',
@@ -147,7 +125,7 @@ return array(
                                     ),
                                     'interface' => array(
                                         // Number of Prospect widget
-                                        'MelisCmsProspects_tool_prospects_header_num_prospects' => array(
+                                        'MelisCmsProspects_tool_prospects_header_num_prospects' => array( 
                                             'conf' => array(
                                                 'id' => 'id_MelisCmsProspects_tool_prospects_header_num_prospects',
                                                 'name' => 'tr_melistoolprospects_tool_prospects_header_num_prospects',

@@ -20,6 +20,9 @@ use Zend\Session\Container;
 use MelisCmsProspects\Model\MelisProspects;
 use MelisCmsProspects\Model\Tables\MelisProspectTable;
 use MelisCmsProspects\Listener\MelisCmsProspectFlashMessengerListener;
+use MelisCmsProspects\Listener\MelisCmsProspectsGdprUserInfoListener;
+use MelisCmsProspects\Listener\MelisCmsProspectsGdprUserExtractListener;
+use MelisCmsProspects\Listener\MelisCmsProspectsGdprUserDeleteListener;
 use Zend\Mvc\Router\Http\RouteMatch;
 /**
  * Class Module
@@ -33,7 +36,7 @@ class Module
         $eventManager        = $e->getApplication()->getEventManager();
         $moduleRouteListener = new ModuleRouteListener();
         $moduleRouteListener->attach($eventManager);
-        
+
         $moduleName = null;
         
         $sm = $e->getApplication()->getServiceManager();
@@ -48,12 +51,13 @@ class Module
             
             if (!empty($moduleName[0]))
 	        {
-	            
-	            
+
 		        if ($moduleName[0] == 'melis-backoffice')
 		        {
                     $eventManager->attach(new MelisCmsProspectFlashMessengerListener());
-                    
+                    $eventManager->attach(new MelisCmsProspectsGdprUserInfoListener());
+                    $eventManager->attach(new MelisCmsProspectsGdprUserExtractListener());
+                    $eventManager->attach(new MelisCmsProspectsGdprUserDeleteListener());
 		        }
 	        }
         }
@@ -79,6 +83,11 @@ class Module
     	    
     	    // Templating plugins
     	    include __DIR__ . '/../config/plugins/MelisCmsProspectsShowFormPlugin.config.php',
+    	    
+    	    include __DIR__ . '/../config/dashboard-plugins/MelisCmsProspectsStatisticsPlugin.config.php',
+
+            //gdpr
+            include __DIR__ . '/../config/app.gdpr.php'
     	);
     	
     	foreach ($configFiles as $file) {
@@ -103,7 +112,8 @@ class Module
     {
         $param = $routeMatch->getParams();
         // Checking if the Request is from Melis-BackOffice or Front
-        if ($param['renderMode'] = 'melis')
+        $renderMode = (isset($param['renderMode'])) ? $param['renderMode'] : 'melis';
+        if ($renderMode == 'melis')
         {
             $container = new Container('meliscore');
             $locale = $container['melis-lang-locale'];

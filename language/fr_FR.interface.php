@@ -22,6 +22,8 @@
         'tr_melistoolprospects_prospects_pros_site_id' => 'Nom du site',
         'tr_melistoolprospects_prospects_pros_filter_site' => 'Site',
         'tr_melistoolprospects_prospects_pros_site tooltip' => 'Choisissez le site correspondant',
+        'tr_melistoolprospects_prospects_pros_filter_type' => 'Type',
+        'tr_melistoolprospects_prospects_common_choose_label' => 'Choisir',
 	    
 	    // Prospects
 	    'tr_prospect_manager_fm_delete_data_title' => 'Effacer un prospect',
@@ -79,7 +81,8 @@
 			
 		// Dashboard
 	    'tr_melistoolprospects_dashboard_Statistics' => 'Statistiques',
-	    'tr_melistoolprospects_dashboard_Prospects Statistics' => 'Prospects statistics',
+	    'tr_melistoolprospects_dashboard_Prospects Statistics' => 'Statistiques des prospects',
+	    'tr_melistoolprospects_dashboard_Prospects Statistics description' => 'Ce plugin affiche les statistiques des entrées de prospects.',
 	    'tr_melistoolprospects_dashboard_Prospects Statistics_daily' => 'Jours',
 	    'tr_melistoolprospects_dashboard_Prospects Statistics_monthly' => 'Mois',
 	    'tr_melistoolprospects_dashboard_Prospects Statistics_yearly' => 'Années',
@@ -231,4 +234,11 @@
 	    'tr_melis_cms_prospects_plugin_config_no_mandatory' => 'Au moins un champ obligatoire est requis',
 	    'tr_melis_cms_prospects_plugin_config_no_field' => 'Au moins un champ doit être affiché',
 	    'tr_melis_cms_prospects_plugin_config_no_theme' => 'Veuillez choisir un theme',
+
+        //GDPR
+        'tr_melis_cms_prospects_gdpr_column_email' => 'Email',
+        'tr_melis_cms_prospects_gdpr_column_name' => 'Nom',
+        'tr_melis_cms_prospects_gdpr_column_company' => 'Entreprise',
+        'tr_melis_cms_prospects_gdpr_column_country' => 'Pays',
+        'tr_melis_cms_prospects_gdpr_column_site' => 'Site',
     );

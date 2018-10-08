@@ -1,13 +1,13 @@
 $(document).ready(function(){
 	
-	$("body").on("change", '.dashchartbar', function() {
-		simpleBarsInit($(this).val());
+	$("body").on("change", '.cms-pros-dash-chart-bar', function() {
+		cmsProsDashBarGraphInit($(this));
 	});
 	
 	if (typeof charts == 'undefined') 
 		return;
 
-	charts.chart_simple_bars = 
+	charts.cmsProsDashBarGraph = 
 	{
 		// data
 		data: 
@@ -33,7 +33,7 @@ $(document).ready(function(){
 	        series: {
 	        	bars: {
 	        		show: true,
-//	        		lineWidth: 100,
+	        		// lineWidth: 100,
 	                barWidth: 12*24*60*60*60,
 	                fill: true,
 	                align : "center"
@@ -43,7 +43,7 @@ $(document).ready(function(){
 	        xaxis: {
 	        	mode: 'time',
 	            timeformat: '%b %d',
-//	            tickSize: [1, 'day'],
+	            // tickSize: [1, 'day'],
 	            position: 'bottom',
 	            tickColor: '#eee',
 			},
@@ -67,14 +67,14 @@ $(document).ready(function(){
 			
 		},
 		
-		placeholder: "#chart_simple_bars",
+		placeholder: ".cms-pros-dash-chart-bar-graph",
 
 		// initialize
 		init: function()
 		{
 			if (this.plot == null){
 				// hook the init function for plotting the chart
-				simpleBarsInit();
+				cmsProsDashBarGraphInit();
 			}
 			
 		}
@@ -82,18 +82,26 @@ $(document).ready(function(){
 		
 	
 	// INIT PLOTTING FUNCTION [also used as callback in the app.interface for when we refresh the chart]
-	window.simpleBarsInit = function(chartFor){
-		if(typeof chartFor === "undefined") chartFor = 'daily';
+	window.cmsProsDashBarGraphInit = function(target, targetDevId){
+		
+		if(typeof target === "undefined"){
+			chartFor = 'daily';
+			placeholder = targetDevId;
+		}else{
+			chartFor = target.val();
+			placeholder = "#"+target.closest(".tab-pane").find(".cms-pros-dash-chart-bar-graph").attr("id");
+		}
+		
 		// get the statistics data
 		$.ajax({
 			type        : 'POST',
-		    url         : '/melis/MelisCmsProspects/Dashboard/getDashboardStats',
+		    url         : '/melis/dashboard-plugin/MelisCmsProspectsStatisticsPlugin/getDashboardStats',
 		    data		: {chartFor : chartFor},
 		    dataType 	: 'json',
 		    encode		: true
 		}).success(function(data){
 			// plot the bar chart
-			var opts = charts.chart_simple_bars.options;
+			var opts = charts.cmsProsDashBarGraph.options;
 			// Set Bar With Depend on Type of Chart
 			switch (chartFor) {
 	            case 'daily':
@@ -112,44 +120,61 @@ $(document).ready(function(){
 	                break;
 			}
 			
-			charts.chart_simple_bars.plot = $.plot(
-				$(charts.chart_simple_bars.placeholder),
+			var tmpData = data.values;
+            var tmpdataLength  = tmpData.length;
+            var finalData = [];
+            var curTime = null;
+
+            for(var i = 0; i < tmpdataLength ; i++)
+            {
+                var newDate = new Date(tmpData[i][0]);
+                var tmpDate = new Date();
+
+                var m = newDate.getMonth() ;
+                var y = newDate.getFullYear();
+                var newMonth = new Date(y, m, 1.5 );
+                var newYear = new Date(y,0, 2);
+
+
+                if(chartFor == 'daily'){
+                    curTime = newDate.getTime();
+                }
+                else if (chartFor == 'monthly'){
+                    curTime = newMonth.getTime();
+                }
+                else if (chartFor == 'yearly'){
+                    curTime = newYear.getTime();
+
+                }
+
+                finalData.push([ curTime , tmpData[i][1]]);
+            }
+			
+			charts.cmsProsDashBarGraph.plot = $.plot(
+				$(placeholder),
 	           	[{
-	    			label: "Prospects", 
-	    			data: data.values,
+	    			label: translations.tr_melistoolprospects_tool_prospects, 
+	    			data: finalData,
 	    			color: successColor,
-	    		}], charts.chart_simple_bars.options);
+	    		}], 
+	    		charts.cmsProsDashBarGraph.options
+    		);
 			
 		}).error(function(xhr, textStatus, errorThrown){
-			alert("ERROR !! Status = "+ textStatus + "\n Error = "+ errorThrown + "\n xhr = "+ xhr.statusText);
+			console.log("ERROR !! Status = "+ textStatus + "\n Error = "+ errorThrown + "\n xhr = "+ xhr.statusText);
 		});
 	}
 	
-	
-	
-	// uncomment to init on load
-	// charts.chart_simple_bars.init();
-
-	// use with tabs
-	$('body').on('shown.bs.tab', 'a[href="#chart-simple-bars"]', function(){
+	// Tab shon event
+	$('body').on('shown.bs.tab', '.chart-simple-lines-tab', function(e){
 
 		// ----=[ Melis customize ]=----
 		// modified this event, used event delegation and hooked it up in the body so it still works after the zone is reloaded.
 		// created var flot; and added or '|| flot === undefined' in the condition to make other charts reinitialize after zoneReloading.
-		
-		var flot = $("#chart_simple_bars").data('plot');
-		if ( charts.chart_simple_bars.plot == null || flot === undefined  ){
-			simpleBarsInit();
+		targetDevId = "#"+$($(this).attr("href")).find(".cms-pros-dash-chart-bar-graph").attr("id");
+		var flot = $(targetDevId).data('plot');
+		if ( charts.cmsProsDashBarGraph.plot == null || flot === undefined  ){
+			cmsProsDashBarGraphInit(undefined, targetDevId);
 		}
-			
 	});
-	
-	$('body').on('click', '.btn-group a[href="#chart-simple-bars"]', function(){
-		$(this).parent().find('[data-toggle]').removeClass('active');
-		$(this).addClass('active');
-		
-	});
-	
-	
-
 });

@@ -11,6 +11,7 @@ namespace MelisCmsProspects\Model\Tables;
 
 use MelisEngine\Model\Tables\MelisGenericTable;
 use Zend\Db\TableGateway\TableGateway;
+use Zend\Db\Metadata\Metadata;
 
 class MelisProspectTable extends MelisGenericTable 
 {
@@ -32,7 +33,7 @@ class MelisProspectTable extends MelisGenericTable
     public function getNumberProspectsPerDay($maxDays = 30)
     {
     	$select = $this->tableGateway->getSql()->select();
-    
+
     	$select->columns(array(new \Zend\Db\Sql\Expression('COUNT("pros_id") AS nb'), "pros_contact_date"));
     	$select->group("pros_contact_date");
     	$select->limit($maxDays);
@@ -84,41 +85,106 @@ class MelisProspectTable extends MelisGenericTable
         return $resultData;
     }
 
-    public function getData($search = '', $prosSiteId = null,  $searchableColumns = [], $orderBy = '', $orderDirection = 'ASC', $start = 0, $limit = null)
+    public function getData($search = '', $prosSiteId = null,  $searchableColumns = [], $orderBy = '', $orderDirection = 'ASC', $start = 0, $limit = null, $prosType = null, $startDate = null, $endDate = null)
     {
         $select = $this->tableGateway->getSql()->select();
         $select->columns(array('*'));
         $select->join('melis_cms_site', 'melis_cms_site.site_id = melis_cms_prospects.pros_site_id',
             array('site_name'), $select::JOIN_LEFT);
 
-        if(!empty($searchableColumns) && !empty($search)) {
-            foreach($searchableColumns as $column) {
-                $select->where->or->like($column, '%'.$search.'%');
+        if (!empty($searchableColumns) && !empty($search)) {
+            foreach ($searchableColumns as $column) {
+                if (!empty($search) && is_array($search)) {
+                    $moreThanOneInput = true;
+                    foreach ($search as $searchItem) {
+                        if ($searchItem != '') {
+                            if ($moreThanOneInput) {
+                                $select->where->like($column, '%' . $searchItem . '%');
+                                $moreThanOneInput = false;
+                            } else
+                                $select->where->or->like($column, '%' . $searchItem . '%');
+                        }
+                    }
+                } else {
+                    $select->where->or->like($column, '%' . $search . '%');
+                }
             }
         }
 
-        if(!empty($prosSiteId) && !is_null($prosSiteId)){
+        if (!empty($prosSiteId) && !is_null($prosSiteId)) {
             $select->where->equalTo("pros_site_id", $prosSiteId);
+        }
+
+        if(!empty($prosType) && !is_null($prosType)){
+            $select->where->equalTo("pros_type", $prosType);
+        }
+
+        if(!empty($startDate) && !empty($endDate)){
+            $select->where->between('pros_contact_date', date('Y-m-d', strtotime($startDate)), date('Y-m-d', strtotime($endDate)));
         }
 
         if(!empty($orderBy)) {
             $select->order($orderBy . ' ' . $orderDirection);
         }
 
-        $getCount = $this->tableGateway->selectWith($select);
-        // set current data count for pagination
-        $this->setCurrentDataCount((int) $getCount->count());
-
-        if(!empty($limit)) {
-            $select->limit( (int) $limit);
+        /**
+         *  Applying Start Date & End Date filters
+         */
+         if (!empty($startDate) && !empty($endDate)) {
+            //select entries >= startDate && <= endDate
+            $select->where->nest()->greaterThanOrEqualTo('pros_contact_date', date_format(date_create($startDate), "Y-m-d H:i:s"))
+                ->and->lessThanOrEqualTo('pros_contact_date', date_format(date_create($endDate . '23:59:59'), "Y-m-d H:i:s"))
+                ->unnest();
         }
 
-        if(!empty($start)) {
-            $select->offset( (int) $start);
+        $getCount = $this->tableGateway->selectWith($select);
+        // set current data count for pagination
+        $this->setCurrentDataCount((int)$getCount->count());
+
+        if (!empty($limit)) {
+            $select->limit((int)$limit);
+        }
+
+        if (!empty($start)) {
+            $select->offset((int)$start);
+        }
+
+        $resultSet = $this->tableGateway->selectWith($select);
+
+        return $resultSet;
+    }
+
+    /**
+     *
+     */
+    public function getDataForGdpr($searchInputs = [], $searchableColumns = [])
+    {
+        $select = $this->tableGateway->getSql()->select();
+        $select->columns(['*']);
+        $select->join(
+            'melis_cms_site', 
+            'melis_cms_site.site_id = melis_cms_prospects.pros_site_id',
+            ['site_name'], 
+            $select::JOIN_LEFT
+        );
+
+        if (! empty($searchInputs)) {
+            foreach ($searchInputs as $searchInputKey => $searchInputValue) {
+                if ($searchInputValue != '') {
+                    if (isset($searchableColumns[$searchInputKey])) {
+                        if (is_array($searchableColumns[$searchInputKey])) {
+                            foreach ($searchableColumns[$searchInputKey] as $search) {
+                                $select->where->or->literal('LOWER(' . $search . ') = ' . "'" . strtolower($searchInputValue) . "'");
+                            }
+                        } else {
+                            $select->where->literal('LOWER(' . $searchableColumns[$searchInputKey] . ') = ' . "'" . strtolower($searchInputValue) . "'");
+                        }
+                    }
+                }
+            }
         }
 
         $resultSet = $this->tableGateway->selectWith($select);
         return $resultSet;
     }
-
 }
