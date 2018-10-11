@@ -33,8 +33,9 @@ class ToolProspectsController extends AbstractActionController
         $translator = $this->getServiceLocator()->get('translator');
         $melisKey = $this->params()->fromRoute('melisKey', '');
         $noAccessPrompt = '';
-        
-        if(!$this->hasAccess($this::TOOL_KEY)) {
+
+        $melisCoreRights = $this->getServiceLocator()->get('MelisCoreRights');
+        if(!$melisCoreRights->canAccess($this::TOOL_KEY)) {
             $noAccessPrompt = $translator->translate('tr_tool_no_access');
         }
         
@@ -630,21 +631,7 @@ class ToolProspectsController extends AbstractActionController
         return new JsonModel($response);
         
     }
-    
-    /**
-     * Checks wether the user has access to this tools or not
-     * @return boolean
-     */
-    private function hasAccess($key)
-    {
-        $melisCoreAuth = $this->getServiceLocator()->get('MelisCoreAuth');
-        $melisCoreRights = $this->getServiceLocator()->get('MelisCoreRights');
-        $xmlRights = $melisCoreAuth->getAuthRights();
 
-        $isAccessible = $melisCoreRights->isAccessiblecanAccess($key);
-
-        return $isAccessible;
-    }
     public function removeAllProspectDataAction()
     {
         $response = array();
