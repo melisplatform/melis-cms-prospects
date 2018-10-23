@@ -17,6 +17,7 @@ SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='TRADITIONAL,ALLOW_INVALID_DATES';
 CREATE TABLE IF NOT EXISTS `melis_cms_prospects_themes` (
   `pros_theme_id` INT NOT NULL AUTO_INCREMENT,
   `pros_theme_name` VARCHAR(45) NOT NULL,
+  `pros_theme_code` VARCHAR(45) NOT NULL,
   PRIMARY KEY (`pros_theme_id`))
 ENGINE = InnoDB;
 
