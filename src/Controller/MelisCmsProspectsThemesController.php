@@ -270,9 +270,13 @@ class MelisCmsProspectsThemesController extends AbstractActionController
                 {
                     foreach ($appConfigForm as $keyForm => $valueForm)
                     {
-                        if ($valueForm['spec']['name'] == $keyError &&
-                            !empty($valueForm['spec']['options']['label']))
-                            $errors[$keyError]['label'] = $valueForm['spec']['options']['label'];
+                        if(isset($valueForm['spec']['name']))
+                        {
+                            if ($valueForm['spec']['name'] == $keyError &&
+                                !empty($valueForm['spec']['options']['label'])
+                            )
+                                $errors[$keyError]['label'] = $valueForm['spec']['options']['label'];
+                        }
                     }
                 }
             }
