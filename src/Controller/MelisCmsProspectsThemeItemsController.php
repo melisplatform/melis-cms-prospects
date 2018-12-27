@@ -163,7 +163,7 @@ class MelisCmsProspectsThemeItemsController extends AbstractActionController
         
         if ($request->isPost()) {
 
-            $forms = $this->tool()->sanitizeRecursive(get_object_vars($request->getPost()), [], true);
+            $forms = $this->tool()->sanitizeRecursive(get_object_vars($request->getPost()), ["'",'"'], false);
             $themeId = $forms['themeId'];
             
             if (isset($forms['forms']) && !empty($forms['forms'])) {
