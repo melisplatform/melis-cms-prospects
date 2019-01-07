@@ -355,7 +355,7 @@ class ToolProspectsController extends AbstractActionController
         $options = '<option  value="">'.$translator->translate('tr_melistoolprospects_prospects_common_choose_label').'</option>';
         foreach($sites as $site){
             $selected  = ($site->site_id == $siteId)? 'selected' : '';
-            $options .= '<option value="'.$site->site_id.'" '.$selected.'>'.$site->site_name .'</option>';
+            $options .= '<option value="'.$site->site_id.'" '.$selected.'>'.$site->site_label .'</option>';
         }
 
         $view =  new ViewModel();
