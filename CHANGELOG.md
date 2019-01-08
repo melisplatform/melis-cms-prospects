@@ -1,14 +1,8 @@
 # Changelog
 All notable changes to this project will be documented in this file.  
 
-## [Unreleased]  
-### Added  
-
-### Changed   
-* composer.json and dependencies  
-
-### Removed  
-
-
-## [2.2.1] - 2017-10-17
-Latest stable version
+## Release Notes
+## v3.0.0 - 2018-07-31
+* updated bundled CSS and JS
+* Updated composer.json dependencies
+* Updated tools tree
