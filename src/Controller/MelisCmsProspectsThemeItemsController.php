@@ -158,50 +158,59 @@ class MelisCmsProspectsThemeItemsController extends AbstractActionController
         $errors  = [];
         $title   = 'tr_melis_cms_prospects_theme_items';
         $request = $this->getRequest();
-        $itemId = null;
+        $itemId  = null;
+        $inputValidator = 0;
         
         if ($request->isPost()) {
 
-            $forms = $this->tool()->sanitizeRecursive(get_object_vars($request->getPost()), [], true);
+            $forms = $this->tool()->sanitizeRecursive(get_object_vars($request->getPost()), ["'",'"'], false);
             $themeId = $forms['themeId'];
             
             if (isset($forms['forms']) && !empty($forms['forms'])) {
-                
+
                 foreach ($forms['forms'] as $idx => $form) {
                     //check for existing item id
-                    
                     $itemId =  empty($itemId) ? (int) $form['item_trans_theme_item_id'] : $itemId;
                     $itemTexts =  empty($itemTexts) ? $form['item_trans_text'] : $itemTexts;
-                    
-                }
-                
-                // create if item ID is empty
-                if(empty($itemId) && !empty($itemTexts)) {
-                    $itemId =  $this->themeItemTable()->save(array('pros_theme_id' => $themeId));
-                }
-                
-                foreach ($forms['forms'] as $idx => $form) {
-                    
-                    $transId = isset($form['item_trans_id']) ? (int) $form['item_trans_id'] : null;
-                    $text = $form['item_trans_text'];
-                    
-                    if(!empty($transId) && empty($text)) {
-                        // delete the entry if it is blank
-                        $this->themeItemTransTable()->deleteById($transId);
-                    }
-                    
-                    if(!empty($itemId) && !empty($text)){
-                       
-                        $form['item_trans_theme_item_id'] = $itemId;
-                        unset($form['item_trans_id']);
-                        $this->themeItemTransTable()->save($form, $transId);
-                        
-                    }
+
+                    //check if is there an input
+                    if(!empty($form['item_trans_text']) || $form['item_trans_text']!="")
+                        $inputValidator++;
 
                 }
+                if($inputValidator) {
 
-                $success = 1;
-                $message = 'tr_melis_cms_prospects_theme_items_save_success';
+                    // create if item ID is empty
+                    if(empty($itemId) && !empty($itemTexts)) {
+                        $itemId =  $this->themeItemTable()->save(array('pros_theme_id' => $themeId));
+                    }
+
+                    foreach ($forms['forms'] as $idx => $form) {
+
+                        $transId = isset($form['item_trans_id']) ? (int) $form['item_trans_id'] : null;
+                        $text = $form['item_trans_text'];
+
+                        if(!empty($transId) && empty($text)) {
+                            // delete the entry if it is blank
+                            $this->themeItemTransTable()->deleteById($transId);
+                        }
+
+                        if(!empty($itemId) && !empty($text)){
+
+                            $form['item_trans_theme_item_id'] = $itemId;
+                            unset($form['item_trans_id']);
+                            $this->themeItemTransTable()->save($form, $transId);
+
+                        }
+
+                    }
+
+                    $success = 1;
+                    $message = 'tr_melis_cms_prospects_theme_items_save_success';
+                }else {
+                    $success = 0;
+                    $errors[$this->tool()->getTranslation("tr_melis_cms_prospects_theme_items_pros_theme_item_text2")]["isEmpty"] = $this->tool()->getTranslation("tr_melis_cms_prospects_theme_items_trans_text_empty");
+                }
             }
 
         }

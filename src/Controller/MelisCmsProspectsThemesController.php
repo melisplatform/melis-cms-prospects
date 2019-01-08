@@ -219,7 +219,7 @@ class MelisCmsProspectsThemesController extends AbstractActionController
             $allowSave = false;
 
 
-            $data = $this->tool()->sanitizeRecursive(get_object_vars($request->getPost()), [], true);
+            $data = $this->tool()->sanitizeRecursive(get_object_vars($request->getPost()), ["'",'"'], false);
             $id   = isset($data['pros_theme_id']) ? (int) $data['pros_theme_id'] : null; // changed to 1
             
             $melisCoreConfig = $this->serviceLocator->get('MelisCoreConfig');
@@ -270,9 +270,13 @@ class MelisCmsProspectsThemesController extends AbstractActionController
                 {
                     foreach ($appConfigForm as $keyForm => $valueForm)
                     {
-                        if ($valueForm['spec']['name'] == $keyError &&
-                            !empty($valueForm['spec']['options']['label']))
-                            $errors[$keyError]['label'] = $valueForm['spec']['options']['label'];
+                        if(isset($valueForm['spec']['name']))
+                        {
+                            if ($valueForm['spec']['name'] == $keyError &&
+                                !empty($valueForm['spec']['options']['label'])
+                            )
+                                $errors[$keyError]['label'] = $valueForm['spec']['options']['label'];
+                        }
                     }
                 }
             }

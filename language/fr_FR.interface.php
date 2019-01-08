@@ -222,6 +222,7 @@
         'tr_melis_cms_prospects_theme_items_edit' => '%s éléments thème',
         'tr_melis_cms_prospects_theme_items_save_success' => 'Eléments sauvegardés',
         'tr_melis_cms_prospects_theme_items_save_failed' => 'Impossible de sauvegarder les éléments',
+        'tr_melis_cms_prospects_theme_items_trans_text_empty' => 'Entrer le nom',
 
         'tr_melis_cms_prospects_theme_item_delete_success' => 'Eléments supprimés',
         'tr_melis_cms_prospects_theme_item_delete_failed' => 'Impossible de supprimer les éléments',

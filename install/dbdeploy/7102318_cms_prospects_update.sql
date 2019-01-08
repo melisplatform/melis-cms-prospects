@@ -1,0 +1,1 @@
+ALTER TABLE `melis_cms_prospects_themes` ADD `pros_theme_code` VARCHAR(45) NULL AFTER `pros_theme_name`;
