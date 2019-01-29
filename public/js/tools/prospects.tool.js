@@ -57,6 +57,14 @@ $(document).ready(function() {
     body.on("click", ".prospectRefreshTable", function(){
         toolProspects.refreshTable();
     });
+
+    // for site filter
+    body.on('change', '#prosSiteSelect', function(){
+        var tableId = $(this).parents().eq(6).find('table').attr('id');
+        $("#"+tableId).DataTable().ajax.reload();
+    });
+
+
 });
 
 
