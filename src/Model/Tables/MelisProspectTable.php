@@ -90,7 +90,7 @@ class MelisProspectTable extends MelisGenericTable
         $select = $this->tableGateway->getSql()->select();
         $select->columns(array('*'));
         $select->join('melis_cms_site', 'melis_cms_site.site_id = melis_cms_prospects.pros_site_id',
-            array('site_name'), $select::JOIN_LEFT);
+            array('site_name','site_label'), $select::JOIN_LEFT);
 
         if (!empty($searchableColumns) && !empty($search)) {
             foreach ($searchableColumns as $column) {
@@ -112,16 +112,16 @@ class MelisProspectTable extends MelisGenericTable
         }
 
         if (!empty($prosSiteId) && !is_null($prosSiteId)) {
-            $select->where->equalTo("pros_site_id", $prosSiteId);
+            $select->where->equalTo("melis_cms_prospects.pros_site_id", $prosSiteId);
         }
 
         if(!empty($prosType) && !is_null($prosType)){
-            $select->where->equalTo("pros_type", $prosType);
+            $select->where->equalTo("melis_cms_prospects.pros_type", $prosType);
         }
 
-        if(!empty($startDate) && !empty($endDate)){
-            $select->where->between('pros_contact_date', date('Y-m-d', strtotime($startDate)), date('Y-m-d', strtotime($endDate)));
-        }
+//        if(!empty($startDate) && !empty($endDate)){
+//            $select->where->between('melis_cms_prospects.pros_contact_date', date('Y-m-d', strtotime($startDate)), date('Y-m-d', strtotime($endDate)));
+//        }
 
         if(!empty($orderBy)) {
             $select->order($orderBy . ' ' . $orderDirection);

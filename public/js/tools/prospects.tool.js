@@ -57,6 +57,12 @@ $(document).ready(function() {
     body.on("click", ".prospectRefreshTable", function(){
         toolProspects.refreshTable();
     });
+    body.on('change', '#prosSiteSelect', function(){
+        var tableId = $(this).parents().eq(6).find('table').attr('id');
+        $("#"+tableId).DataTable().ajax.reload();
+    });
+
+
 });
 
 
@@ -72,9 +78,14 @@ window.initDatePickerFilter = function(d) {
     $(document).on("init.dt", function(e, settings) {
         toolProspects.setDatePickerData();
     });
-
-    initSiteList(d);
-    initProsTypeList(d);
+    if($('#prosSiteSelect').length){
+        d.pros_site_id = $('#prosSiteSelect').val();
+    }
+    if($('#prosTypeSelect').length){
+        d.pros_type = $('#prosTypeSelect').val();
+    }
+    //initSiteList(d);
+    //initProsTypeList(d);
 }
 
 window.initSiteList = function(data){

@@ -71,8 +71,8 @@ return array(
                                 'sortable' => true,
                                 
                             ),
-                            'site_name' => array(
-                                'text' => 'tr_meliscms_tool_site_site_name',
+                            'site_label' => array(
+                                'text' => 'tr_melis_cms_prospects_gdpr_column_site',
                                 'css' => array('width' => '15%', 'padding-right' => '0'),
                                 'sortable' => true,
 

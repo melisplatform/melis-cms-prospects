@@ -120,7 +120,7 @@
         'tr_contactus_country_long' => 'Le pays est trop long, il doit être de moins de 100 caractères',
         'tr_contactus_country_empty' => 'Veuillez saisir le pays',
         'tr_contactus_subject_invalid' => 'Veuillez choisir le sujet',
-        'tr_contactus_subject_empty' => 'Veuillez choisir le sujet',
+        'tr_contactus_subject_empty' => 'Veuillez choisir le thème',
         
         // Contact Us Subject Options
         'tr_contactus_subj_choose' => 'Choisir',

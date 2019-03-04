@@ -15,8 +15,11 @@
     transform: translate(-50%, -50%)
 }
 
-#prosSiteSelect, #prosTypeSelect{
+#prosTypeSelect{
 	width: 100px;
+}
+#prosSiteSelect {
+	width:auto;
 }
 
 @CHARSET "ISO-8859-1";
