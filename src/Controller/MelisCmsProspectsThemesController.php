@@ -9,16 +9,21 @@
 
 namespace MelisCmsProspects\Controller;
 
+use Zend\Form\Factory;
 use Zend\Mvc\Controller\AbstractActionController;
-use Zend\View\Model\ViewModel;
-use Zend\View\Model\JsonModel;
-use MelisCore\Service\MelisCoreRightsService;
 use Zend\Session\Container;
+use Zend\View\Model\JsonModel;
+use Zend\View\Model\ViewModel;
+
 /**
  * This controller handles the display of the Prospect Theme Tool
  */
 class MelisCmsProspectsThemesController extends AbstractActionController
 {
+    const LOG_ADD = 'CMS_PROSPECTS_THEME_ADD';
+    const LOG_UPDATE = 'CMS_PROSPECTS_THEME_UPDATE';
+    const LOG_DELETE = 'CMS_PROSPECTS_THEME_DELETE';
+
     /**
      * Tool container
      * @return ViewModel
@@ -201,7 +206,7 @@ class MelisCmsProspectsThemesController extends AbstractActionController
     {
         return new ViewModel();
     }
-    
+
     /**
      * Save event for theme tool
      * @return JsonModel
@@ -210,68 +215,66 @@ class MelisCmsProspectsThemesController extends AbstractActionController
     {
         $success = 0;
         $message = 'tr_melis_cms_prospects_theme_failed';
-        $errors  = [];
-        $title   = 'tr_melis_cms_prospects_theme';
+        $errors = [];
+        $title = 'tr_melis_cms_prospects_theme';
         $request = $this->getRequest();
-        $id      = null;
-        if($request->isPost()) {
+        $id = 0;
+        $logType = self::LOG_ADD;
 
+        if ($request->isPost()) {
             $allowSave = false;
 
+            $data = $this->tool()->sanitizeRecursive($request->getPost()->toArray(), ["'", '"'], false);
+            if (!empty($data['pros_theme_id'])) {
+                $id = (int)$data['pros_theme_id'];
+                $logType = self::LOG_UPDATE;
+            }
 
-            $data = $this->tool()->sanitizeRecursive(get_object_vars($request->getPost()), ["'",'"'], false);
-            $id   = isset($data['pros_theme_id']) ? (int) $data['pros_theme_id'] : null; // changed to 1
-            
             $melisCoreConfig = $this->serviceLocator->get('MelisCoreConfig');
-            $appConfigForm = $melisCoreConfig->getFormMergedAndOrdered('melistoolprospects/tools/melistoolprospects_tool_prospects_themes/forms/prospects_theme_form','prospects_theme_form');
-            $factory = new \Zend\Form\Factory();
+            $appConfigForm = $melisCoreConfig->getFormMergedAndOrdered('melistoolprospects/tools/melistoolprospects_tool_prospects_themes/forms/prospects_theme_form', 'prospects_theme_form');
+            $factory = new Factory();
             $formElements = $this->serviceLocator->get('FormElementManager');
             $factory->setFormElementManager($formElements);
+            /** @var \Zend\Form\Form $form */
             $form = $factory->createForm($appConfigForm);
-            
             $form->setData($data);
-            
-            if($form->isValid()) {
+
+            if ($form->isValid()) {
                 $checkData = $this->themeTable()->getEntryByField('pros_theme_name', $data['pros_theme_name'])->current();
                 unset($data['pros_theme_id']);
 
-                if(!$checkData && !$id) {
+                if (!$checkData && !$id) {
                     $allowSave = true;
-                }
-                elseif($id && $checkData) {
+                } elseif ($id && $checkData) {
                     $currentCode = $this->themeTable()->getEntryById($id)->current()->pros_theme_code;
-                    if($currentCode != $data['pros_theme_code']) {
+                    if ($currentCode != $data['pros_theme_code']) {
                         // recheck if the code exists
                         $checkData = $this->themeTable()->getEntryByField('pros_theme_code', $data['pros_theme_code'])->current();
-                        if(empty($checkData)) {
+                        if (empty($checkData)) {
                             $allowSave = true;
-                        }
-                        else {
+                        } else {
                             $message = 'tr_melis_cms_prospects_theme_code_exists';
                         }
-                    }
-                    else {
+                    } else {
                         $allowSave = true;
                     }
-                }
-                else {
+                } else {
                     $allowSave = true;
                 }
 
-                if($allowSave) {
-                    $this->themeTable()->save($data, $id);
-                    $success = 1;
-                    $message = 'tr_melis_cms_prospects_theme_success';
+                if ($allowSave) {
+                    $success = $this->themeTable()->save($data, $id);
+                    if ($success) {
+                        $id = $success;
+                        $success = true;
+                        $message = 'tr_melis_cms_prospects_theme_success';
+                    }
                 }
-            }
-            else {
+            } else {
                 $errors = $form->getMessages();
-                foreach ($errors as $keyError => $valueError)
-                {
-                    foreach ($appConfigForm as $keyForm => $valueForm)
-                    {
-                        if(isset($valueForm['spec']['name']))
-                        {
+                foreach ($errors as $keyError => $valueError) {
+                    foreach ($appConfigForm as $keyForm => $valueForm) {
+                        if (isset($valueForm['spec']['name'])) {
                             if ($valueForm['spec']['name'] == $keyError &&
                                 !empty($valueForm['spec']['options']['label'])
                             )
@@ -284,13 +287,20 @@ class MelisCmsProspectsThemesController extends AbstractActionController
         }
 
         $response = [
-            'success'     => $success,
-            'errors'      => $errors,
+            'success' => $success,
+            'errors' => $errors,
             'textMessage' => $this->tool()->getTranslation($message),
-            'textTitle'   => $this->tool()->getTranslation($title)
+            'textTitle' => $this->tool()->getTranslation($title)
         ];
 
-        $this->getEventManager()->trigger('meliscmsprospects_theme_save_end', $this, array_merge($response, array('typeCode' => 'CMS_PROSPECTS_THEME_SAVE', 'itemId' => $id)));
+        $this->getEventManager()->trigger(
+            'meliscmsprospects_theme_save_end',
+            $this,
+            array_merge(
+                $response,
+                ['typeCode' => $logType, 'itemId' => $id]
+            )
+        );
 
         return new JsonModel($response);
     }
@@ -303,32 +313,38 @@ class MelisCmsProspectsThemesController extends AbstractActionController
     {
         $success = 0;
         $message = 'tr_melis_cms_prospects_theme_delete_failed';
-        $errors  = [];
-        $title   = 'tr_melis_cms_prospects_theme';
+        $errors = [];
+        $title = 'tr_melis_cms_prospects_theme';
         $request = $this->getRequest();
-        $id      = null;
+        $id = 0;
 
-        if($request->isPost()) {
-            $id        = (int) $request->getPost('id');
+        if ($request->isPost()) {
+            $id = (int)$request->getPost('id');
             $checkData = $this->themeTable()->getEntryById($id)->current();
 
-            if($checkData) {
+            if ($checkData) {
                 $this->themeTable()->deleteById($id);
                 $this->themeItemTable()->deleteByField('pros_theme_id', $id);
                 $success = 1;
                 $message = 'tr_melis_cms_prospects_theme_delete_success';
             }
-
         }
 
         $response = [
-            'success'     => $success,
-            'errors'      => $errors,
+            'success' => $success,
+            'errors' => $errors,
             'textMessage' => $this->tool()->getTranslation($message),
-            'textTitle'   => $this->tool()->getTranslation($title)
+            'textTitle' => $this->tool()->getTranslation($title)
         ];
 
-        $this->getEventManager()->trigger('meliscmsprospects_theme_delete_end', $this, array_merge($response, array('typeCode' => 'CMS_PROSPECTS_THEME_DELETE', 'itemId' => $id)));
+        $this->getEventManager()->trigger(
+            'meliscmsprospects_theme_delete_end',
+            $this,
+            array_merge(
+                $response,
+                ['typeCode' => self::LOG_DELETE, 'itemId' => $id]
+            )
+        );
 
         return new JsonModel($response);
     }

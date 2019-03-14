@@ -10,15 +10,18 @@
 namespace MelisCmsProspects\Controller;
 
 use Zend\Mvc\Controller\AbstractActionController;
-use Zend\View\Model\ViewModel;
-use Zend\View\Model\JsonModel;
-use MelisCore\Service\MelisCoreRightsService;
 use Zend\Session\Container;
+use Zend\View\Model\JsonModel;
+use Zend\View\Model\ViewModel;
+
 /**
  * This controller handles the display of the Prospect Theme Item Tool
  */
 class MelisCmsProspectsThemeItemsController extends AbstractActionController
 {
+    const LOG_ADD = 'CMS_PROSPECTS_THEME_ITEM_ADD';
+    const LOG_UPDATE = 'CMS_PROSPECTS_THEME_ITEM_UPDATE';
+    const LOG_DELETE = 'CMS_PROSPECTS_THEME_ITEM_DELETE';
 
     /**
      * Tool container
@@ -155,59 +158,58 @@ class MelisCmsProspectsThemeItemsController extends AbstractActionController
     {
         $success = 0;
         $message = 'tr_melis_cms_prospects_theme_items_save_failed';
-        $errors  = [];
-        $title   = 'tr_melis_cms_prospects_theme_items';
+        $errors = [];
+        $title = 'tr_melis_cms_prospects_theme_items';
         $request = $this->getRequest();
-        $itemId  = null;
+        $itemId = 0;
+        $logType = self::LOG_ADD;
         $inputValidator = 0;
-        
+
         if ($request->isPost()) {
-
-            $forms = $this->tool()->sanitizeRecursive(get_object_vars($request->getPost()), ["'",'"'], false);
+            $forms = $this->tool()->sanitizeRecursive($request->getPost()->toArray(), ["'", '"'], false);
             $themeId = $forms['themeId'];
-            
-            if (isset($forms['forms']) && !empty($forms['forms'])) {
 
+            if (isset($forms['forms']) && !empty($forms['forms'])) {
                 foreach ($forms['forms'] as $idx => $form) {
                     //check for existing item id
-                    $itemId =  empty($itemId) ? (int) $form['item_trans_theme_item_id'] : $itemId;
-                    $itemTexts =  empty($itemTexts) ? $form['item_trans_text'] : $itemTexts;
+                    $itemId = empty($itemId) ? (int)$form['item_trans_theme_item_id'] : $itemId;
+                    $itemTexts = empty($itemTexts) ? $form['item_trans_text'] : $itemTexts;
 
                     //check if is there an input
-                    if(!empty($form['item_trans_text']) || $form['item_trans_text']!="")
+                    if (!empty($form['item_trans_text']) || $form['item_trans_text'] != "") {
                         $inputValidator++;
-
+                    }
                 }
-                if($inputValidator) {
 
+                if (!empty($itemId)) {
+                    $logType = self::LOG_UPDATE;
+                }
+
+                if ($inputValidator) {
                     // create if item ID is empty
-                    if(empty($itemId) && !empty($itemTexts)) {
-                        $itemId =  $this->themeItemTable()->save(array('pros_theme_id' => $themeId));
+                    if (empty($itemId) && !empty($itemTexts)) {
+                        $itemId = $this->themeItemTable()->save(array('pros_theme_id' => $themeId));
                     }
 
                     foreach ($forms['forms'] as $idx => $form) {
-
-                        $transId = isset($form['item_trans_id']) ? (int) $form['item_trans_id'] : null;
+                        $transId = isset($form['item_trans_id']) ? (int)$form['item_trans_id'] : null;
                         $text = $form['item_trans_text'];
 
-                        if(!empty($transId) && empty($text)) {
+                        if (!empty($transId) && empty($text)) {
                             // delete the entry if it is blank
                             $this->themeItemTransTable()->deleteById($transId);
                         }
 
-                        if(!empty($itemId) && !empty($text)){
-
+                        if (!empty($itemId) && !empty($text)) {
                             $form['item_trans_theme_item_id'] = $itemId;
                             unset($form['item_trans_id']);
                             $this->themeItemTransTable()->save($form, $transId);
-
                         }
-
                     }
 
                     $success = 1;
                     $message = 'tr_melis_cms_prospects_theme_items_save_success';
-                }else {
+                } else {
                     $success = 0;
                     $errors[$this->tool()->getTranslation("tr_melis_cms_prospects_theme_items_pros_theme_item_text2")]["isEmpty"] = $this->tool()->getTranslation("tr_melis_cms_prospects_theme_items_trans_text_empty");
                 }
@@ -222,7 +224,14 @@ class MelisCmsProspectsThemeItemsController extends AbstractActionController
             'textTitle' => $this->tool()->getTranslation($title)
         ];
 
-        $this->getEventManager()->trigger('meliscmsprospects_theme_item_save_end', $this, array_merge($response, array('typeCode' => 'CMS_PROSPECTS_THEME_ITEM_SAVE', 'itemId' => $itemId)));
+        $this->getEventManager()->trigger(
+            'meliscmsprospects_theme_item_save_end',
+            $this,
+            array_merge(
+                $response,
+                ['typeCode' => $logType, 'itemId' => $itemId]
+            )
+        );
 
         return new JsonModel($response);
     }
@@ -235,35 +244,40 @@ class MelisCmsProspectsThemeItemsController extends AbstractActionController
     {
         $success = 0;
         $message = 'tr_melis_cms_prospects_theme_item_delete_failed';
-        $errors  = [];
-        $title   = 'tr_melis_cms_prospects_theme_items';
+        $errors = [];
+        $title = 'tr_melis_cms_prospects_theme_items';
         $request = $this->getRequest();
-        $id      = null;
+        $itemId = 0;
 
-        if($request->isPost()) {
+        if ($request->isPost()) {
             $itemId = $request->getPost('itemId');
-            
+
             $this->themeItemTable()->deleteById($itemId);
             $this->themeItemTransTable()->deleteByField('item_trans_theme_item_id', $itemId);
-            
+
             $checkData = $this->themeItemTable()->getEntryById($itemId)->toArray();
-            
-            if(empty($checkData)) {
-               
+
+            if (empty($checkData)) {
                 $success = 1;
                 $message = 'tr_melis_cms_prospects_theme_item_delete_success';
             }
-
         }
 
         $response = [
-            'success'     => $success,
-            'errors'      => $errors,
+            'success' => $success,
+            'errors' => $errors,
             'textMessage' => $this->tool()->getTranslation($message),
-            'textTitle'   => $this->tool()->getTranslation($title)
+            'textTitle' => $this->tool()->getTranslation($title)
         ];
 
-        $this->getEventManager()->trigger('meliscmsprospects_theme_delete_end', $this, array_merge($response, array('typeCode' => 'CMS_PROSPECTS_THEME_DELETE', 'itemId' => $id)));
+        $this->getEventManager()->trigger(
+            'meliscmsprospects_theme_delete_end',
+            $this,
+            array_merge(
+                $response,
+                ['typeCode' => self::LOG_DELETE, 'itemId' => $itemId]
+            )
+        );
 
         return new JsonModel($response);
     }

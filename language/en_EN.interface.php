@@ -218,7 +218,7 @@
         'tr_melis_cms_prospects_theme_item_code_save_exists' => 'Item code already exists, please choose another',
 
         'tr_melis_cms_prospects_theme_items_edit' => '%s theme Items',
-        'tr_melis_cms_prospects_theme_items_save_success' => 'Theme items has been successfully saved',
+        'tr_melis_cms_prospects_theme_items_save_success' => 'Theme item has been successfully saved',
         'tr_melis_cms_prospects_theme_items_save_failed' => 'Unable to save theme item',
         'tr_melis_cms_prospects_theme_items_trans_text_empty' => 'Please enter the name',
 
