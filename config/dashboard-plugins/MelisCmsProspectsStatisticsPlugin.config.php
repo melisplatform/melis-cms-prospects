@@ -19,7 +19,7 @@
                         'thumbnail' => '/MelisCmsProspects/plugins/images/MelisCmsProspectsStatisticsPlugin.jpg',
                         'jscallback' => 'cmsProsDashLineGraphInit()',
                         'height' => 8,
-                        
+                        'section' => 'MelisMarketing',
                         'interface' => array(
                             'meliscalendar_events' => array(
                                 'forward' => array(
