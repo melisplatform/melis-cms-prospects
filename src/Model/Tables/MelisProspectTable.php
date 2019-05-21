@@ -167,7 +167,7 @@ class MelisProspectTable extends MelisGenericTable
         $select->join(
             'melis_cms_site', 
             'melis_cms_site.site_id = melis_cms_prospects.pros_site_id',
-            ['site_name'],
+            ['site_label'],
             $select::JOIN_LEFT
         );
 
