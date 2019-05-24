@@ -39,10 +39,9 @@ $(document).ready(function() {
         param.endDate = prospectDateFilterEnd;
 
         var queryString = $.param(param);
-
-        if(!melisCoreTool.isTableEmpty("tableToolProspect")) {
+        // if(!melisCoreTool.isTableEmpty("tableToolProspect")) {
             melisCoreTool.exportData('/melis/MelisCmsProspects/ToolProspects/exportToCsv?'+queryString);
-        }
+        // }
     });
 
     body.on("click", "#id_MelisCmsProspects_tool_prospects_modal .tooltabmodal .mce-btn", function(){

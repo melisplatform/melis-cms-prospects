@@ -512,8 +512,11 @@ class ToolProspectsController extends AbstractActionController
         }
 
         $data = $prospectTable->getData($searched, $siteId, $columns, 'pros_contact_date', 'DESC', 0, null, $prosType, $startDate, $endDate);
+        $data = $data->toArray();
+        if(empty($data))
+            $data = array(array());
 
-        return $melisTool->exportDataToCsv($data->toArray());
+        return $melisTool->exportDataToCsv($data);
     }
 
     
