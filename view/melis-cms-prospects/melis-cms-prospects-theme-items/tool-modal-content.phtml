@@ -26,6 +26,10 @@ if (!empty($this->zoneconfig['conf']['id']))
                                             <li class="">
                                                 <a class="clearfix" data-toggle="tab" href="#<?= $lang['lang_cms_name']; ?>-log-type-details" aria-expanded="false">
                                                     <span><?= $lang['lang_cms_name']; ?></span>
+                                                    <?php
+                                                    $img = $lang['lang_cms_locale'];
+                                                    echo '<span class="pull-right"><img src="/MelisCms/images/lang-flags/'.$img.'.png" class="imgDisplay pull-right"/></span>';
+                                                    ?>
                                                 </a>
                                             </li>
                                         <?php } ?>
