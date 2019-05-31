@@ -38,7 +38,23 @@ class MelisCmsProspectsGdprUserDeleteListener extends MelisCoreGeneralListener i
                     $ids = $parameters['selected'][$moduleName];
                     $prospectsTable = $e->getTarget()->getServiceLocator()->get('MelisProspects');
 
-                    $countOfDeletedProspects = $prospectsTable->deleteByField('pros_id', $ids);
+                    try {
+                        $countOfDeletedProspects = $prospectsTable->deleteByField('pros_id', $ids);
+                        $success = 1;
+                    } catch (\Exception $ex) {
+                        $success = 0;
+                    }
+
+                    foreach ($ids as $id) {
+                        $parameters['log'][$moduleName][$id] = [
+                            'event' => 'meliscmsprospects_toolprospects_delete_end',
+                            'success' => $success,
+                            'textTitle' => 'tr_melistoolprospects_tool_prospects',
+                            'textMessage' => 'tr_prospect_manager_fm_delete_data_content',
+                            'typeCode' => 'CMS_PROSPECTS_DELETE',
+                            'itemId' => $id
+                        ];
+                    }
 
                     $noErrors = ($countOfDeletedProspects == count($ids)) ? true : false;
                     $parameters['results'][$moduleName] = $noErrors;
