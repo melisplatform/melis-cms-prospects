@@ -1,3 +1,4 @@
+<?php if ($this->toolIsAccessible): ?>
 <div class="widget widget-tabs widget-tabs-responsive">
     <!-- Tabs Heading -->
     <div class="widget-head">
@@ -77,7 +78,7 @@
 				<!-- Table body -->
 				<tbody>
 					<?php if (!empty($this->recentPropects)) :?>
-					
+
 						<?php $recentData = $this->recentPropects ?>
 						<!-- Table row -->
 						<?php for($i = 0; $i < count($recentData); $i++){ ?>
@@ -98,7 +99,12 @@
 				<!-- // Table body END -->
 			</table>
 			<!-- // Table END -->
-			
+
 		</div>
 	</div>
 </div>
+<?php else: ?>
+    <div class="no-rights-container">
+        <span><?= $this->translate('tr_melisdashboardplugin_plugin_no_rights'); ?></span>
+    </div>
+<?php endif; ?>
