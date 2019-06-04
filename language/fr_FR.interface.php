@@ -31,7 +31,7 @@
 	    'tr_prospect_manager_fm_delete_update_title' => 'Editer prospect',
 	    'tr_prospect_manager_fm_update_data_content' => 'Données prospect mises à jour.',
 	    'tr_prospect_manager_fm_update_data_content_error' => 'Impossible de mettre à jour les données prospect',
-	    'tr_tool_text_prospect_manager_update' => 'Sauvegarder',
+	    'tr_tool_text_prospect_manager_update' => 'Enregistrer',
 	    'tr_tool_text_prospect_manager_delete' => 'Supprimer',
 	    'tr_tool_text_prospect_manager_delete_confirm' => 'Êtes-vous sûr de vouloir supprimer ce prospect ?',
 	    // Prospects Widgets
