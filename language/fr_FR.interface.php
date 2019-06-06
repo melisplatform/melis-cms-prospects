@@ -169,9 +169,9 @@
         'tr_melis_cms_prospects_theme_pros_theme_name tooltip' => 'Nom du thème',
 
         // buttons
-        'tr_melis_cms_prospects_theme_new' => 'Ajouter un theme',
-        'tr_melis_cms_prospects_theme_new_title' => 'Nouveau theme',
-        'tr_melis_cms_prospects_theme_edit_title' => 'Editer le theme',
+        'tr_melis_cms_prospects_theme_new' => 'Ajouter un thème',
+        'tr_melis_cms_prospects_theme_new_title' => 'Nouveau thème',
+        'tr_melis_cms_prospects_theme_edit_title' => 'Editer le thème',
 
         // validations
         'tr_melis_cms_prospects_theme_pros_theme_id_invalid' => 'ID invalide',
