@@ -595,7 +595,7 @@ class ToolProspectsController extends AbstractActionController
                 
                 $data['pros_contact_date'] = $curData->pros_contact_date;
                 $data['pros_type'] = $curData->pros_type;
-                
+                $data['pros_theme'] = empty($data['pros_theme']) ? null : $data['pros_theme'];
                 $prospectTable->save($data, $id);
                 
                 // add event to Flash messenger
