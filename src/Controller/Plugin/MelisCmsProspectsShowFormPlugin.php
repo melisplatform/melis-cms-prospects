@@ -227,6 +227,17 @@ class MelisCmsProspectsShowFormPlugin extends MelisTemplatingPlugin
                             $melisEngineGeneralService = $this->getServiceLocator()->get('MelisEngineGeneralService');
                             $melisEngineGeneralService->sendEvent('meliscms_prospects_plugin_save', $post);
                             $success = 1;
+
+                            if (!$request->isXmlHttpRequest()) {
+                                $router = $this->getServiceLocator()->get('router');
+                                $uri = $router->getRequestUri();
+
+                                // Add Flash success message to flag the Success result
+                                $this->getController()->flashMessenger()->addSuccessMessage('success');
+                                // Redirect to the current uri
+                                // this will avoid submit form by reloading page
+                                $this->getController()->redirect()->toUrl($uri);
+                            }
                         }
                     }
                     else
@@ -252,6 +263,11 @@ class MelisCmsProspectsShowFormPlugin extends MelisTemplatingPlugin
                     }
                 }
             }
+        }
+
+        $flashMessenger = $this->getController()->flashMessenger();
+        if ($flashMessenger->hasCurrentSuccessMessages()) {
+            $success = 1;
         }
         
         // Create an array with the variables that will be available in the view
