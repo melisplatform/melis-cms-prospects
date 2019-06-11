@@ -31,7 +31,7 @@
 	    'tr_prospect_manager_fm_delete_update_title' => 'Editer prospect',
 	    'tr_prospect_manager_fm_update_data_content' => 'Données prospect mises à jour.',
 	    'tr_prospect_manager_fm_update_data_content_error' => 'Impossible de mettre à jour les données prospect',
-	    'tr_tool_text_prospect_manager_update' => 'Sauvegarder',
+	    'tr_tool_text_prospect_manager_update' => 'Enregistrer',
 	    'tr_tool_text_prospect_manager_delete' => 'Supprimer',
 	    'tr_tool_text_prospect_manager_delete_confirm' => 'Êtes-vous sûr de vouloir supprimer ce prospect ?',
 	    // Prospects Widgets
@@ -169,9 +169,9 @@
         'tr_melis_cms_prospects_theme_pros_theme_name tooltip' => 'Nom du thème',
 
         // buttons
-        'tr_melis_cms_prospects_theme_new' => 'Ajouter un theme',
-        'tr_melis_cms_prospects_theme_new_title' => 'Nouveau theme',
-        'tr_melis_cms_prospects_theme_edit_title' => 'Editer le theme',
+        'tr_melis_cms_prospects_theme_new' => 'Ajouter un thème',
+        'tr_melis_cms_prospects_theme_new_title' => 'Nouveau thème',
+        'tr_melis_cms_prospects_theme_edit_title' => 'Editer le thème',
 
         // validations
         'tr_melis_cms_prospects_theme_pros_theme_id_invalid' => 'ID invalide',
@@ -183,10 +183,10 @@
         'tr_melis_cms_prospects_theme_name_long' => 'Nom trop long, 45 caractères maximum',
 
         'tr_melis_cms_prospects_theme_code_exists' => 'Ce code existe déjà',
-        'tr_melis_cms_prospects_theme_success' => 'Theme sauvegardé',
+        'tr_melis_cms_prospects_theme_success' => 'Thème sauvegardé',
         'tr_melis_cms_prospects_theme_failed' => 'Impossible de sauvegarder le thème',
 
-        'tr_melis_cms_prospects_theme_delete_success' => 'Theme supprimé',
+        'tr_melis_cms_prospects_theme_delete_success' => 'Thème supprimé',
         'tr_melis_cms_prospects_theme_delete_failed' => 'Impossible de supprimer le thème',
         'tr_melis_cms_prospects_theme_delete_confirm' => 'Êtes-vous sur de vouloir supprimer ce thème ?',
 
@@ -220,12 +220,12 @@
         'tr_melis_cms_prospects_theme_item_code_save_exists' => 'Le code élément existe déjà',
 
         'tr_melis_cms_prospects_theme_items_edit' => '%s éléments thème',
-        'tr_melis_cms_prospects_theme_items_save_success' => 'Eléments sauvegardés',
-        'tr_melis_cms_prospects_theme_items_save_failed' => 'Impossible de sauvegarder les éléments',
+        'tr_melis_cms_prospects_theme_items_save_success' => 'Elément sauvegardé',
+        'tr_melis_cms_prospects_theme_items_save_failed' => 'Impossible de sauvegarder le élément',
         'tr_melis_cms_prospects_theme_items_trans_text_empty' => 'Entrer le nom',
 
-        'tr_melis_cms_prospects_theme_item_delete_success' => 'Eléments supprimés',
-        'tr_melis_cms_prospects_theme_item_delete_failed' => 'Impossible de supprimer les éléments',
+        'tr_melis_cms_prospects_theme_item_delete_success' => 'Elément supprimé',
+        'tr_melis_cms_prospects_theme_item_delete_failed' => 'Impossible de supprimer le élément',
         'tr_melis_cms_prospects_theme_item_delete_confirm' => 'Êtes-vous sur de vouloir supprimer cet élément?',
 
 	    'tr_melis_cms_prospects_plugin_config_fields' => 'Champs',

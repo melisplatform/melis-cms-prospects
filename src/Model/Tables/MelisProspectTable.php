@@ -155,33 +155,35 @@ class MelisProspectTable extends MelisGenericTable
     }
 
     /**
-     *
+     * Returns needed data for the gdpr tool
+     * @param array $searchInputs
+     * @param bool $isSpecificSearch
+     * @return mixed
      */
-    public function getDataForGdpr($searchInputs = [], $searchableColumns = [])
+    public function getDataForGdpr($searchInputs = [], $isSpecificSearch = false)
     {
         $select = $this->tableGateway->getSql()->select();
         $select->columns(['*']);
         $select->join(
             'melis_cms_site', 
             'melis_cms_site.site_id = melis_cms_prospects.pros_site_id',
-            ['site_name'], 
+            ['site_label'],
             $select::JOIN_LEFT
         );
 
-        if (! empty($searchInputs)) {
-            foreach ($searchInputs as $searchInputKey => $searchInputValue) {
-                if ($searchInputValue != '') {
-                    if (isset($searchableColumns[$searchInputKey])) {
-                        if (is_array($searchableColumns[$searchInputKey])) {
-                            foreach ($searchableColumns[$searchInputKey] as $search) {
-                                $select->where->or->literal('LOWER(' . $search . ') = ' . "'" . strtolower($searchInputValue) . "'");
-                            }
-                        } else {
-                            $select->where->literal('LOWER(' . $searchableColumns[$searchInputKey] . ') = ' . "'" . strtolower($searchInputValue) . "'");
-                        }
-                    }
-                }
+        if (!empty($searchInputs)) {
+            if (!empty($searchInputs['user_name'])) {
+                if ($isSpecificSearch)
+                    $select->where->literal('LOWER(' . 'pros_name' . ') = ' . "'" . strtolower($searchInputs['user_name']) . "'");
+                else
+                    $select->where->literal('LOWER(' . 'pros_name' . ') LIKE ' . "'%" . strtolower($searchInputs['user_name']) . "%'");
             }
+
+            if (!empty($searchInputs['user_email']))
+                $select->where->literal('LOWER(' . 'pros_email' . ') = ' . "'" . strtolower($searchInputs['user_email']) . "'");
+
+            if (!empty($searchInputs['site_id']))
+                $select->where->literal('LOWER(' . 'pros_site_id' . ') = ' . "'" . strtolower($searchInputs['site_id']) . "'");
         }
 
         $resultSet = $this->tableGateway->selectWith($select);

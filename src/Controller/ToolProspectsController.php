@@ -512,8 +512,11 @@ class ToolProspectsController extends AbstractActionController
         }
 
         $data = $prospectTable->getData($searched, $siteId, $columns, 'pros_contact_date', 'DESC', 0, null, $prosType, $startDate, $endDate);
+        $data = $data->toArray();
+        if(empty($data))
+            $data = array(array());
 
-        return $melisTool->exportDataToCsv($data->toArray());
+        return $melisTool->exportDataToCsv($data);
     }
 
     
@@ -592,7 +595,7 @@ class ToolProspectsController extends AbstractActionController
                 
                 $data['pros_contact_date'] = $curData->pros_contact_date;
                 $data['pros_type'] = $curData->pros_type;
-                
+                $data['pros_theme'] = empty($data['pros_theme']) ? null : $data['pros_theme'];
                 $prospectTable->save($data, $id);
                 
                 // add event to Flash messenger

@@ -36,7 +36,7 @@
                                     'text' => 'tr_melis_cms_prospects_gdpr_column_country',
                                     'sorting' => false
                                 ],
-                                'site_name' => [
+                                'site_label' => [
                                     'id' => 'meliscmsprospects_pros_site',
                                     'class' => '',
                                     'style' => '',

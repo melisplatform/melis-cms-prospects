@@ -28,7 +28,16 @@ class MelisCmsProspectsStatisticsPlugin extends MelisCoreDashboardTemplatingPlug
         $melisProspects = $this->getServiceLocator()->get('MelisProspects');
         $melisTool = $this->getServiceLocator()->get('MelisCoreTool');
         $melisProspectsService = $this->getServiceLocator()->get('MelisProspectsService');
-        
+
+        /**
+         * Check user's accessibility(rights) for this plugin
+         * @var \MelisCore\Service\MelisCoreDashboardPluginsRightsService $dashboardPluginsService
+         */
+        $dashboardPluginsService = $this->getServiceLocator()->get('MelisCoreDashboardPluginsService');
+        $path = explode('\\', __CLASS__);
+        $className = array_pop($path);
+        $isAccessible = $dashboardPluginsService->canAccess($className);
+
         // Get Total number Prospects
         $numPropects = $melisProspectsService->getProspectsDataForWidgets('numPropects');
         
@@ -54,6 +63,7 @@ class MelisCmsProspectsStatisticsPlugin extends MelisCoreDashboardTemplatingPlug
         $view->numPropects = $numPropects;
         $view->recentPropects = (!empty($prosData)) ? $prosData : array();
         $view->dateFormat = $dateFormat;
+        $view->toolIsAccessible = $isAccessible;
         
         return $view;
     }

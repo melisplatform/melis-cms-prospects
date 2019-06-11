@@ -401,7 +401,7 @@ return array(
                                 ),
                                 'pros_theme' => array(
                                     'name'     => 'pros_theme',
-                                    'required' => true,
+                                    'required' => false,
                                     'validators' => array(
                                         array(
                                             'name'    => 'StringLength',
