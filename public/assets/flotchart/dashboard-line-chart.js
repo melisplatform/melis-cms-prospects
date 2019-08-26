@@ -107,7 +107,7 @@ $(document).ready(function(){
             data		: {chartFor : chartFor},
             dataType 	: 'json',
             encode		: true
-        }).success(function(data){
+        }).done(function(data){
             // plot the chartvar tmpData = data.values;
 
             var tmpData = data.values;
@@ -153,7 +153,7 @@ $(document).ready(function(){
             });
 
 
-        }).error(function(xhr, textStatus, errorThrown){
+        }).fail(function(xhr, textStatus, errorThrown){
             console.log("ERROR !! Status = "+ textStatus + "\n Error = "+ errorThrown + "\n xhr = "+ xhr.statusText);
         });
     }
