@@ -80,7 +80,7 @@ $(function() {
                         cmsProsDashLineGraphInit();
                     }
                 }
-            };
+        };
 
 
         // INIT PLOTTING FUNCTION [also used as callback in the app.interface for when we refresh the chart]
@@ -149,8 +149,6 @@ $(function() {
                         charts.cmsProsDashLineGraph.options
                     );
                 });
-
-
             }).fail(function(xhr, textStatus, errorThrown){
                 console.log("ERROR !! Status = "+ textStatus + "\n Error = "+ errorThrown + "\n xhr = "+ xhr.statusText);
             });
