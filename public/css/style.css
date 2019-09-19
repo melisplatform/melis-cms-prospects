@@ -22,7 +22,12 @@
 	width:auto;
 }
 
-@CHARSET "ISO-8859-1";
+.cms-pros-dash-chart-bar,
+.cms-pros-dash-chart-line {
+	display: none;
+}
+
+/* @CHARSET "ISO-8859-1"; */
 
 @media (min-width: 1600px) and (max-width: 1840px) {
 	.pros-dash-lbl {
