@@ -68,7 +68,7 @@ $(document).ready(function(){
 				
 			},
 			
-			placeholder: ".cms-pros-dash-chart-bar-graph",
+			placeholder: "#"+activeTabId+" .cms-pros-dash-chart-bar-graph",
 
 			// initialize
 			init: function()
@@ -82,14 +82,16 @@ $(document).ready(function(){
 		};
 			
 		// INIT PLOTTING FUNCTION [also used as callback in the app.interface for when we refresh the chart]
-		window.cmsProsDashBarGraphInit = function(target, targetDevId){
-			if(typeof target === "undefined"){
+		window.cmsProsDashBarGraphInit = function(target, targetDevId) {
+			if ( typeof target === "undefined" ) {
 				chartFor = 'daily';
 				placeholder = targetDevId;
-			}else{
+			} else {
 				chartFor = target.val();
 				placeholder = "#"+target.closest(".tab-pane").find(".cms-pros-dash-chart-bar-graph").attr("id");
 			}
+
+			$(placeholder).css("width", "100%");
 			
 			// get the statistics data
 			$.ajax({
@@ -146,7 +148,7 @@ $(document).ready(function(){
 
 								finalData.push([ curTime , tmpData[i][1]]);
 						}
-					
+
 						charts.cmsProsDashBarGraph.plot = $.plot(
 							$(placeholder),
 							[{
@@ -156,8 +158,9 @@ $(document).ready(function(){
 							}], 
 							charts.cmsProsDashBarGraph.options
 						);
+
 			}).fail(function(xhr, textStatus, errorThrown){
-				console.log("ERROR !! Status = "+ textStatus + "\n Error = "+ errorThrown + "\n xhr = "+ xhr.statusText);
+				alert("ERROR !! Status = "+ textStatus + "\n Error = "+ errorThrown + "\n xhr = "+ xhr.statusText);
 			});
 		}
 		
