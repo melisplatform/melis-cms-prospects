@@ -20,7 +20,7 @@ return array(
                         'target' => '#tableToolProspect', 
                         'ajaxUrl' => '/melis/MelisCmsProspects/ToolProspects/getToolProspectData',
                         'dataFunction' => 'initDatePickerFilter',
-                        'ajaxCallback' => 'paginateDataTables()',
+                        'ajaxCallback' => '',
                         'filters' => array(
                             'left' => array(
                                 'toolprospect-limit' => array(
@@ -462,7 +462,7 @@ return array(
                         'target' => '#tableToolProspectsTheme',
                         'ajaxUrl' => '/melis/MelisCmsProspects/ProspectThemes/getData',
                         'dataFunction' => '',
-                        'ajaxCallback' => 'paginateDataTables()',
+                        'ajaxCallback' => '',
                         'filters' => array(
                             'left' => array(
                                 'tool-prospect-themes-limit' => array(
@@ -628,7 +628,7 @@ return array(
                         'target' => '#tableToolProspectsThemeItems',
                         'ajaxUrl' => '/melis/MelisCmsProspects/ProspectThemeItems/getItemData',
                         'dataFunction' => 'setThemeId',
-                        'ajaxCallback' => 'paginateDataTables()',
+                        'ajaxCallback' => '',
                         'filters' => array(
                             'left' => array(
                                 'tool-prospect-theme-items-limit' => array(
