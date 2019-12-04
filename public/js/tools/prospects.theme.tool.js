@@ -268,8 +268,3 @@ $(function() {
                 $("button").removeAttr("disabled");
         });
 });
-
-// paginate dataTables data
-window.paginateDataTables = function() {
-    melisCore.paginateDataTables();
-}

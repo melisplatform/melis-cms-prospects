@@ -106,11 +106,6 @@ window.initProsTypeList = function(data){
     }
 }
 
-// paginate dataTables data
-window.paginateDataTables = function() {
-    melisCore.paginateDataTables();
-}
-
 var toolProspects = {
     table: function() {
         return "#tableToolProspect";
@@ -542,11 +537,6 @@ $(function() {
                 $("button").removeAttr("disabled");
         });
 });
-
-// paginate dataTables data
-window.paginateDataTables = function() {
-    melisCore.paginateDataTables();
-}
 $(function() {
     var $body = $("body");
 
