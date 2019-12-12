@@ -701,13 +701,13 @@ $(function() {
             // Init Cms prospects dashboard line graph
             setTimeout(function(){ cmsProsDashLineGraphInit(); }, 3000);
 });
-$(document).ready(function(){
+$(function() {
 	var $body = $("body");
 
 		$body.on("change", '.cms-pros-dash-chart-bar', function() {
 			cmsProsDashBarGraphInit($(this));
 		});
-		
+	
 		if (typeof charts == 'undefined') 
 			return;
 
