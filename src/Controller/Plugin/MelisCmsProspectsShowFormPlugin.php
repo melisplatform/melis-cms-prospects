@@ -464,9 +464,13 @@ class MelisCmsProspectsShowFormPlugin extends MelisTemplatingPlugin
         $frontConfig = $this->pluginFrontConfig;
         $fields      = $frontConfig['fields'] ? : [];
 
+        if (! is_array($fields)) {
+            $fields = explode(',', $fields);
+        }
 
         if(!empty($fields)) {
             $tmp = [];
+
             foreach($fields as $idx => $name) {
                 $tmp[$name] = $elements[$name];
             }
