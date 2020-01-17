@@ -68,11 +68,10 @@ $(function() {
 				
 			},
 			
-			placeholder: "#"+activeTabId+" .cms-pros-dash-chart-bar-graph",
+			placeholder: "#id_meliscore_toolstree_section_dashboard.active .cms-pros-dash-chart-bar-graph",
 
 			// initialize
-			init: function()
-			{
+			init: function() {
 				if (this.plot == null){
 					// hook the init function for plotting the chart
 					cmsProsDashBarGraphInit();
