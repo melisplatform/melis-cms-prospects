@@ -64,7 +64,7 @@ var prospectsDashboardLineChart = (function($, window) {
                 init: function() {
                     if ( this.plot == null ) {
                         // hook the init function for plotting the chart
-                        cmsProsDashLineGraphInit();
+                        loadChart();
                     }
                 }
             };
@@ -157,7 +157,7 @@ var prospectsDashboardLineChart = (function($, window) {
     };
 })($, window);
 
-$(document).ready(function() {
+$(function() {
     /**
      * chart class 
      * [.flotchart-holder] 
@@ -167,6 +167,7 @@ $(document).ready(function() {
         $activeTab  = $("#"+activeTabId);
 
         $body.on("change", '.cms-pros-dash-chart-line', function() {
+            prospectsDashboardLineChart.setUpChart();
             prospectsDashboardLineChart.cmsProsDashLineGraphInit( $(this) );
         });
 
