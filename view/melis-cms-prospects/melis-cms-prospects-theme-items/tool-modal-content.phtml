@@ -28,7 +28,7 @@ if (!empty($this->zoneconfig['conf']['id']))
                                                     <span><?= $lang['lang_cms_name']; ?></span>
                                                     <?php
                                                     $img = $lang['lang_cms_locale'];
-                                                    echo '<span class="pull-right"><img src="/MelisCms/images/lang-flags/'.$img.'.png" class="imgDisplay pull-right"/></span>';
+                                                    echo '<span class="float-right"><img src="/MelisCms/images/lang-flags/'.$img.'.png" class="imgDisplay float-right"/></span>';
                                                     ?>
                                                 </a>
                                             </li>
@@ -63,8 +63,8 @@ if (!empty($this->zoneconfig['conf']['id']))
                                 </div>
                             </div>
                         </div>
-                        <div align="right">
-                            <button data-dismiss="modal" class="btn btn-danger pull-left"><i class="fa fa-times"></i> <?php echo $this->translate('tr_meliscore_common_close')?></button>
+                        <div class="footer-modal d-flex flex-row justify-content-between">
+                            <button data-dismiss="modal" class="btn btn-danger"><i class="fa fa-times"></i> <?php echo $this->translate('tr_meliscore_common_close')?></button>
                             <button class="btn btn-success" id="btn-save-theme-items"><i class="fa fa-save"></i>  <?php echo $this->translate('tr_meliscore_tool_gen_save'); ?></button>
                         </div>
                     </div>

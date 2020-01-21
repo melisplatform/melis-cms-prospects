@@ -134,6 +134,8 @@ class MelisProspectTable extends MelisGenericTable
          */
          if (!empty($startDate) && !empty($endDate)) {
             //select entries >= startDate && <= endDate
+            $startDate = implode("-", explode("/", $startDate));
+            $endDate = implode("-", explode("/", $endDate));
             $select->where->nest()->greaterThanOrEqualTo('pros_contact_date', date_format(date_create($startDate), "Y-m-d H:i:s"))
                 ->and->lessThanOrEqualTo('pros_contact_date', date_format(date_create($endDate . '23:59:59'), "Y-m-d H:i:s"))
                 ->unnest();

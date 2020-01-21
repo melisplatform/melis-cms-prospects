@@ -1,35 +1,25 @@
-$(document).ready(function(){
+var prospectsDashboardLineChart = (function($, window) {
+    function setUpChart() {
+        if ( typeof charts == 'undefined' )
+            return;
 
-    $("body").on("change", '.cms-pros-dash-chart-line', function() {
-        cmsProsDashLineGraphInit($(this));
-    });
-
-    if (typeof charts == 'undefined')
-        return;
-
-    charts.cmsProsDashLineGraph =
-        {
-            // data
-            data:
-                {
+            charts.cmsProsDashLineGraph = {
+                // data
+                data:{
                     d1: []
                 },
-
-            // will hold the chart object
-            plot: null,
-
-            // chart options
-            options:
-                {
-                    grid:
-                        {
-                            color: "#dedede",
-                            borderWidth: 1,
-                            borderColor: "#eee",
-                            clickable: true,
-                            hoverable: true,
-                            labelMargin: 20,
-                        },
+                // will hold the chart object
+                plot: null,
+                // chart options
+                options: {
+                    grid: {
+                        color: "#dedede",
+                        borderWidth: 1,
+                        borderColor: "#eee",
+                        clickable: true,
+                        hoverable: true,
+                        labelMargin: 20
+                    },
                     series: {
                         lines: {
                             show: true,
@@ -49,13 +39,13 @@ $(document).ready(function(){
                         mode: 'time',
                         /*timeformat: '%b %d',
                         tickSize: [1, 'day'],*/
-                        tickColor: '#eee',
+                        tickColor: '#eee'
                     },
                     yaxis: {
                         show : true,
                         tickColor: '#eee',
                         min: 0,
-                        tickDecimals: 0,
+                        tickDecimals: 0
                     },
                     legend: { position: "nw", noColumns: 2, backgroundColor: null, backgroundOpacity: 0 },
                     shadowSize: 0,
@@ -69,96 +59,121 @@ $(document).ready(function(){
                         defaultTheme: false
                     }
                 },
-
-            placeholder: ".cms-pros-dash-chart-line-graph",
-
-            // initialize
-            init: function()
-            {
-                if (this.plot == null){
-                    // hook the init function for plotting the chart
-                    cmsProsDashLineGraphInit();
+                placeholder: ".cms-pros-dash-chart-line-graph",
+                // initialize
+                init: function() {
+                    if ( this.plot == null ) {
+                        // hook the init function for plotting the chart
+                        loadChart();
+                    }
                 }
-            }
-        };
-
-
-    // INIT PLOTTING FUNCTION [also used as callback in the app.interface for when we refresh the chart]
-    window.cmsProsDashLineGraphInit = function(target){
-        var placeholder = "";
-        var chartFor = "";
-        if(typeof target === "undefined"){
-            chartFor = 'daily';
-            if(melisDashBoardDragnDrop.getCurrentPlugin() == null){
-                placeholder = charts.cmsProsDashLineGraph.placeholder;
-            }else{
-                placeholder = "#"+melisDashBoardDragnDrop.getCurrentPlugin().find(".cms-pros-dash-chart-line-graph").attr("id");
-            }
-
-        }else{
-            chartFor = target.val();
-            placeholder = "#"+target.closest(".tab-pane").find(".cms-pros-dash-chart-line-graph").attr("id");
-        }
-
-        // get the statistics data
-        $.ajax({
-            type        : 'POST',
-            url         : '/melis/dashboard-plugin/MelisCmsProspectsStatisticsPlugin/getDashboardStats',
-            data		: {chartFor : chartFor},
-            dataType 	: 'json',
-            encode		: true
-        }).success(function(data){
-            // plot the chartvar tmpData = data.values;
-
-            var tmpData = data.values;
-            var tmpdataLength  = tmpData.length;
-            var finalData = [];
-            var curTime = null;
-
-            for(var i = 0; i < tmpdataLength ; i++)
-            {
-                var newDate = new Date(tmpData[i][0]);
-
-                var m = newDate.getMonth() ;
-                var y = newDate.getFullYear();
-                var newMonth = new Date(y, m, 1.5 );
-                var newYear = new Date(y,0, 2);
-
-                if(chartFor == 'daily'){
-                    curTime = newDate.getTime();
-                }
-                else if (chartFor == 'monthly'){
-                    curTime = newMonth.getTime();
-                }
-                else if (chartFor == 'yearly'){
-                    curTime = newYear.getTime();
-
-                }
-
-                finalData.push([ curTime , tmpData[i][1]]);
-            }
-
-            $(placeholder).each(function(){
-                charts.cmsProsDashLineGraph.plot = $.plot(
-                    $(this),
-                    [{
-                        label: translations.tr_melistoolprospects_tool_prospects,
-                        data: finalData,
-                        color: successColor,
-                        lines: { fill: 0.2 },
-                        points: { fillColor: "#fff"}
-                    }],
-                    charts.cmsProsDashLineGraph.options
-                );
-            });
-
-
-        }).error(function(xhr, textStatus, errorThrown){
-            console.log("ERROR !! Status = "+ textStatus + "\n Error = "+ errorThrown + "\n xhr = "+ xhr.statusText);
-        });
+            };
     }
 
-    // Init Cms prospects dashboard line graph
+    function cmsProsDashLineGraphInit(target) {
+        var $placeholder = $(".cms-pros-dash-chart-line-graph"),
+            chartFor    = "",
+            // prevent from clicking the tab links without displayed graph
+            $navLink    =  $(".cms-pros-dash-chart-line-graph").parents(".widget-body").find(".widget-tabs .nav-tabs .nav-item .nav-link");
+            
+            if ( $placeholder.length > 0 ) {
 
-    setTimeout(function(){ cmsProsDashLineGraphInit(); }, 3000);
+                if ( typeof target === "undefined" ) {
+                    chartFor = 'daily';
+                } else {
+                    chartFor = target.val();
+                }
+
+                $placeholder.css("width", "100%");
+
+                if ( $placeholder.html() === "" ) {
+                    $navLink.addClass("disabled");
+                }
+
+                // get the statistics data
+                $.ajax({
+                    type        : 'POST',
+                    url         : '/melis/dashboard-plugin/MelisCmsProspectsStatisticsPlugin/getDashboardStats',
+                    data        : {chartFor : chartFor},
+                    dataType    : 'json',
+                    encode      : true
+                }).done(function(data){
+                    // plot the chartvar tmpData = data.values;
+                    var tmpData         = data.values,
+                        tmpdataLength   = tmpData.length,
+                        finalData       = [],
+                        curTime         = null;
+
+                        for ( var i = 0; i < tmpdataLength ; i++ ) {
+
+                            var newDate     = new Date(tmpData[i][0]),
+                                m           = newDate.getMonth(),
+                                y           = newDate.getFullYear(),
+                                newMonth    = new Date(y, m, 1.5 ),
+                                newYear     = new Date(y,0, 2);
+
+                            if ( chartFor == 'daily' ) {
+                                curTime = newDate.getTime();
+                            }
+                            else if (chartFor == 'monthly') {
+                                curTime = newMonth.getTime();
+                            }
+                            else if (chartFor == 'yearly') {
+                                curTime = newYear.getTime();
+                            }
+
+                            finalData.push([ curTime , tmpData[i][1]]);
+                        }
+
+                        charts.cmsProsDashLineGraph.plot = $.plot(
+                            $placeholder,
+                            [{
+                                label: translations.tr_melistoolprospects_tool_prospects,
+                                data: finalData,
+                                color: successColor,
+                                lines: { fill: 0.2 },
+                                points: { fillColor: "#fff"}
+                            }],
+                            charts.cmsProsDashLineGraph.options
+                        );
+
+                        $navLink.removeClass("disabled");
+
+                }).fail(function(xhr, textStatus, errorThrown){
+                    alert("ERROR !! Status = "+ textStatus + "\n Error = "+ errorThrown + "\n xhr = "+ xhr.statusText);
+                });
+            }
+    }
+
+    function loadChart() {
+        setUpChart();
+        cmsProsDashLineGraphInit();
+    }
+
+    return {
+        loadChart                   : loadChart,
+        setUpChart                  : setUpChart,
+        cmsProsDashLineGraphInit    : cmsProsDashLineGraphInit
+    };
+})($, window);
+
+$(function() {
+    /**
+     * chart class 
+     * [.flotchart-holder] 
+     * [.cms-pros-dash-chart-line-graph]
+     */
+    var $body       = $("body"),
+        $activeTab  = $("#"+activeTabId);
+
+        $body.on("change", '.cms-pros-dash-chart-line', function() {
+            prospectsDashboardLineChart.setUpChart();
+            prospectsDashboardLineChart.cmsProsDashLineGraphInit( $(this) );
+        });
+
+        if ( typeof melisUserTabs === "undefined" ) {
+            if ( $activeTab.data("meliskey") === "meliscore_dashboard" && $activeTab.find(".cms-pros-dash-chart-line-graph").length > 0 ) {
+                prospectsDashboardLineChart.loadChart();
+            }
+        }
 });

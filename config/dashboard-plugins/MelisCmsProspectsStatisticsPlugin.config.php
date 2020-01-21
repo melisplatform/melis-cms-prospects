@@ -39,7 +39,7 @@
                             'description' => 'tr_melistoolprospects_dashboard_Prospects Statistics description',
                             'icon' => 'fa fa-bar-chart-o',
                             'thumbnail' => '/MelisCmsProspects/plugins/images/MelisCmsProspectsStatisticsPlugin.jpg',
-                            'jscallback' => 'cmsProsDashLineGraphInit()',
+                            'jscallback' => 'prospectsDashboardLineChart.loadChart()',
                             'height' => 4,
                             'width' => 6,
                             'x-axis' => 0,
