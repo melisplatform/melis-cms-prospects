@@ -168,6 +168,15 @@ $(function() {
             prospectsDashboardLineChart.cmsProsDashLineGraphInit( $(this) );
         });
 
+        //initialize all the charts on first load of dashboard.
+        $body.find(".cms-pros-dash-chart-line").each(function(index, value) {
+            var pluginConfig = $(value).closest('.grid-stack-item').find('.grid-stack-item-content .widget .widget-parent .widget-body .dashboard-plugin-json-config').text();
+            var filter = JSON.parse(pluginConfig).activeFilter;
+            var placeholder = JSON.parse(pluginConfig).plugin_id;
+
+            prospectsDashboardLineChart.cmsProsDashLineGraphInit(filter, placeholder);
+        });
+
         if ( typeof melisUserTabs === "undefined" ) {
             if ( $activeTab.data("meliskey") === "meliscore_dashboard" && $activeTab.find(".cms-pros-dash-chart-line-graph").length > 0 ) {
                 prospectsDashboardLineChart.loadChart();
