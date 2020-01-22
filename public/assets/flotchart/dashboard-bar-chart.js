@@ -68,7 +68,7 @@ $(function() {
 				
 			},
 			
-			placeholder: "#id_meliscore_toolstree_section_dashboard.active .cms-pros-dash-chart-bar-graph",
+			placeholder: ".cms-pros-dash-chart-bar-graph",
 
 			// initialize
 			init: function() {
@@ -164,13 +164,13 @@ $(function() {
 		}
 		
 		// Tab shon event
-		$body.on('shown.bs.tab', '.chart-simple-lines-tab', function(e){
+		$body.on('shown.bs.tab', '.chart-simple-lines-tab', function(e) {
 			// ----=[ Melis customize ]=----
 			// modified this event, used event delegation and hooked it up in the body so it still works after the zone is reloaded.
 			// created var flot; and added or '|| flot === undefined' in the condition to make other charts reinitialize after zoneReloading.
 			targetDevId = "#"+$($(this).attr("href")).find(".cms-pros-dash-chart-bar-graph").attr("id");
 			var flot = $(targetDevId).data('plot');
-			if ( charts.cmsProsDashBarGraph.plot == null || flot === undefined  ){
+			if ( charts.cmsProsDashBarGraph.plot == null || flot === undefined ) {
 				cmsProsDashBarGraphInit(undefined, targetDevId);
 			}
 		});
