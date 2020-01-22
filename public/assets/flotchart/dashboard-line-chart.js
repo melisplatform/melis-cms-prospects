@@ -178,7 +178,7 @@ $(function() {
         });
 
         if ( typeof melisUserTabs === "undefined" ) {
-            if ( $activeTab.data("meliskey") === "meliscore_dashboard" && $activeTab.find(".cms-pros-dash-chart-line-graph").length > 0 ) {
+            if ( $activeTab.find(".cms-pros-dash-chart-line-graph").length > 0 ) {
                 prospectsDashboardLineChart.loadChart();
             }
         }
