@@ -12,9 +12,9 @@
 </style>
 <div class="fields-settings">
 	<div class="row">
-		<div class="col-xs-5"><h4><?php echo $this->translate('tr_melis_cms_prospects_plugin_config_fields')?></h4></div>
-		<div class="col-xs-4 text-center"><h4><?php echo $this->translate('tr_melis_cms_prospects_plugin_config_status')?></h4></div>
-		<div class="col-xs-3 text-center"><h4><?php echo $this->translate('tr_melis_cms_prospects_plugin_config_mandatory')?></h4></div>
+		<div class="col-5"><h4><?php echo $this->translate('tr_melis_cms_prospects_plugin_config_fields')?></h4></div>
+		<div class="col-4 text-center"><h4><?php echo $this->translate('tr_melis_cms_prospects_plugin_config_status')?></h4></div>
+		<div class="col-3 text-center"><h4><?php echo $this->translate('tr_melis_cms_prospects_plugin_config_mandatory')?></h4></div>
 	</div>
     <div class="fields-sortable">
         <form method="POST" name="MelisCmsProspectsShowFormPlugin_select_field" id="MelisCmsProspectsShowFormPlugin_select_field">
@@ -23,10 +23,10 @@
                 foreach($this->cbElements as $name => $label) { ?>
                     <div class="module-cont clearfix">
                     	<div class="row">
-                    		<div class="col-xs-5">
+                    		<div class="col-5">
                         		<h4><?= $label; ?></h4>
                         	</div>
-                    		<div class="col-xs-4 text-center">
+                    		<div class="col-4 text-center">
                                 <div class="make-switch module-switch prospects-plugin-switch"
                                 	data-label-icon="fa fa-arrows-h"
                                     data-on-label="<?= $this->translate('tr_MelisCmsProspectsShowFormPlugin_show'); ?>"
@@ -42,7 +42,7 @@
                                     <input name="fields[]" value="<?= $name; ?>" type="checkbox" <?= $status; ?>/>
                                 </div>
                         	</div>
-                    		<div class="col-xs-3 text-center">
+                    		<div class="col-3 text-center">
                     			<?php 
                     			    $checked = '';
                     			    if (in_array($name, $requiredFields) && empty($disableReqFld)) {
