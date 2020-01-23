@@ -37,6 +37,10 @@
     border: 0 !important;
 }
 
+#MelisCmsProspectsShowFormPlugin_select_field .module-cont .has-switch {
+	top: 0;
+}
+
 /* @CHARSET "ISO-8859-1"; */
 
 @media (min-width: 1600px) and (max-width: 1840px) {
