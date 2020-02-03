@@ -116,6 +116,10 @@ class MelisCmsProspectsThemesController extends AbstractActionController
             $form->setData($data);
         }
         else {
+            $elementOptions = $form->get('pros_theme_id')->getOptions();
+            unset($elementOptions['tooltip']);
+            $form->get('pros_theme_id')->setOptions($elementOptions);
+            
             $form->get('pros_theme_id')->setAttribute('style', 'display:none')->setLabel('');
             $form->get('pros_theme_id')->setLabelAttributes(array('style' => 'display:none'));
         }
