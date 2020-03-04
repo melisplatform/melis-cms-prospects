@@ -67,6 +67,11 @@ $(function() {
 
                 $("#"+tableId).DataTable().ajax.reload();
         });
+
+    $body.on('change', '#prosTypeSelect', function(){
+        var tableId = $(this).parents().eq(6).find('table').attr('id');
+        $("#"+tableId).DataTable().ajax.reload();
+    });
 });
 
 

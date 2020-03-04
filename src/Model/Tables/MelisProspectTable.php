@@ -93,20 +93,22 @@ class MelisProspectTable extends MelisGenericTable
             array('site_name','site_label'), $select::JOIN_LEFT);
 
         if (!empty($searchableColumns) && !empty($search)) {
+            $nest = $select->where->nest();
+
             foreach ($searchableColumns as $column) {
                 if (!empty($search) && is_array($search)) {
                     $moreThanOneInput = true;
                     foreach ($search as $searchItem) {
                         if ($searchItem != '') {
                             if ($moreThanOneInput) {
-                                $select->where->like($column, '%' . $searchItem . '%');
+                                $nest->like($column, '%' . $searchItem . '%');
                                 $moreThanOneInput = false;
                             } else
-                                $select->where->or->like($column, '%' . $searchItem . '%');
+                                $nest->or->like($column, '%' . $searchItem . '%');
                         }
                     }
                 } else {
-                    $select->where->or->like($column, '%' . $search . '%');
+                    $nest->or->like($column, '%' . $search . '%');
                 }
             }
         }
