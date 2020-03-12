@@ -23,6 +23,8 @@ use MelisCmsProspects\Listener\MelisCmsProspectFlashMessengerListener;
 use MelisCmsProspects\Listener\MelisCmsProspectsGdprUserInfoListener;
 use MelisCmsProspects\Listener\MelisCmsProspectsGdprUserExtractListener;
 use MelisCmsProspects\Listener\MelisCmsProspectsGdprUserDeleteListener;
+use MelisCmsProspects\Listener\MelisCmsProspectsTableColumnDisplayListener;
+use MelisCmsProspects\Listener\MelisCmsProspectsToolCreatorEditionTypeListener;
 use Zend\Mvc\Router\Http\RouteMatch;
 /**
  * Class Module
@@ -58,6 +60,8 @@ class Module
                     $eventManager->attach(new MelisCmsProspectsGdprUserInfoListener());
                     $eventManager->attach(new MelisCmsProspectsGdprUserExtractListener());
                     $eventManager->attach(new MelisCmsProspectsGdprUserDeleteListener());
+                    $eventManager->attach(new MelisCmsProspectsToolCreatorEditionTypeListener());
+                    $eventManager->attach(new MelisCmsProspectsTableColumnDisplayListener());
 		        }
 	        }
         }

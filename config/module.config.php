@@ -84,6 +84,7 @@ return array(
         'factories' => array(
             'MelisCmsProspectThemeSelect' => 'MelisCmsProspects\Form\Factory\ProspectThemeSelectFactory',
             'MelisCmsProspectThemeItemSelect' => 'MelisCmsProspects\Form\Factory\ProspectThemeItemSelectFactory',
+            'MelisCmsProspectName' => 'MelisCmsProspects\Form\Factory\ProspectNameSelectFactory',
         ),
     ),
     'view_manager' => array(
