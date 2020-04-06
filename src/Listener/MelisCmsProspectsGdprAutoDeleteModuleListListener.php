@@ -9,8 +9,7 @@
 
 namespace MelisCmsProspects\Listener;
 
-use MelisCmsUserAccount\Service\MelisCmsProspectsGdprAutoDeleteService;
-use MelisCmsUserAccount\Service\MelisCmsUserAccountGdprAutoDeleteService;
+use MelisCmsProspects\Service\MelisCmsProspectsGdprAutoDeleteService;
 use MelisCore\Service\MelisCoreGdprAutoDeleteService;
 use Zend\EventManager\EventManagerInterface;
 use Zend\EventManager\ListenerAggregateInterface;
