@@ -9,6 +9,10 @@
 
 namespace MelisCmsProspects;
 
+use MelisCmsProspects\Listener\MelisCmsProspectsGdprAutoDeleteModuleListListener;
+use MelisCmsProspects\Listener\MelisCmsProspectsGdprAutoDeleteActionDeleteUserListener;
+use MelisCmsProspects\Listener\MelisCmsProspectsGdprAutoDeleteSecondWarningListUsersListener;
+use MelisCmsProspects\Listener\MelisCmsProspectsGdprAutoDeleteTagsListListener;
 use Zend\Mvc\ModuleRouteListener;
 use Zend\Mvc\MvcEvent;
 use Zend\ModuleManager\ModuleManager;
@@ -64,6 +68,16 @@ class Module
                     $eventManager->attach(new MelisCmsProspectsTableColumnDisplayListener());
 		        }
 	        }
+            // module listing for auto delete gdpr
+            $eventManager->attach(new MelisCmsProspectsGdprAutoDeleteModuleListListener());
+            // tags list
+            $eventManager->attach(new MelisCmsProspectsGdprAutoDeleteTagsListListener());
+            // first warning list of users
+            $eventManager->attach(new MelisCmsProspectsGdprAutoDeleteSecondWarningListUsersListener());
+            // second warning list of users
+            $eventManager->attach(new MelisCmsProspectsGdprAutoDeleteSecondWarningListUsersListener());
+            // for deleting the user account
+            $eventManager->attach(new MelisCmsProspectsGdprAutoDeleteActionDeleteUserListener());
         }
     }
     
