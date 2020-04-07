@@ -34,7 +34,7 @@ class MelisCmsProspectsGdprAutoDeleteService extends MelisCoreGeneralService imp
             Gdpr::TAG_LIST_KEY => [
                 self::MODULE_NAME => [
                     // TODO : List of Tags for replacing tags of email content
-                    'NAME', 'FIRSTNAME', 'EMAIL'
+                    'USER', 'LOGIN', 'EMAIL'
                 ]
             ]
         ];
@@ -54,6 +54,7 @@ class MelisCmsProspectsGdprAutoDeleteService extends MelisCoreGeneralService imp
                 'lang' => '1',
                 'last_date' => $this->getUserLastDateByEmail('sample@mmail.com'),
                 'site_id' => $this->getUserSiteIdByEmail('sample@mmail.com')
+                'acount_id' => [id]
             ],
         ]
      *
@@ -66,7 +67,25 @@ class MelisCmsProspectsGdprAutoDeleteService extends MelisCoreGeneralService imp
         return [
             Gdpr::WARNING_LIST_KEY => [
                 self::MODULE_NAME => [
-                    // TODO : List of first alert warning users
+//                    'jrago@melistechnology.com' => [
+//                        'tags' => [
+//                            // tags
+//                            'NAME' => 'Jerremei',
+//                            'EMAIL' => 'jrago@melistechnology.com',
+//                            'URL' => '%revalidation_url%'
+//                        ],
+//                        'config' => [
+//                            // validation key
+//                            'validationKey' => md5('NAME' . 'EMAIL' . Gdpr::WARNING_LIST_KEY),
+//                            /*
+//                             * required keys for gdpr auto delete
+//                             */
+//                            'lang' => '1',
+//                            'last_date' => $this->getUserLastDateByEmail('jrago@melistechnology.com'),
+//                            'site_id' => $this->getUserSiteIdByEmail('jrago@melistechnology.com'),
+//                            'account_id' => $this->getUserByEmail('jrago@melistechnology.com')->pros_id ?: null
+//                        ],
+//                    ]
                 ]
             ]
         ];
@@ -87,6 +106,7 @@ class MelisCmsProspectsGdprAutoDeleteService extends MelisCoreGeneralService imp
                 'lang' => '1',
                 'last_date' => $this->getUserLastDateByEmail('sample@mail.com'),
                 'site_id' => $this->getUserSiteIdByEmail('sample@mail.com')
+                'acount_id' => [id]
             ],
         ]
      *
@@ -99,9 +119,71 @@ class MelisCmsProspectsGdprAutoDeleteService extends MelisCoreGeneralService imp
         return [
             Gdpr::SECOND_WARNING_LIST_KEY => [
                 self::MODULE_NAME => [
-                    // TODO : List of second (resend) alert warning users
+//            'jrago@melistechnology.com' => [
+//                'tags' => [
+//                    // tags
+//                    'NAME' => 'Jerremei',
+//                    'EMAIL' => 'jrago@melistechnology.com',
+//                ],
+//                // config
+//                'config' => [
+//                    /*
+//                     * required keys for gdpr auto delete
+//                     */
+//                    'lang' => '1',
+//                    'last_date' => $this->getUserLastDateByEmail('jrago@melistechnology.com'),
+//                    'site_id' => $this->getUserSiteIdByEmail('jrago@melistechnology.com'),
+//                    'account_id' => $this->getUserByEmail('jrago@melistechnology.com')->pros_id ?: null
+//                ],
+//            ]
                 ]
             ]
+        ];
+    }
+
+    /**
+     * ** FORMAT **
+     * 'sample@mail.com' => [
+        'tags' => [
+            // tags
+            'USER_LOGIN' => 'sample',
+        ],
+        // config
+        'config' => [
+                // lang id
+                'lang' => '1',
+                // user last date active
+                'last_date' => $this->getUserLastDateByEmail('sample@mail.com'),
+                // user site id
+                'site_id'   => $this->getUserSiteIdByEmail('sample@mail.com')
+                'acount_id' => [id]
+            ],
+        ]
+     *
+     * above keys are basic required for gdpr auto delete
+     *
+     * @return array
+     */
+    public function getDeleteListOfUsers()
+    {
+        return [
+//            'jrago@melistechnology.com' => [
+//                'tags' => [
+//                    // tags
+//                    'NAME' => 'Jerremei',
+//                    'EMAIL' => 'jrago@melistechnology.com',
+//                ],
+//                // config
+//                'config' => [
+//                    /*
+//                     * required keys for gdpr auto delete
+//                     */
+//                    'lang' => '1',
+//                    'last_date' => $this->getUserLastDateByEmail('jrago@melistechnology.com'),
+//                    'site_id' => $this->getUserSiteIdByEmail('jrago@melistechnology.com'),
+//                    'account_id' => $this->getUserByEmail('jrago@melistechnology.com')->pros_id ?: null
+//                ],
+//            ]
         ];
     }
 
@@ -123,7 +205,7 @@ class MelisCmsProspectsGdprAutoDeleteService extends MelisCoreGeneralService imp
                         // search for the validation key
                         if ($emailOpts['config']['validationKey'] == $validationKey) {
                             // return user data
-                            $userData = null;
+                            $userData = $this->getUserByEmail($email);
                             if (! empty($userData)) {
                                 // include user config options
                                 $userData->config = $emailOpts['config'];
@@ -140,43 +222,21 @@ class MelisCmsProspectsGdprAutoDeleteService extends MelisCoreGeneralService imp
     }
 
     /**
-     * update user status
+     * update user last date
      *
      * @param $validationKey
      * @return mixed
      */
     public function updateGdprUserStatus($validationKey)
     {
-        return true;
-    }
+        // get user
+        $user = $this->getUserPerValidationKey($validationKey);
+        // update the last date of the user
+        if ($this->getServiceLocator()->get('MelisProspects')->save(['pros_gdpr_lastdate' => date('Y-m-d h:i:s')], $user->pros_id)) {
+            return true;
+        }
 
-    /**
-     * ** FORMAT **
-     * 'sample@mail.com' => [
-        'tags' => [
-            // tags
-            'USER_LOGIN' => 'sample',
-        ],
-        // config
-        'config' => [
-                // lang id
-                'lang' => '1',
-                // user last date active
-                'last_date' => $this->getUserLastDateByEmail('sample@mail.com'),
-                // user site id
-                'site_id'   => $this->getUserSiteIdByEmail('sample@mail.com')
-            ],
-        ]
-     *
-     * above keys are basic required for gdpr auto delete
-     *
-     * @return array
-     */
-    public function getDeleteListOfUsers()
-    {
-        return [
-            // TODO : List of delete users
-        ];
+        return false;
     }
 
     /**
@@ -187,8 +247,23 @@ class MelisCmsProspectsGdprAutoDeleteService extends MelisCoreGeneralService imp
      */
     public function removeOldUnvalidatedUsers($autoDeleteConfig)
     {
-
         $deletedUsers = [];
+        if ($autoDeleteConfig['mgdprc_module_name'] == self::MODULE_NAME) {
+            foreach ($this->getDeleteListOfUsers() as $email => $val) {
+                // delete if users days of inactivity is already passed the set
+                if ($this->getDaysDiff($val['config']['last_date'], date('Y-m-d')) > $autoDeleteConfig['mgdprc_delete_days']) {
+                    // get user data
+                    $data = $this->getUserByEmail($email);
+                    // perform delete
+                    if ($this->getServiceLocator()->get('MelisProspects')->deleteById($data->pros_id)) {
+                        // return deleted email with its opeions
+                        $deletedUsers[$email] = $val;
+                    }
+                    // trigger event for other modules
+                    $this->getEventManager()->trigger('melis_cms_prospects_gdpr_auto_delete_action_delete', $this, $data);
+                }
+            }
+        }
 
         return $deletedUsers;
     }
@@ -203,6 +278,39 @@ class MelisCmsProspectsGdprAutoDeleteService extends MelisCoreGeneralService imp
     private function getDaysDiff($date1, $date2)
     {
         return round((strtotime($date2) - strtotime($date1)) / (60 * 60 * 24));
+    }
+
+    /**
+     * @param $email
+     * @return false|null|string
+     */
+    private function getUserLastDateByEmail($email)
+    {
+        $data = $this->getServiceLocator()->get('MelisProspects')->getEntryByField('pros_email', $email)->current();
+        if (! empty($data)) {
+            return date('Y-m-d', strtotime($data->pros_gdpr_lastdate));
+        }
+
+        return null;
+    }
+
+    private function getUserByEmail($email)
+    {
+        return $this->getServiceLocator()->get('MelisProspects')->getEntryByField('pros_email', $email)->current() ?: [];
+    }
+
+    /**
+     * @param $email
+     * @return null
+     */
+    private function getUserSiteIdByEmail($email)
+    {
+        $data = $this->getServiceLocator()->get('MelisProspects')->getEntryByField('pros_email',$email)->current();
+        if (! empty($data)) {
+            return $data->pros_site_id;
+        }
+
+        return null;
     }
 
 }
