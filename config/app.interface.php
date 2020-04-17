@@ -40,6 +40,15 @@ return array(
                 'id' => '',
                 'name' => 'tr_melistoolprospects_tool_prospects',
                 'rightsDisplay' => 'none',
+                'gdpr' => [
+                    'tags' => [
+                        'SITE_NAME',
+                        'NAME',
+                        'DATE_REGISTERED',
+                        'COMPANY',
+                        'URL_VALIDATION'
+                    ]
+                ]
             ),
             'ressources' => array(
                 'js' => array(

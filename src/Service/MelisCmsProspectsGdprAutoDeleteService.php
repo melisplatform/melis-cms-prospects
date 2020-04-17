@@ -32,9 +32,8 @@ class MelisCmsProspectsGdprAutoDeleteService extends MelisCoreGeneralService imp
     {
         return [
             Gdpr::TAG_LIST_KEY => [
-                self::MODULE_NAME => [
-                    // TODO : List of Tags for replacing tags of email content
-                    'USER', 'LOGIN', 'EMAIL'
+                self::MODULE_NAME=> [
+                    Gdpr::TAG_KEY  => $this->getServiceLocator()->get('MelisCoreConfig')->getItem('/MelisCmsProspects/conf/gdpr/tags')
                 ]
             ]
         ];
@@ -81,7 +80,7 @@ class MelisCmsProspectsGdprAutoDeleteService extends MelisCoreGeneralService imp
 //                             * required keys for gdpr auto delete
 //                             */
 //                            'lang' => '1',
-//                            'last_date' => $this->getUserLastDateByEmail('jrago@melistechnology.com'),
+//                            'last_date' => $this->getUserLastDateByEmail('jrago@v.com'),
 //                            'site_id' => $this->getUserSiteIdByEmail('jrago@melistechnology.com'),
 //                            'account_id' => $this->getUserByEmail('jrago@melistechnology.com')->pros_id ?: null
 //                        ],
@@ -250,17 +249,20 @@ class MelisCmsProspectsGdprAutoDeleteService extends MelisCoreGeneralService imp
         $deletedUsers = [];
         if ($autoDeleteConfig['mgdprc_module_name'] == self::MODULE_NAME) {
             foreach ($this->getDeleteListOfUsers() as $email => $val) {
-                // delete if users days of inactivity is already passed the set
-                if ($this->getDaysDiff($val['config']['last_date'], date('Y-m-d')) > $autoDeleteConfig['mgdprc_delete_days']) {
-                    // get user data
-                    $data = $this->getUserByEmail($email);
-                    // perform delete
-                    if ($this->getServiceLocator()->get('MelisProspects')->deleteById($data->pros_id)) {
-                        // return deleted email with its opeions
-                        $deletedUsers[$email] = $val;
+                // check if user belongs to the config site
+                if ($autoDeleteConfig['mgdprc_site_id'] == $val['config']['site_id']) {
+                    // delete if users days of inactivity is already passed the set
+                    if ($this->getDaysDiff($val['config']['last_date'], date('Y-m-d')) > $autoDeleteConfig['mgdprc_delete_days']) {
+                        // get user data
+                        $data = $this->getUserByEmail($email);
+                        // perform delete
+                        if ($this->getServiceLocator()->get('MelisProspects')->deleteById($data->pros_id)) {
+                            // return deleted email with its opeions
+                            $deletedUsers[$email] = $val;
+                        }
+                        // trigger event for other modules
+                        $this->getEventManager()->trigger('melis_cms_prospects_gdpr_auto_delete_action_delete', $this, $data);
                     }
-                    // trigger event for other modules
-                    $this->getEventManager()->trigger('melis_cms_prospects_gdpr_auto_delete_action_delete', $this, $data);
                 }
             }
         }
