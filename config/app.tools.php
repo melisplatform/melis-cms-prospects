@@ -151,7 +151,7 @@ return array(
                                 'method' => 'POST',
                                 'action' => '',
                             ),
-                            'hydrator'  => 'Zend\Stdlib\Hydrator\ArraySerializable',
+                            'hydrator'  => 'Laminas\Hydrator\ArraySerializable',
                             'elements' => array(
                 
                                 array(
@@ -272,7 +272,7 @@ return array(
                                 array(
                                     'spec' => array(
                                         'name' => 'pros_message',
-                                        'type' => 'TextArea',
+                                        'type' => 'Textarea',
                                         'options' => array(
                                             'label' => 'tr_melistoolprospects_prospects_pros_message',
                                             'tooltip' => 'tr_melistoolprospects_prospects_pros_message tooltip',
@@ -296,8 +296,8 @@ return array(
                                             'name'    => 'IsInt',
                                             'options' => array(
                                                 'messages' => array(
-                                                    \Zend\I18n\Validator\IsInt::NOT_INT => 'tr_meliscms_tool_platform_not_digit',
-                                                    \Zend\I18n\Validator\IsInt::INVALID => 'tr_meliscms_tool_platform_not_digit',
+                                                    \Laminas\I18n\Validator\IsInt::NOT_INT => 'tr_meliscms_tool_platform_not_digit',
+                                                    \Laminas\I18n\Validator\IsInt::INVALID => 'tr_meliscms_tool_platform_not_digit',
                                                 )
                                             )
                                         ),
@@ -317,7 +317,7 @@ return array(
                                                 //'min'      => 1,
                                                 'max'      => 255,
                                                 'messages' => array(
-                                                    \Zend\Validator\StringLength::TOO_LONG => 'tr_tool_text_prospect_pros_name_error_long'
+                                                    \Laminas\Validator\StringLength::TOO_LONG => 'tr_tool_text_prospect_pros_name_error_long'
                                                 ),
                                             ),
                                         ),
@@ -325,7 +325,7 @@ return array(
                                             'name' => 'NotEmpty',
                                             'options' => array(
                                                 'messages' => array(
-                                                    \Zend\Validator\NotEmpty::IS_EMPTY => 'tr_tool_text_prospect_pros_name_error_empty',
+                                                    \Laminas\Validator\NotEmpty::IS_EMPTY => 'tr_tool_text_prospect_pros_name_error_empty',
                                                 ),
                                             ),
                                         ),
@@ -356,7 +356,7 @@ return array(
                                                 //'min'      => 1,
                                                 'max'      => 255,
                                                 'messages' => array(
-                                                    \Zend\Validator\StringLength::TOO_LONG => 'tr_tool_text_prospect_pros_email_error_long'
+                                                    \Laminas\Validator\StringLength::TOO_LONG => 'tr_tool_text_prospect_pros_email_error_long'
                                                 ),
                                             ),
                                         ),
@@ -364,7 +364,7 @@ return array(
                                             'name' => 'NotEmpty',
                                             'options' => array(
                                                 'messages' => array(
-                                                    \Zend\Validator\NotEmpty::IS_EMPTY => 'tr_tool_text_prospect_pros_email_error_empty',
+                                                    \Laminas\Validator\NotEmpty::IS_EMPTY => 'tr_tool_text_prospect_pros_email_error_empty',
                                                 ),
                                             ),
                                         ),
@@ -382,14 +382,14 @@ return array(
                                             'name'    => 'regex', false,
                                             'options' => array(
                                                 'pattern' => '/^([0-9\(\)\/\+ \-]*)$/',
-                                                'messages'=> array(\Zend\Validator\Regex::NOT_MATCH => sprintf('tr_tool_text_prospect_validation_invalid_phone_num','%value%')),
+                                                'messages'=> array(\Laminas\Validator\Regex::NOT_MATCH => sprintf('tr_tool_text_prospect_validation_invalid_phone_num','%value%')),
                                             ),
                                         ),
                                         array(
                                             'name' => 'NotEmpty',
                                             'options' => array(
                                                 'messages' => array(
-                                                    \Zend\Validator\NotEmpty::IS_EMPTY => 'tr_tool_text_prospect_pros_telephone_error_empty',
+                                                    \Laminas\Validator\NotEmpty::IS_EMPTY => 'tr_tool_text_prospect_pros_telephone_error_empty',
                                                 ),
                                             ),
                                         ),
@@ -410,7 +410,7 @@ return array(
                                                 //'min'      => 1,
                                                 'max'      => 255,
                                                 'messages' => array(
-                                                    \Zend\Validator\StringLength::TOO_LONG => 'tr_tool_text_prospect_pros_theme_error_long',
+                                                    \Laminas\Validator\StringLength::TOO_LONG => 'tr_tool_text_prospect_pros_theme_error_long',
                                                 ),
                                             ),
                                         ),
@@ -418,7 +418,7 @@ return array(
                                             'name' => 'NotEmpty',
                                             'options' => array(
                                                 'messages' => array(
-                                                    \Zend\Validator\NotEmpty::IS_EMPTY => 'tr_tool_text_prospect_pros_theme_error_empty',
+                                                    \Laminas\Validator\NotEmpty::IS_EMPTY => 'tr_tool_text_prospect_pros_theme_error_empty',
                                                 ),
                                             ),
                                         ),
@@ -436,7 +436,7 @@ return array(
                                             'name' => 'NotEmpty',
                                             'options' => array(
                                                 'messages' => array(
-                                                    \Zend\Validator\NotEmpty::IS_EMPTY => 'tr_tool_text_prospect_pros_message_error_empty',
+                                                    \Laminas\Validator\NotEmpty::IS_EMPTY => 'tr_tool_text_prospect_pros_message_error_empty',
                                                 ),
                                             ),
                                         ),
@@ -531,7 +531,7 @@ return array(
                                 'method' => 'POST',
                                 'action' => '',
                             ),
-                            'hydrator'  => 'Zend\Stdlib\Hydrator\ArraySerializable',
+                            'hydrator'  => 'Laminas\Hydrator\ArraySerializable',
                             'elements' => array(
                                 array(
                                     'spec' => array(
@@ -573,8 +573,8 @@ return array(
                                             'name'    => 'IsInt',
                                             'options' => array(
                                                 'messages' => array(
-                                                    \Zend\I18n\Validator\IsInt::NOT_INT => 'tr_melis_cms_prospects_theme_pros_theme_id_invalid',
-                                                    \Zend\I18n\Validator\IsInt::INVALID => 'tr_melis_cms_prospects_theme_pros_theme_id_invalid',
+                                                    \Laminas\I18n\Validator\IsInt::NOT_INT => 'tr_melis_cms_prospects_theme_pros_theme_id_invalid',
+                                                    \Laminas\I18n\Validator\IsInt::INVALID => 'tr_melis_cms_prospects_theme_pros_theme_id_invalid',
                                                 )
                                             )
                                         ),
@@ -595,7 +595,7 @@ return array(
                                                 //'min'      => 1,
                                                 'max'      => 45,
                                                 'messages' => array(
-                                                    \Zend\Validator\StringLength::TOO_LONG => 'tr_melis_cms_prospects_theme_name_long',
+                                                    \Laminas\Validator\StringLength::TOO_LONG => 'tr_melis_cms_prospects_theme_name_long',
                                                 ),
                                             ),
                                         ),
@@ -603,7 +603,7 @@ return array(
                                             'name' => 'NotEmpty',
                                             'options' => array(
                                                 'messages' => array(
-                                                    \Zend\Validator\NotEmpty::IS_EMPTY => 'tr_melis_cms_prospects_theme_name_empty',
+                                                    \Laminas\Validator\NotEmpty::IS_EMPTY => 'tr_melis_cms_prospects_theme_name_empty',
                                                 ),
                                             ),
                                         ),
@@ -692,7 +692,7 @@ return array(
                                 'method' => 'POST',
                                 'action' => '',
                             ),
-                            'hydrator'  => 'Zend\Stdlib\Hydrator\ArraySerializable',
+                            'hydrator'  => 'Laminas\Hydrator\ArraySerializable',
                             'elements' => array(
                                 array(
                                     'spec' => array(

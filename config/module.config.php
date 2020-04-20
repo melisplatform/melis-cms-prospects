@@ -46,38 +46,29 @@ return array(
             ),            
         ),
     ),
-    'translator' => array(
-    	'locale' => 'en_EN',
-	),
     'service_manager' => array(
-        'invokables' => array(
-            'MelisCmsProspects\Service\MelisCmsProspectsServiceInterface' => 'MelisCmsProspects\Service\MelisCmsProspectsService',
-        ),
         'aliases' => array(
-            'translator' => 'MvcTranslator',
-            'MelisProspects' => 'MelisCmsProspects\Model\Tables\MelisProspectTable',
-            'MelisCmsProspectsService' => 'MelisCmsProspects\Service\MelisCmsProspectsService',
-        ),
-        'factories' => array(
-            'MelisProspectsService' => 'MelisCmsProspects\Service\Factory\MelisCmsProspectsServiceFactory',
-            'MelisCmsProspects\Model\Tables\MelisProspectTable' => 'MelisCmsProspects\Model\Tables\Factory\MelisProspectsTableFactory',
-            'MelisCmsProspectsThemeTable'     => 'MelisCmsProspects\Model\Tables\Factory\MelisCmsProspectsThemeTableFactory',
-            'MelisCmsProspectsThemeItemTable' => 'MelisCmsProspects\Model\Tables\Factory\MelisCmsProspectsThemeItemTableFactory',
-            'MelisCmsProspectsThemeItemTransTable' => 'MelisCmsProspects\Model\Tables\Factory\MelisCmsProspectsThemeItemTransTableFactory',
+            'MelisCmsProspectsService' => \MelisCmsProspects\Service\MelisCmsProspectsService::class,
+            'MelisProspectsService' => \MelisCmsProspects\Service\MelisCmsProspectsService::class,
+
+            'MelisProspects' => \MelisCmsProspects\Model\Tables\MelisProspectTable::class,
+            'MelisCmsProspectsThemeTable'     => \MelisCmsProspects\Model\Tables\MelisCmsProspectsThemeTable::class,
+            'MelisCmsProspectsThemeItemTable' => \MelisCmsProspects\Model\Tables\MelisCmsProspectsThemeItemTable::class,
+            'MelisCmsProspectsThemeItemTransTable' => \MelisCmsProspects\Model\Tables\MelisCmsProspectsThemeItemTransTable::class,
         ),
     ),
     'controllers' => array(
         'invokables' => array(
-            'MelisCmsProspects\Controller\ProspectThemes' => 'MelisCmsProspects\Controller\MelisCmsProspectsThemesController',
-            'MelisCmsProspects\Controller\ProspectThemeItems' => 'MelisCmsProspects\Controller\MelisCmsProspectsThemeItemsController',
-            'MelisCmsProspects\Controller\ToolProspects'    => 'MelisCmsProspects\Controller\ToolProspectsController',
+            'MelisCmsProspects\Controller\ProspectThemes' => \MelisCmsProspects\Controller\MelisCmsProspectsThemesController::class,
+            'MelisCmsProspects\Controller\ProspectThemeItems' => \MelisCmsProspects\Controller\MelisCmsProspectsThemeItemsController::class,
+            'MelisCmsProspects\Controller\ToolProspects'    => \MelisCmsProspects\Controller\ToolProspectsController::class,
         ),
     ),
     'controller_plugins' => array(
         'invokables' => array(
-            'MelisCmsProspectsShowFormPlugin' => 'MelisCmsProspects\Controller\Plugin\MelisCmsProspectsShowFormPlugin',
+            'MelisCmsProspectsShowFormPlugin' => \MelisCmsProspects\Controller\Plugin\MelisCmsProspectsShowFormPlugin::class,
             // Dashboard plugins
-            'MelisCmsProspectsStatisticsPlugin' => 'MelisCmsProspects\Controller\DashboardPlugins\MelisCmsProspectsStatisticsPlugin'
+            'MelisCmsProspectsStatisticsPlugin' => \MelisCmsProspects\Controller\DashboardPlugins\MelisCmsProspectsStatisticsPlugin::class
         ),
     ),
     'form_elements' => array(

@@ -9,14 +9,14 @@
 
 namespace MelisCmsProspects;
 
-use Zend\Mvc\ModuleRouteListener;
-use Zend\Mvc\MvcEvent;
-use Zend\ModuleManager\ModuleManager;
-use Zend\Db\TableGateway\TableGateway;
-use Zend\Stdlib\Hydrator\ObjectProperty;
-use Zend\Db\ResultSet\HydratingResultSet;
-use Zend\Stdlib\ArrayUtils;
-use Zend\Session\Container;
+use Laminas\Mvc\ModuleRouteListener;
+use Laminas\Mvc\MvcEvent;
+use Laminas\ModuleManager\ModuleManager;
+use Laminas\Db\TableGateway\TableGateway;
+use Laminas\Stdlib\Hydrator\ObjectProperty;
+use Laminas\Db\ResultSet\HydratingResultSet;
+use Laminas\Stdlib\ArrayUtils;
+use Laminas\Session\Container;
 use MelisCmsProspects\Model\MelisProspects;
 use MelisCmsProspects\Model\Tables\MelisProspectTable;
 use MelisCmsProspects\Listener\MelisCmsProspectFlashMessengerListener;
@@ -25,7 +25,7 @@ use MelisCmsProspects\Listener\MelisCmsProspectsGdprUserExtractListener;
 use MelisCmsProspects\Listener\MelisCmsProspectsGdprUserDeleteListener;
 use MelisCmsProspects\Listener\MelisCmsProspectsTableColumnDisplayListener;
 use MelisCmsProspects\Listener\MelisCmsProspectsToolCreatorEditionTypeListener;
-use Zend\Mvc\Router\Http\RouteMatch;
+use Laminas\Mvc\Router\Http\RouteMatch;
 /**
  * Class Module
  * @package MelisCmsProspects
@@ -56,12 +56,12 @@ class Module
 
 		        if ($moduleName[0] == 'melis-backoffice')
 		        {
-                    $eventManager->attach(new MelisCmsProspectFlashMessengerListener());
-                    $eventManager->attach(new MelisCmsProspectsGdprUserInfoListener());
-                    $eventManager->attach(new MelisCmsProspectsGdprUserExtractListener());
-                    $eventManager->attach(new MelisCmsProspectsGdprUserDeleteListener());
-                    $eventManager->attach(new MelisCmsProspectsToolCreatorEditionTypeListener());
-                    $eventManager->attach(new MelisCmsProspectsTableColumnDisplayListener());
+                    (new MelisCmsProspectFlashMessengerListener())->attach($eventManager);
+                    (new MelisCmsProspectsGdprUserInfoListener())->attach($eventManager);
+                    (new MelisCmsProspectsGdprUserExtractListener())->attach($eventManager);
+                    (new MelisCmsProspectsGdprUserDeleteListener())->attach($eventManager);
+                    (new MelisCmsProspectsToolCreatorEditionTypeListener())->attach($eventManager);
+                    (new MelisCmsProspectsTableColumnDisplayListener())->attach($eventManager);
 		        }
 	        }
         }
@@ -104,7 +104,7 @@ class Module
     public function getAutoloaderConfig()
     {
         return array(
-            'Zend\Loader\StandardAutoloader' => array(
+            'Laminas\Loader\StandardAutoloader' => array(
                 'namespaces' => array(
                     __NAMESPACE__ => __DIR__ . '/src/' . __NAMESPACE__,
                 ),

@@ -18,7 +18,7 @@ return array(
 							'method'=> 'POST',
 							'action'=> $_SERVER['REQUEST_URI'],
 						),
-						'hydrator' => 'Zend\Stdlib\Hydrator\ArraySerializable',
+						'hydrator' => 'Laminas\Hydrator\ArraySerializable',
 						'elements' => array(
 							array(
 								'spec' => array(
@@ -51,7 +51,7 @@ return array(
 										'name' => 'NotEmpty',
 										'option' => array(
 											'messages' => array(
-												\Zend\Validator\NotEmpty::INTEGER => 'Please enter widgetId'
+												\Laminas\Validator\NotEmpty::INTEGER => 'Please enter widgetId'
 											),
 										),
 									),
@@ -75,7 +75,7 @@ return array(
 							'method'=> 'POST',
 							'action'=> $_SERVER['REQUEST_URI'],
 						),
-						'hydrator' => 'Zend\Stdlib\Hydrator\ArraySerializable',
+						'hydrator' => 'Laminas\Hydrator\ArraySerializable',
 						'elements' => array(
 							array(
 								'spec' => array(
@@ -124,7 +124,7 @@ return array(
 										'name' => 'NotEmpty',
 										'options' => array(
 											'message' => array(
-												\Zend\Validator\NotEmpty::IS_EMPTY => 'Please enter widgetId'
+												\Laminas\Validator\NotEmpty::IS_EMPTY => 'Please enter widgetId'
 											),
 										),
 									),
@@ -142,7 +142,7 @@ return array(
 										'name' => 'NotEmpty',
 										'options' => array(
 											'message' => array(
-												\Zend\Validator\NotEmpty::IS_EMPTY => 'Please enter date'
+												\Laminas\Validator\NotEmpty::IS_EMPTY => 'Please enter date'
 											),
 										),
 									),
@@ -165,7 +165,7 @@ return array(
 							'method'=> 'POST',
 							'action'=> $_SERVER['REQUEST_URI'],
 						),
-						'hydrator' => 'Zend\Stdlib\Hydrator\ArraySerializable',
+						'hydrator' => 'Laminas\Hydrator\ArraySerializable',
 						'elements' => array(
 							array(
 								'spec' => array(
@@ -197,7 +197,7 @@ return array(
 										'name' => 'NotEmpty',
 										'options' => array(
 											'messages' => array(
-												\Zend\Validator\NotEmpty::IS_EMPTY => 'Please enter identifier'
+												\Laminas\Validator\NotEmpty::IS_EMPTY => 'Please enter identifier'
 											),
 										),
 									),

@@ -9,11 +9,11 @@
 
 namespace MelisCmsProspects\Controller;
 
-use Zend\Mvc\Controller\AbstractActionController;
-use Zend\View\Model\ViewModel;
-use Zend\View\Model\JsonModel;
+use Laminas\View\Model\ViewModel;
+use Laminas\View\Model\JsonModel;
+use MelisCore\Controller\AbstractActionController;
 use MelisCore\Service\MelisCoreRightsService;
-use Zend\Session\Container;
+use Laminas\Session\Container;
 
 /**
  * This controller handles the display of the Prospect Tool
@@ -25,22 +25,22 @@ class ToolProspectsController extends AbstractActionController
     
     /**
      * Renders the View file of this controller
-     * @return \Zend\View\Model\ViewModel
+     * @return \Laminas\View\Model\ViewModel
      */
     public function renderProspectsAction()
     {
         
-        $translator = $this->getServiceLocator()->get('translator');
+        $translator = $this->getServiceManager()->get('translator');
         $melisKey = $this->params()->fromRoute('melisKey', '');
         $noAccessPrompt = '';
 
-        $melisCoreRights = $this->getServiceLocator()->get('MelisCoreRights');
+        $melisCoreRights = $this->getServiceManager()->get('MelisCoreRights');
         if(!$melisCoreRights->canAccess($this::TOOL_KEY)) {
             $noAccessPrompt = $translator->translate('tr_tool_no_access');
         }
         
         $melisKey = $this->params()->fromRoute('melisKey', '');
-        $melisTool = $this->getServiceLocator()->get('MelisCoreTool');
+        $melisTool = $this->getServiceManager()->get('MelisCoreTool');
         $melisTool->setMelisToolKey('melistoolprospects', 'melistoolprospects_tool_prospects');
         
 
@@ -53,11 +53,11 @@ class ToolProspectsController extends AbstractActionController
     
     /**
      * Renders to the Tool Header Title
-     * @return \Zend\View\Model\ViewModel
+     * @return \Laminas\View\Model\ViewModel
      */
     public function renderToolProspectsHeaderAction()
     {
-        $melisTool = $this->getServiceLocator()->get('MelisCoreTool');
+        $melisTool = $this->getServiceManager()->get('MelisCoreTool');
         $melisKey = $this->params()->fromRoute('melisKey', '');
         $zoneConfig = $this->params()->fromRoute('zoneconfig', array());
         
@@ -73,7 +73,7 @@ class ToolProspectsController extends AbstractActionController
     
     /**
      * Renders the Widget Container
-     * @return \Zend\View\Model\ViewModel
+     * @return \Laminas\View\Model\ViewModel
      */
     public function renderToolProspectsWidgetsContentAction()
     {
@@ -87,14 +87,14 @@ class ToolProspectsController extends AbstractActionController
     
     /**
      * Renders the Number of Prospects
-     * @return \Zend\View\Model\ViewModel
+     * @return \Laminas\View\Model\ViewModel
      */
     public function renderToolProspectsWidgetNumProspectsAction()
     {
-        $melisTool = $this->getServiceLocator()->get('MelisCoreTool');
+        $melisTool = $this->getServiceManager()->get('MelisCoreTool');
         $melisKey = $this->params()->fromRoute('melisKey', '');
         
-        $melisProspectsService = $this->getServiceLocator()->get('MelisProspectsService');
+        $melisProspectsService = $this->getServiceManager()->get('MelisProspectsService');
         $numPropects = $melisProspectsService->getProspectsDataForWidgets('numPropects');
         
         $view = new ViewModel();
@@ -107,14 +107,14 @@ class ToolProspectsController extends AbstractActionController
     
     /**
      * Renders the Prospect Widget for Number of CurrentProspects Month
-     * @return \Zend\View\Model\ViewModel
+     * @return \Laminas\View\Model\ViewModel
      */
     public function renderToolProspectsWidgetNumProspectsThisMonthAction()
     {
-        $melisTool = $this->getServiceLocator()->get('MelisCoreTool');
+        $melisTool = $this->getServiceManager()->get('MelisCoreTool');
         $melisKey = $this->params()->fromRoute('melisKey', '');
         
-        $melisProspectsService = $this->getServiceLocator()->get('MelisProspectsService');
+        $melisProspectsService = $this->getServiceManager()->get('MelisProspectsService');
         $numPropectsMonth = $melisProspectsService->getWidgetProspects('curMonth');
         
         $view = new ViewModel();
@@ -126,14 +126,14 @@ class ToolProspectsController extends AbstractActionController
     
     /**
      * Renders the Prospect Widget for Number of CurrentProspects Month
-     * @return \Zend\View\Model\ViewModel
+     * @return \Laminas\View\Model\ViewModel
      */
     public function renderToolProspectsWidgetProspectsAveragePerMonthAction()
     {
-        $melisTool = $this->getServiceLocator()->get('MelisCoreTool');
+        $melisTool = $this->getServiceManager()->get('MelisCoreTool');
         $melisKey = $this->params()->fromRoute('melisKey', '');
         
-        $melisProspectsService = $this->getServiceLocator()->get('MelisProspectsService');
+        $melisProspectsService = $this->getServiceManager()->get('MelisProspectsService');
         $numPropectsMonthAvg = $melisProspectsService->getWidgetProspects('avgMonth');
         
         $view = new ViewModel();
@@ -145,7 +145,7 @@ class ToolProspectsController extends AbstractActionController
     
     /**
      * Renders the Refresh Button of the tool
-     * @return \Zend\View\Model\ViewModel
+     * @return \Laminas\View\Model\ViewModel
      */
     public function renderToolProspectsHeaderRefreshAction()
     {
@@ -159,13 +159,13 @@ class ToolProspectsController extends AbstractActionController
     
     /**
      * Renders to the overall content of the tool (table, modals and tool buttons)
-     * @return \Zend\View\Model\ViewModel
+     * @return \Laminas\View\Model\ViewModel
      */
     public function renderToolProspectsContentAction()
     {
-        $translator = $this->getServiceLocator()->get('translator');
+        $translator = $this->getServiceManager()->get('translator');
         $melisKey = $this->params()->fromRoute('melisKey', '');
-        $melisTool = $this->getServiceLocator()->get('MelisCoreTool');
+        $melisTool = $this->getServiceManager()->get('MelisCoreTool');
         $melisTool->setMelisToolKey('melistoolprospects', 'melistoolprospects_tool_prospects');
         
         $container = new Container('meliscore');
@@ -185,7 +185,7 @@ class ToolProspectsController extends AbstractActionController
     
     /**
      * Renders to the date filter plugin in the filter bar inside the datatable
-     * @return \Zend\View\Model\ViewModel
+     * @return \Laminas\View\Model\ViewModel
      */
     public function renderToolProspectsContentFiltersDateAction()
     {
@@ -194,7 +194,7 @@ class ToolProspectsController extends AbstractActionController
     
     /**
      * Renders to the limit selection in the filter bar inside the datatable
-     * @return \Zend\View\Model\ViewModel
+     * @return \Laminas\View\Model\ViewModel
      */
     public function renderToolProspectsContentFiltersLimitAction()
     {
@@ -203,7 +203,7 @@ class ToolProspectsController extends AbstractActionController
     
     /**
      * Renders to the search input in the filter bar inside the datatable
-     * @return \Zend\View\Model\ViewModel
+     * @return \Laminas\View\Model\ViewModel
      */
     public function renderToolProspectsContentFiltersSearchAction()
     {
@@ -212,7 +212,7 @@ class ToolProspectsController extends AbstractActionController
     
     /**
      * Renders to the refresh button in the filter bar inside the datatable
-     * @return \Zend\View\Model\ViewModel
+     * @return \Laminas\View\Model\ViewModel
      */
     public function renderToolProspectsContentFiltersRefreshAction()
     {
@@ -227,7 +227,7 @@ class ToolProspectsController extends AbstractActionController
     
     /**
      * Renders to modal container
-     * @return \Zend\View\Model\ViewModel
+     * @return \Laminas\View\Model\ViewModel
      */
     public function renderToolProspectsModalContainerAction() {
         
@@ -242,22 +242,22 @@ class ToolProspectsController extends AbstractActionController
     
     /**
      * Renders the update form content for the modal
-     * @return \Zend\View\Model\ViewModel
+     * @return \Laminas\View\Model\ViewModel
      */
     public function renderToolProspectUpdateFormAction()
     {
         $prospectId = (int) $this->params()->fromQuery('prospectId', '');
         
-        $melisCoreConfig = $this->serviceLocator->get('MelisCoreConfig');
+        $melisCoreConfig = $this->getServiceManager()->get('MelisCoreConfig');
         $appConfigForm = $melisCoreConfig->getFormMergedAndOrdered('melistoolprospects/tools/melistoolprospects_tool_prospects/forms/melistoolprospects_tool_prospects_update','melistoolprospects_tool_prospects_update');
-        $factory = new \Zend\Form\Factory();
-        $formElements = $this->serviceLocator->get('FormElementManager');
+        $factory = new \Laminas\Form\Factory();
+        $formElements = $this->getServiceManager()->get('FormElementManager');
         $factory->setFormElementManager($formElements);
         $form = $factory->createForm($appConfigForm);
         
-        $prospectTable = $this->getServiceLocator()->get('MelisProspects');
-        $themeTable = $this->getServiceLocator()->get('MelisCmsProspectsThemeTable');
-        $themeItemTable = $this->getServiceLocator()->get('MelisCmsProspectsThemeItemTable');
+        $prospectTable = $this->getServiceManager()->get('MelisProspects');
+        $themeTable = $this->getServiceManager()->get('MelisCmsProspectsThemeTable');
+        $themeItemTable = $this->getServiceManager()->get('MelisCmsProspectsThemeItemTable');
         $container = new Container('meliscore');
         
         if(!empty($prospectId)){
@@ -324,7 +324,7 @@ class ToolProspectsController extends AbstractActionController
     public function renderToolProspectsModalUpdateContentAction() 
     {
         $melisKey = $this->params()->fromRoute('melisKey', '');
-        $melisTool = $this->getServiceLocator()->get('MelisCoreTool');
+        $melisTool = $this->getServiceManager()->get('MelisCoreTool');
         $melisTool->setMelisToolKey('melistoolprospects', 'melistoolprospects_tool_prospects');
         
         $view = new ViewModel();
@@ -343,12 +343,12 @@ class ToolProspectsController extends AbstractActionController
 
     /**
      * renders the list content prospects filter site
-     * @return \Zend\View\Model\ViewModel
+     * @return \Laminas\View\Model\ViewModel
      */
     public function renderToolProspectsContentFiltersSiteAction()
     {
-        $tableSite = $this->getServiceLocator()->get('MelisEngineTableSite');
-        $translator = $this->getServiceLocator()->get('translator');
+        $tableSite = $this->getServiceManager()->get('MelisEngineTableSite');
+        $translator = $this->getServiceManager()->get('translator');
         $sites = $tableSite->fetchAll();
         $siteId = $this->getRequest()->getPost('pros_site_id');
 
@@ -368,8 +368,8 @@ class ToolProspectsController extends AbstractActionController
      */
     public function renderToolProspectsContentFiltersProsTypeAction()
     {
-        $prospectsTable = $this->getServiceLocator()->get('MelisProspects');
-        $translator = $this->getServiceLocator()->get('translator');
+        $prospectsTable = $this->getServiceManager()->get('MelisProspects');
+        $translator = $this->getServiceManager()->get('translator');
         $types = $prospectsTable->fetchAll()->toArray();
 
         $prosTypes = array();
@@ -392,16 +392,16 @@ class ToolProspectsController extends AbstractActionController
 
     /**
      * Returns all prospect data in JSON format
-     * @return \Zend\View\Model\JsonModel
+     * @return \Laminas\View\Model\JsonModel
      */
     public function getToolProspectDataAction()
     {
         /** @var \MelisCmsProspects\Model\Tables\MelisProspectTable $prospectTable */
-        $prospectTable = $this->getServiceLocator()->get('MelisProspects');
-        $translator = $this->getServiceLocator()->get('translator');
-        $melisTool = $this->getServiceLocator()->get('MelisCoreTool');
+        $prospectTable = $this->getServiceManager()->get('MelisProspects');
+        $translator = $this->getServiceManager()->get('translator');
+        $melisTool = $this->getServiceManager()->get('MelisCoreTool');
         $melisTool->setMelisToolKey('melistoolprospects', 'melistoolprospects_tool_prospects');
-        $melisTranslation = $this->getServiceLocator()->get('MelisCoreTranslation');
+        $melisTranslation = $this->getServiceManager()->get('MelisCoreTranslation');
         $container = new Container('meliscore');
         $locale = $container['melis-lang-locale'];
         
@@ -445,7 +445,7 @@ class ToolProspectsController extends AbstractActionController
 
             $getData = $prospectTable->getData($search, $pros_site_id, $melisTool->getSearchableColumns(), $selCol, $sortOrder, $start, $length, $pros_type, $prosStartDate, $prosEndDate);
 
-            $themeItemTable = $this->getServiceLocator()->get('MelisCmsProspectsThemeItemTable');
+            $themeItemTable = $this->getServiceManager()->get('MelisCmsProspectsThemeItemTable');
             
             // store fetched Object Data into array so we can apply any string modifications
             $tableData = $getData->toArray();
@@ -489,9 +489,9 @@ class ToolProspectsController extends AbstractActionController
     
     public function exportToCsvAction()
     {
-        $prospectTable = $this->getServiceLocator()->get('MelisProspects');
-        $translator = $this->getServiceLocator()->get('translator');
-        $melisTool = $this->getServiceLocator()->get('MelisCoreTool');
+        $prospectTable = $this->getServiceManager()->get('MelisProspects');
+        $translator = $this->getServiceManager()->get('translator');
+        $melisTool = $this->getServiceManager()->get('MelisCoreTool');
         $melisTool->setMelisToolKey('melistoolprospects', 'melistoolprospects_tool_prospects');
 
 
@@ -522,15 +522,15 @@ class ToolProspectsController extends AbstractActionController
     
     /**
      * Removed a specific prospect data in the database table
-     * @return \Zend\View\Model\JsonModel
+     * @return \Laminas\View\Model\JsonModel
      */
     public function removeProspectDataAction()
     {
     	$response = array();
     	$this->getEventManager()->trigger('meliscmsprospects_toolprospects_delete_start', $this, $response);
         
-    	$translator = $this->getServiceLocator()->get('translator');
-        $prospectTable = $this->getServiceLocator()->get('MelisProspects');
+    	$translator = $this->getServiceManager()->get('translator');
+        $prospectTable = $this->getServiceManager()->get('MelisProspects');
         $id = $this->params()->fromRoute('id', $this->params()->fromQuery('id', ''));
         
         $prospectTable->deleteById($id);
@@ -548,11 +548,11 @@ class ToolProspectsController extends AbstractActionController
     
     /**
      * returns the prospect data from the ID provided
-     * @return \Zend\View\Model\JsonModel
+     * @return \Laminas\View\Model\JsonModel
      */
     public function retrieveProspectDataByIdAction()
     {
-        $prospectTable = $this->getServiceLocator()->get('MelisProspects');
+        $prospectTable = $this->getServiceManager()->get('MelisProspects');
         $id = $this->params()->fromRoute('id', $this->params()->fromQuery('id', ''));
         
         return new JsonModel($prospectTable->getEntryById($id));
@@ -560,7 +560,7 @@ class ToolProspectsController extends AbstractActionController
     
     /**
      * Updates an specific information of Prospect Data 
-     * @return \Zend\View\Model\JsonModel
+     * @return \Laminas\View\Model\JsonModel
      */
     public function updateProspectDataAction()
     {
@@ -572,9 +572,9 @@ class ToolProspectsController extends AbstractActionController
         $textTitle = 'tr_melistoolprospects_tool_prospects';
         $textMessage = '';
         // for event logging
-        $translator = $this->getServiceLocator()->get('translator');
-        $prospectTable = $this->getServiceLocator()->get('MelisProspects');
-        $melisTool = $this->getServiceLocator()->get('MelisCoreTool');
+        $translator = $this->getServiceManager()->get('translator');
+        $prospectTable = $this->getServiceManager()->get('MelisProspects');
+        $melisTool = $this->getServiceManager()->get('MelisCoreTool');
         $melisTool->setMelisToolKey('melistoolprospects', 'melistoolprospects_tool_prospects');
         $prospectForm = $melisTool->getForm('melistoolprospects_tool_prospects_update');
         
@@ -607,7 +607,7 @@ class ToolProspectsController extends AbstractActionController
                 $errors = $prospectForm->getMessages();
             }
             
-            $melisMelisCoreConfig = $this->serviceLocator->get('MelisCoreConfig');
+            $melisMelisCoreConfig = $this->getServiceManager()->get('MelisCoreConfig');
             $appConfigForm = $melisMelisCoreConfig->getItem('melistoolprospects/tools/melistoolprospects_tool_prospects/forms/melistoolprospects_tool_prospects_update');
             $appConfigForm = $appConfigForm['elements'];
             
@@ -640,8 +640,8 @@ class ToolProspectsController extends AbstractActionController
         $response = array();
         $this->getEventManager()->trigger('meliscmsprospects_toolprospects_delete_start', $this, $response);
 
-        $translator = $this->getServiceLocator()->get('translator');
-        $prospectTable = $this->getServiceLocator()->get('MelisProspects');
+        $translator = $this->getServiceManager()->get('translator');
+        $prospectTable = $this->getServiceManager()->get('MelisProspects');
         $id = $this->params()->fromRoute('id', $this->params()->fromQuery('id', ''));
 
 

@@ -9,11 +9,11 @@
 
 namespace MelisCmsProspects\Controller;
 
-use Zend\Form\Factory;
-use Zend\Mvc\Controller\AbstractActionController;
-use Zend\Session\Container;
-use Zend\View\Model\JsonModel;
-use Zend\View\Model\ViewModel;
+use Laminas\Form\Factory;
+use Laminas\Session\Container;
+use Laminas\View\Model\JsonModel;
+use Laminas\View\Model\ViewModel;
+use MelisCore\Controller\AbstractActionController;
 
 /**
  * This controller handles the display of the Prospect Theme Tool
@@ -61,7 +61,7 @@ class MelisCmsProspectsThemesController extends AbstractActionController
      */
     public function toolContentAction()
     {
-        $translator = $this->getServiceLocator()->get('translator');
+        $translator = $this->getServiceManager()->get('translator');
 
 
         $container = new Container('meliscore');
@@ -234,12 +234,12 @@ class MelisCmsProspectsThemesController extends AbstractActionController
                 $logType = self::LOG_UPDATE;
             }
 
-            $melisCoreConfig = $this->serviceLocator->get('MelisCoreConfig');
+            $melisCoreConfig = $this->getServiceManager()->get('MelisCoreConfig');
             $appConfigForm = $melisCoreConfig->getFormMergedAndOrdered('melistoolprospects/tools/melistoolprospects_tool_prospects_themes/forms/prospects_theme_form', 'prospects_theme_form');
             $factory = new Factory();
-            $formElements = $this->serviceLocator->get('FormElementManager');
+            $formElements = $this->getServiceManager()->get('FormElementManager');
             $factory->setFormElementManager($formElements);
-            /** @var \Zend\Form\Form $form */
+            /** @var \Laminas\Form\Form $form */
             $form = $factory->createForm($appConfigForm);
             $form->setData($data);
 
@@ -392,7 +392,7 @@ class MelisCmsProspectsThemesController extends AbstractActionController
      */
     private function tool()
     {
-        $tool = $this->getServiceLocator()->get('MelisCoreTool');
+        $tool = $this->getServiceManager()->get('MelisCoreTool');
         $tool->setMelisToolKey('melistoolprospects', 'melistoolprospects_tool_prospects_themes');
         return $tool;
     }
@@ -402,7 +402,7 @@ class MelisCmsProspectsThemesController extends AbstractActionController
      */
     private function themeTable()
     {
-        $table = $this->getServiceLocator()->get('MelisCmsProspectsThemeTable');
+        $table = $this->getServiceManager()->get('MelisCmsProspectsThemeTable');
         return $table;
     }
 
@@ -411,7 +411,7 @@ class MelisCmsProspectsThemesController extends AbstractActionController
      */
     private function themeItemTable()
     {
-        $table = $this->getServiceLocator()->get('MelisCmsProspectsThemeItemTable');
+        $table = $this->getServiceManager()->get('MelisCmsProspectsThemeItemTable');
         return $table;
     }
 

@@ -36,6 +36,7 @@
     "ext-json": "*",
     "ext-pdo_mysql": "*",
     "justinrainbow/json-schema": "5.2.1",
+    "laminas/laminas-mvc-plugin-flashmessenger": "^1.2",
     "melisplatform/melis-core": "*",
     "melisplatform/melis-engine": "*",
     "melisplatform/melis-front": "*",

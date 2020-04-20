@@ -9,10 +9,10 @@
 
 namespace MelisCmsProspects\Controller;
 
-use Zend\Mvc\Controller\AbstractActionController;
-use Zend\Session\Container;
-use Zend\View\Model\JsonModel;
-use Zend\View\Model\ViewModel;
+use Laminas\Session\Container;
+use Laminas\View\Model\JsonModel;
+use Laminas\View\Model\ViewModel;
+use MelisCore\Controller\AbstractActionController;
 
 /**
  * This controller handles the display of the Prospect Theme Item Tool
@@ -62,7 +62,7 @@ class MelisCmsProspectsThemeItemsController extends AbstractActionController
      */
     public function toolContentAction()
     {
-        $translator = $this->getServiceLocator()->get('translator');
+        $translator = $this->getServiceManager()->get('translator');
 
         $container = new Container('meliscore');
         $locale    = $container['melis-lang-locale'];
@@ -117,7 +117,7 @@ class MelisCmsProspectsThemeItemsController extends AbstractActionController
         if($themeItemId)
         $data = $this->themeItemTable()->getItemById($themeItemId)->toArray();
 
-        $langTable = $this->getServiceLocator()->get('MelisEngineTableCmsLang');
+        $langTable = $this->getServiceManager()->get('MelisEngineTableCmsLang');
         $languages = $langTable->fetchAll()->toArray();
 
         $tmpData = array();
@@ -290,11 +290,11 @@ class MelisCmsProspectsThemeItemsController extends AbstractActionController
 
     public function getItemDataAction()
     {
-        $itemTable = $this->getServiceLocator()->get('MelisCmsProspectsThemeItemTable');
-        $translator = $this->getServiceLocator()->get('translator');
-        $melisTool = $this->getServiceLocator()->get('MelisCoreTool');
+        $itemTable = $this->getServiceManager()->get('MelisCmsProspectsThemeItemTable');
+        $translator = $this->getServiceManager()->get('translator');
+        $melisTool = $this->getServiceManager()->get('MelisCoreTool');
         $melisTool->setMelisToolKey('melistoolprospects', 'melistoolprospects_tool_prospects_theme_items');
-        $melisTranslation = $this->getServiceLocator()->get('MelisCoreTranslation');
+        $melisTranslation = $this->getServiceManager()->get('MelisCoreTranslation');
     
         $container = new Container('meliscore');
         $locale = $container['melis-lang-locale'];
@@ -309,7 +309,7 @@ class MelisCmsProspectsThemeItemsController extends AbstractActionController
             $themeId        = $this->getRequest()->getPost('themeId', null);;
             $langId         = $this->tool()->getCurrentLocaleID();
             
-            $melisCoreAuth = $this->serviceLocator->get('MelisCoreAuth');
+            $melisCoreAuth = $this->getServiceManager()->get('MelisCoreAuth');
             $user = $melisCoreAuth->getIdentity();
     
             $colId = array_keys($melisTool->getColumns());
@@ -445,7 +445,7 @@ class MelisCmsProspectsThemeItemsController extends AbstractActionController
      */
     private function tool()
     {
-        $tool = $this->getServiceLocator()->get('MelisCoreTool');
+        $tool = $this->getServiceManager()->get('MelisCoreTool');
         $tool->setMelisToolKey('melistoolprospects', 'melistoolprospects_tool_prospects_theme_items');
         return $tool;
     }
@@ -473,7 +473,7 @@ class MelisCmsProspectsThemeItemsController extends AbstractActionController
      */
     private function themeTable()
     {
-        $table = $this->getServiceLocator()->get('MelisCmsProspectsThemeTable');
+        $table = $this->getServiceManager()->get('MelisCmsProspectsThemeTable');
         return $table;
     }
 
@@ -482,13 +482,13 @@ class MelisCmsProspectsThemeItemsController extends AbstractActionController
      */
     private function themeItemTable()
     {
-        $table = $this->getServiceLocator()->get('MelisCmsProspectsThemeItemTable');
+        $table = $this->getServiceManager()->get('MelisCmsProspectsThemeItemTable');
         return $table;
     }
     
     private function themeItemTransTable()
     {
-       return $this->getServiceLocator()->get('MelisCmsProspectsThemeItemTransTable');
+       return $this->getServiceManager()->get('MelisCmsProspectsThemeItemTransTable');
     }
 
 }

@@ -10,17 +10,22 @@
 namespace MelisCmsProspects\Model\Tables;
 
 use MelisEngine\Model\Tables\MelisGenericTable;
-use Zend\Db\TableGateway\TableGateway;
+use Laminas\Db\TableGateway\TableGateway;
 
 class MelisCmsProspectsThemeTable extends MelisGenericTable
 {
-    protected $tableGateway;
-    protected $idField;
+    /**
+     * Table name
+     */
+    const TABLE = 'melis_cms_prospects_themes';
+    /**
+     * Primary key
+     */
+    const PRIMARY_KEY = 'pros_theme_id';
 
-    public function __construct(TableGateway $tableGateway)
+    public function __construct()
     {
-        parent::__construct($tableGateway);
-        $this->idField = 'pros_theme_id';
+        $this->idField = self::PRIMARY_KEY;
     }
 
     public function getData($search = '', $searchableColumns = [], $orderBy = '', $orderDirection = 'ASC', $start = 0, $limit = null)

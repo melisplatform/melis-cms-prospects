@@ -10,9 +10,9 @@
 namespace MelisCmsProspects\Controller\DashboardPlugins;
 
 use MelisCore\Controller\DashboardPlugins\MelisCoreDashboardTemplatingPlugin;
-use Zend\View\Model\ViewModel;
-use Zend\Session\Container;
-use Zend\View\Model\JsonModel;
+use Laminas\View\Model\ViewModel;
+use Laminas\Session\Container;
+use Laminas\View\Model\JsonModel;
 
 
 class MelisCmsProspectsStatisticsPlugin extends MelisCoreDashboardTemplatingPlugin
@@ -25,15 +25,15 @@ class MelisCmsProspectsStatisticsPlugin extends MelisCoreDashboardTemplatingPlug
     
     public function prospectsStatistics()
     {
-        $melisProspects = $this->getServiceLocator()->get('MelisProspects');
-        $melisTool = $this->getServiceLocator()->get('MelisCoreTool');
-        $melisProspectsService = $this->getServiceLocator()->get('MelisProspectsService');
+        $melisProspects = $this->getServiceManager()->get('MelisProspects');
+        $melisTool = $this->getServiceManager()->get('MelisCoreTool');
+        $melisProspectsService = $this->getServiceManager()->get('MelisProspectsService');
 
         /**
          * Check user's accessibility(rights) for this plugin
          * @var \MelisCore\Service\MelisCoreDashboardPluginsRightsService $dashboardPluginsService
          */
-        $dashboardPluginsService = $this->getServiceLocator()->get('MelisCoreDashboardPluginsService');
+        $dashboardPluginsService = $this->getServiceManager()->get('MelisCoreDashboardPluginsService');
         $path = explode('\\', __CLASS__);
         $className = array_pop($path);
         $isAccessible = $dashboardPluginsService->canAccess($className);
@@ -84,7 +84,7 @@ class MelisCmsProspectsStatisticsPlugin extends MelisCoreDashboardTemplatingPlug
             $chartFor = get_object_vars($this->getController()->getRequest()->getPost());
             $chartFor = isset($chartFor['chartFor']) ? $chartFor['chartFor'] : 'monthly';
             
-            $melisProspectsService = $this->getServiceLocator()->get('MelisProspectsService');
+            $melisProspectsService = $this->getServiceManager()->get('MelisProspectsService');
             
             // Last Date/value of the Graph will be the Current Date
             $curdate = date('Y-m-d');

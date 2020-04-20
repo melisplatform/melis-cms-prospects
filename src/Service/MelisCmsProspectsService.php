@@ -9,27 +9,14 @@
 
 namespace MelisCmsProspects\Service;
 
-use Zend\ServiceManager\ServiceLocatorAwareInterface;
-use Zend\ServiceManager\ServiceLocatorInterface;
+use MelisCore\Service\MelisGeneralService;
 
 /**
  * This service is made for dealing with prospects
  *
  */
-class MelisCmsProspectsService implements MelisCmsProspectsServiceInterface, ServiceLocatorAwareInterface
+class MelisCmsProspectsService extends MelisGeneralService implements MelisCmsProspectsServiceInterface
 {
-	protected $serviceLocator;
-	
-	public function setServiceLocator(ServiceLocatorInterface $sl)
-	{
-		$this->serviceLocator = $sl;
-		return $this;
-	}
-	
-	public function getServiceLocator()
-	{
-		return $this->serviceLocator;
-	}	
 	
 	/**
 	 * Save a prospect in the database
@@ -40,7 +27,7 @@ class MelisCmsProspectsService implements MelisCmsProspectsServiceInterface, Ser
 	 */
 	public function saveProspectsDatas($datas, $prosId = null){
 	    
-	    $prospectsTable = $this->getServiceLocator()->get('MelisProspects');
+	    $prospectsTable = $this->getServiceManager()->get('MelisProspects');
 	    
 	    try 
 	    {
@@ -66,8 +53,8 @@ class MelisCmsProspectsService implements MelisCmsProspectsServiceInterface, Ser
 	 * */
 	public function getProspectsDataForWidgets($widgetId = '')
 	{
-	    
-	    $prospectsTable = $this->getServiceLocator()->get('MelisProspects');
+
+	    $prospectsTable = $this->getServiceManager()->get('MelisProspects');
 	    
 	    $dataProspects = $prospectsTable->getProspectsOrderByDate();
 	
@@ -167,7 +154,7 @@ class MelisCmsProspectsService implements MelisCmsProspectsServiceInterface, Ser
 	 */
 	public function getProspectsDataByDate($type = 'daily', $date){
 	    
-	    $prospectsTable = $this->getServiceLocator()->get('MelisProspects');
+	    $prospectsTable = $this->getServiceManager()->get('MelisProspects');
 	    $dataProspects = $prospectsTable->getProspectsOrderByDate('DESC');
 	
 	    // Set Number of Prospect to Zero as default Value
@@ -225,7 +212,7 @@ class MelisCmsProspectsService implements MelisCmsProspectsServiceInterface, Ser
 	    $results = null;
 	     
 	    // Service implementation start
-	    $prospectTable = $this->getServiceLocator()->get('MelisProspects');
+	    $prospectTable = $this->getServiceManager()->get('MelisProspects');
 	    switch($identifier){
 	        case 'curMonth':
 	            $results = $prospectTable->getCurrentMonth()->count(); break;

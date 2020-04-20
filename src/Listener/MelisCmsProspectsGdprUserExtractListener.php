@@ -9,33 +9,31 @@
 
 namespace MelisCmsProspects\Listener;
 
-use Zend\EventManager\EventManagerInterface;
-use Zend\EventManager\ListenerAggregateInterface;
-use MelisCore\Listener\MelisCoreGeneralListener;
-use Zend\ServiceManager\ServiceManager;
+use Laminas\EventManager\EventManagerInterface;
+use Laminas\EventManager\ListenerAggregateInterface;
+use MelisCore\Listener\MelisGeneralListener;
+use Laminas\ServiceManager\ServiceManager;
 
 /**
  *
  */
-class MelisCmsProspectsGdprUserExtractListener extends MelisCoreGeneralListener implements ListenerAggregateInterface
+class MelisCmsProspectsGdprUserExtractListener extends MelisGeneralListener implements ListenerAggregateInterface
 {
 
-    public function attach(EventManagerInterface $events)
+    public function attach(EventManagerInterface $events, $priority = 1)
     {
         $sharedEvents = $events->getSharedManager();
 
         $callBackHandler = $sharedEvents->attach(
             '*',
-            array(
-                'melis_core_gdpr_user_extract_event',
-            ),
+            'melis_core_gdpr_user_extract_event',
             function($e){
                 $parameters = $e->getParams();
                 $moduleName = 'MelisCmsProspects';
 
                 if (isset($parameters['selected'][$moduleName])) {
-                    $melisCoreConfig = $e->getTarget()->getServiceLocator()->get('config');
-                    $prospectsTable = $e->getTarget()->getServiceLocator()->get('MelisProspects');
+                    $melisCoreConfig = $e->getTarget()->getServiceManager()->get('config');
+                    $prospectsTable = $e->getTarget()->getServiceManager()->get('MelisProspects');
 
                     $columns = $melisCoreConfig['plugins'][$moduleName]['gdpr']['extract']['columns'];
 

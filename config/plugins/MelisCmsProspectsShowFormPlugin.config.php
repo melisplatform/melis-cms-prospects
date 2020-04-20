@@ -42,7 +42,7 @@ return array(
                                     'action' => '',
                                     'data-pluginid' => 'showform'
                                 ),
-                                'hydrator'  => 'Zend\Stdlib\Hydrator\ArraySerializable',
+                                'hydrator'  => 'Laminas\Hydrator\ArraySerializable',
                                 'elements' => array(
                                     array(
                                         'spec' => array(
@@ -138,7 +138,7 @@ return array(
                                     array(
                                         'spec' => array(
                                             'name' => 'pros_message',
-                                            'type' => 'Zend\Form\Element\Textarea',
+                                            'type' => 'Laminas\Form\Element\Textarea',
                                             'options' => array(
                                                 'label' => 'tr_contactus_message',
                                             ),
@@ -164,7 +164,7 @@ return array(
                                                     //'min'      => 1,
                                                     'max'      => 50,
                                                     'messages' => array(
-                                                        \Zend\Validator\StringLength::TOO_LONG => 'tr_contactus_name_long',
+                                                        \Laminas\Validator\StringLength::TOO_LONG => 'tr_contactus_name_long',
                                                     ),
                                                 ),
                                             ),
@@ -172,7 +172,7 @@ return array(
                                                 'name' => 'NotEmpty',
                                                 'options' => array(
                                                     'messages' => array(
-                                                        \Zend\Validator\NotEmpty::IS_EMPTY => 'tr_contactus_name_empty',
+                                                        \Laminas\Validator\NotEmpty::IS_EMPTY => 'tr_contactus_name_empty',
                                                     ),
                                                 ),
                                             ),
@@ -193,7 +193,7 @@ return array(
                                                     //'min'      => 1,
                                                     'max'      => 100,
                                                     'messages' => array(
-                                                        \Zend\Validator\StringLength::TOO_LONG => 'tr_contactus_company_long',
+                                                        \Laminas\Validator\StringLength::TOO_LONG => 'tr_contactus_company_long',
                                                     ),
                                                 ),
                                             ),
@@ -201,7 +201,7 @@ return array(
                                                 'name' => 'NotEmpty',
                                                 'options' => array(
                                                     'messages' => array(
-                                                        \Zend\Validator\NotEmpty::IS_EMPTY => 'tr_contactus_company_empty',
+                                                        \Laminas\Validator\NotEmpty::IS_EMPTY => 'tr_contactus_company_empty',
                                                     ),
                                                 ),
                                             ),
@@ -222,7 +222,7 @@ return array(
                                                     //'min'      => 1,
                                                     'max'      => 100,
                                                     'messages' => array(
-                                                        \Zend\Validator\StringLength::TOO_LONG => 'tr_contactus_country_long',
+                                                        \Laminas\Validator\StringLength::TOO_LONG => 'tr_contactus_country_long',
                                                     ),
                                                 ),
                                             ),
@@ -230,7 +230,7 @@ return array(
                                                 'name' => 'NotEmpty',
                                                 'options' => array(
                                                     'messages' => array(
-                                                        \Zend\Validator\NotEmpty::IS_EMPTY => 'tr_contactus_country_empty',
+                                                        \Laminas\Validator\NotEmpty::IS_EMPTY => 'tr_contactus_country_empty',
                                                     ),
                                                 ),
                                             ),
@@ -258,7 +258,7 @@ return array(
                                                 'name' => 'NotEmpty',
                                                 'options' => array(
                                                     'messages' => array(
-                                                        \Zend\Validator\NotEmpty::IS_EMPTY => 'tr_contactus_empty_email',
+                                                        \Laminas\Validator\NotEmpty::IS_EMPTY => 'tr_contactus_empty_email',
                                                     ),
                                                 ),
                                             ),
@@ -279,7 +279,7 @@ return array(
                                                     //'min'      => 1,
                                                     'max'      => 50,
                                                     'messages' => array(
-                                                        \Zend\Validator\StringLength::TOO_LONG => 'tr_contactus_phone_long',
+                                                        \Laminas\Validator\StringLength::TOO_LONG => 'tr_contactus_phone_long',
                                                     ),
                                                 ),
                                             ),
@@ -287,7 +287,7 @@ return array(
                                                 'name' => 'NotEmpty',
                                                 'options' => array(
                                                     'messages' => array(
-                                                        \Zend\Validator\NotEmpty::IS_EMPTY => 'tr_contactus_phone_empty',
+                                                        \Laminas\Validator\NotEmpty::IS_EMPTY => 'tr_contactus_phone_empty',
                                                     ),
                                                 ),
                                             ),
@@ -295,7 +295,7 @@ return array(
                                                 'name'    => 'regex', false,
                                                 'options' => array(
                                                     'pattern' => '/^([0-9\(\)\/\+ \-]*)$/',
-                                                    'messages'=> array(\Zend\Validator\Regex::NOT_MATCH => 'tr_tool_text_prospect_validation_invalid_phone_num'),
+                                                    'messages'=> array(\Laminas\Validator\Regex::NOT_MATCH => 'tr_tool_text_prospect_validation_invalid_phone_num'),
                                                 ),
                                             ),
                                         ),
@@ -312,7 +312,7 @@ return array(
                                                 'name' => 'NotEmpty',
                                                 'options' => array(
                                                     'messages' => array(
-                                                        \Zend\Validator\NotEmpty::IS_EMPTY => 'tr_contactus_subject_empty',
+                                                        \Laminas\Validator\NotEmpty::IS_EMPTY => 'tr_contactus_subject_empty',
                                                     ),
                                                 ),
                                             ),
@@ -328,7 +328,7 @@ return array(
                                                 'name' => 'NotEmpty',
                                                 'options' => array(
                                                     'messages' => array(
-                                                        \Zend\Validator\NotEmpty::IS_EMPTY => 'tr_contactus_message_empty',
+                                                        \Laminas\Validator\NotEmpty::IS_EMPTY => 'tr_contactus_message_empty',
                                                     ),
                                                 ),
                                             ),
@@ -375,7 +375,7 @@ return array(
                                     'method' => '',
                                     'action' => '',
                                 ),
-                                'hydrator'  => 'Zend\Stdlib\Hydrator\ArraySerializable',
+                                'hydrator'  => 'Laminas\Hydrator\ArraySerializable',
                                 'elements' => array(
                                     array(
                                         'spec' => array(
@@ -421,7 +421,7 @@ return array(
                                                 'name' => 'NotEmpty',
                                                 'options' => array(
                                                     'messages' => array(
-                                                        \Zend\Validator\NotEmpty::IS_EMPTY => 'tr_front_template_path_empty',
+                                                        \Laminas\Validator\NotEmpty::IS_EMPTY => 'tr_front_template_path_empty',
                                                     ),
                                                 ),
                                             ),
@@ -437,7 +437,7 @@ return array(
                                                 'name' => 'NotEmpty',
                                                 'options' => array(
                                                     'messages' => array(
-                                                        \Zend\Validator\NotEmpty::IS_EMPTY => 'tr_front_common_input_empty',
+                                                        \Laminas\Validator\NotEmpty::IS_EMPTY => 'tr_front_common_input_empty',
                                                     ),
                                                 ),
                                             ),
@@ -457,7 +457,7 @@ return array(
                                     'method' => '',
                                     'action' => '',
                                 ),
-                                'hydrator'  => 'Zend\Stdlib\Hydrator\ArraySerializable',
+                                'hydrator'  => 'Laminas\Hydrator\ArraySerializable',
                                 'elements' => array(
 
                                 ),
@@ -475,7 +475,7 @@ return array(
                                     'method' => '',
                                     'action' => '',
                                 ),
-                                'hydrator'  => 'Zend\Stdlib\Hydrator\ArraySerializable',
+                                'hydrator'  => 'Laminas\Hydrator\ArraySerializable',
                                 'elements' => array(
                                     array(
                                         'spec' => array(
@@ -511,7 +511,7 @@ return array(
                                                 'name' => 'NotEmpty',
                                                 'options' => array(
                                                     'messages' => array(
-                                                        \Zend\Validator\NotEmpty::IS_EMPTY => 'tr_melis_cms_prospects_plugin_config_no_theme',
+                                                        \Laminas\Validator\NotEmpty::IS_EMPTY => 'tr_melis_cms_prospects_plugin_config_no_theme',
                                                     ),
                                                 ),
                                             ),

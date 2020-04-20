@@ -9,13 +9,13 @@
 
 namespace MelisCmsProspects\Listener;
 
-use Zend\EventManager\EventManagerInterface;
-use Zend\EventManager\ListenerAggregateInterface;
-use MelisCore\Listener\MelisCoreGeneralListener;
+use Laminas\EventManager\EventManagerInterface;
+use Laminas\EventManager\ListenerAggregateInterface;
+use MelisCore\Listener\MelisGeneralListener;
 
-class MelisCmsProspectsTableColumnDisplayListener extends MelisCoreGeneralListener implements ListenerAggregateInterface
+class MelisCmsProspectsTableColumnDisplayListener extends MelisGeneralListener implements ListenerAggregateInterface
 {
-    public function attach(EventManagerInterface $events)
+    public function attach(EventManagerInterface $events, $priority = 1)
     {
         $sharedEvents      = $events->getSharedManager();
 
@@ -24,7 +24,7 @@ class MelisCmsProspectsTableColumnDisplayListener extends MelisCoreGeneralListen
             'melis_toolcreator_col_display_options',
             function ($e) {
 
-                $sm = $e->getTarget()->getServiceLocator();
+                $sm = $e->getTarget()->getServiceManager();
                 $params = $e->getParams();
                 $params['valueOptions']['prospect_name'] = $sm->get('translator')->translate('tr_melistoolprospects_tool_prospects');
             }
@@ -35,7 +35,7 @@ class MelisCmsProspectsTableColumnDisplayListener extends MelisCoreGeneralListen
             'melis_tool_column_display_prospect_name',
             function($e){
 
-                $sm = $e->getTarget()->getServiceLocator();
+                $sm = $e->getTarget()->getServiceManager();
                 $params = $e->getParams();
 
                 $name = $params['data'];

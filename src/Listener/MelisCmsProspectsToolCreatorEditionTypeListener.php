@@ -9,13 +9,13 @@
 
 namespace MelisCmsProspects\Listener;
 
-use Zend\EventManager\EventManagerInterface;
-use Zend\EventManager\ListenerAggregateInterface;
-use MelisCore\Listener\MelisCoreGeneralListener;
+use Laminas\EventManager\EventManagerInterface;
+use Laminas\EventManager\ListenerAggregateInterface;
+use MelisCore\Listener\MelisGeneralListener;
 
-class MelisCmsProspectsToolCreatorEditionTypeListener extends MelisCoreGeneralListener implements ListenerAggregateInterface
+class MelisCmsProspectsToolCreatorEditionTypeListener extends MelisGeneralListener implements ListenerAggregateInterface
 {
-    public function attach(EventManagerInterface $events)
+    public function attach(EventManagerInterface $events, $priority = 1)
     {
         $sharedEvents      = $events->getSharedManager();
 
@@ -23,7 +23,7 @@ class MelisCmsProspectsToolCreatorEditionTypeListener extends MelisCoreGeneralLi
             '*',
             'melis_toolcreator_input_edition_type_options',
             function ($e) {
-                $sm = $e->getTarget()->getServiceLocator();
+                $sm = $e->getTarget()->getServiceManager();
                 $params = $e->getParams();
                 $params['valueOptions']['MelisCmsProspectName'] = $sm->get('translator')->translate('tr_melistoolprospects_tool_prospects');
             }

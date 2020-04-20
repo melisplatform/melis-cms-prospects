@@ -10,17 +10,22 @@
 namespace MelisCmsProspects\Model\Tables;
 
 use MelisEngine\Model\Tables\MelisGenericTable;
-use Zend\Db\TableGateway\TableGateway;
+use Laminas\Db\TableGateway\TableGateway;
 
 class MelisCmsProspectsThemeItemTransTable extends MelisGenericTable 
 {
-    protected $tableGateway;
-    protected $idField;
-    
-    public function __construct(TableGateway $tableGateway)
+    /**
+     * Table name
+     */
+    const TABLE = 'melis_cms_prospects_theme_items_trans';
+    /**
+     * Primary key
+     */
+    const PRIMARY_KEY = 'item_trans_id';
+
+    public function __construct()
     {
-        parent::__construct($tableGateway);
-        $this->idField = 'item_trans_id';
+        $this->idField = self::PRIMARY_KEY;
     }
     
     public function checkForDuplicates($itemId, $text, $lang){
