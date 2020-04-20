@@ -21,11 +21,6 @@ class MelisCmsProspectsGdprAutoDeleteService extends MelisCoreGeneralService imp
     const MODULE_NAME = "melis-cms-prospects";
 
     /**
-     * ** FORMAT **
-     * Gdpr::TAG_KEY => [
-        'NAME', 'FIRSTNAME', 'EMAIL'
-        ]
-     *
      * @return array
      */
     public function getListOfTags()
@@ -40,150 +35,35 @@ class MelisCmsProspectsGdprAutoDeleteService extends MelisCoreGeneralService imp
     }
 
     /**
-     * ** FORMAT **
-     * 'sample@mmail.com' => [
-            'tags' => [
-                // tags
-                'USER_LOGIN' => 'sample',
-            ],
-            'config' => [
-                // validation key
-                'validationKey' => md5('USER_LOGIN' . Gdpr::WARNING_LIST_KEY),
-                // lang id
-                'lang' => '1',
-                'last_date' => $this->getUserLastDateByEmail('sample@mmail.com'),
-                'site_id' => $this->getUserSiteIdByEmail('sample@mmail.com')
-                'acount_id' => [id]
-            ],
-        ]
-     *
-     * above keys are basic required for gdpr auto delete
-     *
      * @return array
      */
     public function getWarningListOfUsers()
     {
         return [
             Gdpr::WARNING_LIST_KEY => [
-                self::MODULE_NAME => [
-//                    'jrago@melistechnology.com' => [
-//                        'tags' => [
-//                            // tags
-//                            'NAME' => 'Jerremei',
-//                            'EMAIL' => 'jrago@melistechnology.com',
-//                            'URL' => '%revalidation_url%'
-//                        ],
-//                        'config' => [
-//                            // validation key
-//                            'validationKey' => md5('NAME' . 'EMAIL' . Gdpr::WARNING_LIST_KEY),
-//                            /*
-//                             * required keys for gdpr auto delete
-//                             */
-//                            'lang' => '1',
-//                            'last_date' => $this->getUserLastDateByEmail('jrago@v.com'),
-//                            'site_id' => $this->getUserSiteIdByEmail('jrago@melistechnology.com'),
-//                            'account_id' => $this->getUserByEmail('jrago@melistechnology.com')->pros_id ?: null
-//                        ],
-//                    ]
-                ]
+                self::MODULE_NAME => $this->getUsersWithTagsAndConfig(Gdpr::WARNING_LIST_KEY)
             ]
         ];
     }
 
     /**
-     * ** FORMAT **
-     * 'sample@mail.com' => [
-            'tags' => [
-                // tags
-                'USER_LOGIN' => 'sample',
-            ],
-            // config
-            'config' => [
-                // validation key
-                'validationKey' => md5('USER_LOGIN' . Gdpr::WARNING_LIST_KEY),
-                // lang id
-                'lang' => '1',
-                'last_date' => $this->getUserLastDateByEmail('sample@mail.com'),
-                'site_id' => $this->getUserSiteIdByEmail('sample@mail.com')
-                'acount_id' => [id]
-            ],
-        ]
-     *
-     * above keys are basic required for gdpr auto delete
-     *
      * @return array
      */
     public function getSecondWarningListOfUsers()
     {
         return [
             Gdpr::SECOND_WARNING_LIST_KEY => [
-                self::MODULE_NAME => [
-//            'jrago@melistechnology.com' => [
-//                'tags' => [
-//                    // tags
-//                    'NAME' => 'Jerremei',
-//                    'EMAIL' => 'jrago@melistechnology.com',
-//                ],
-//                // config
-//                'config' => [
-//                    /*
-//                     * required keys for gdpr auto delete
-//                     */
-//                    'lang' => '1',
-//                    'last_date' => $this->getUserLastDateByEmail('jrago@melistechnology.com'),
-//                    'site_id' => $this->getUserSiteIdByEmail('jrago@melistechnology.com'),
-//                    'account_id' => $this->getUserByEmail('jrago@melistechnology.com')->pros_id ?: null
-//                ],
-//            ]
-                ]
+                self::MODULE_NAME => $this->getUsersWithTagsAndConfig(Gdpr::SECOND_WARNING_LIST_KEY)
             ]
         ];
     }
 
     /**
-     * ** FORMAT **
-     * 'sample@mail.com' => [
-        'tags' => [
-            // tags
-            'USER_LOGIN' => 'sample',
-        ],
-        // config
-        'config' => [
-                // lang id
-                'lang' => '1',
-                // user last date active
-                'last_date' => $this->getUserLastDateByEmail('sample@mail.com'),
-                // user site id
-                'site_id'   => $this->getUserSiteIdByEmail('sample@mail.com')
-                'acount_id' => [id]
-            ],
-        ]
-     *
-     * above keys are basic required for gdpr auto delete
-     *
      * @return array
      */
     public function getDeleteListOfUsers()
     {
-        return [
-//            'jrago@melistechnology.com' => [
-//                'tags' => [
-//                    // tags
-//                    'NAME' => 'Jerremei',
-//                    'EMAIL' => 'jrago@melistechnology.com',
-//                ],
-//                // config
-//                'config' => [
-//                    /*
-//                     * required keys for gdpr auto delete
-//                     */
-//                    'lang' => '1',
-//                    'last_date' => $this->getUserLastDateByEmail('jrago@melistechnology.com'),
-//                    'site_id' => $this->getUserSiteIdByEmail('jrago@melistechnology.com'),
-//                    'account_id' => $this->getUserByEmail('jrago@melistechnology.com')->pros_id ?: null
-//                ],
-//            ]
-        ];
+        return $this->getUsersWithTagsAndConfig("user-deleted");
     }
 
     /**
@@ -251,7 +131,7 @@ class MelisCmsProspectsGdprAutoDeleteService extends MelisCoreGeneralService imp
             foreach ($this->getDeleteListOfUsers() as $email => $val) {
                 // check if user belongs to the config site
                 if ($autoDeleteConfig['mgdprc_site_id'] == $val['config']['site_id']) {
-                    // delete if users days of inactivity is already passed the set
+                    // delete if users days of inactivity is already pas sed the set
                     if ($this->getDaysDiff($val['config']['last_date'], date('Y-m-d')) > $autoDeleteConfig['mgdprc_delete_days']) {
                         // get user data
                         $data = $this->getUserByEmail($email);
@@ -279,40 +159,81 @@ class MelisCmsProspectsGdprAutoDeleteService extends MelisCoreGeneralService imp
      */
     private function getDaysDiff($date1, $date2)
     {
-        return round((strtotime($date2) - strtotime($date1)) / (60 * 60 * 24));
+        return round((time() - strtotime($date1)) / 60);
+       # return round((strtotime($date2) - strtotime($date1)) / (60 * 60 * 24));
     }
 
     /**
-     * @param $email
-     * @return false|null|string
+     * @param  $type
+     * @return array
      */
-    private function getUserLastDateByEmail($email)
+    private function getUsersWithTagsAndConfig($type)
     {
-        $data = $this->getServiceLocator()->get('MelisProspects')->getEntryByField('pros_email', $email)->current();
-        if (! empty($data)) {
-            return date('Y-m-d', strtotime($data->pros_gdpr_lastdate));
+        $users = $this->getServiceLocator()->get('MelisProspects')->fetchAll()->toArray();
+        // get all tags
+        $prospectsTags = $this->getServiceLocator()->get('MelisCoreConfig')->getItem('/MelisCmsProspects/conf/gdpr/tags');
+        $userList = [];
+        if (! empty($users)) {
+            foreach ($users as $i => $data) {
+                // setup user data
+                $userList[$data['pros_email']] = [
+                    // append tags with value
+                    'tags' => $this->assigningValueOfTags($prospectsTags, $data),
+                    // append config
+                    'config' => [
+                        'lang'       => 1,
+                        'site_id'    => $data['pros_site_id'],
+                        'last_date'  => $data['pros_gdpr_lastdate'],
+                        'account_id' => $data['pros_id'],
+                        'validationKey' => md5(implode('', array_keys($prospectsTags)) . $type . $data['pros_email'])
+                    ]
+                ];
+
+            }
         }
 
-        return null;
+
+        return $userList;
     }
 
     private function getUserByEmail($email)
     {
-        return $this->getServiceLocator()->get('MelisProspects')->getEntryByField('pros_email', $email)->current() ?: [];
+        return $this->getServiceLocator()->get('MelisProspects')->getEntryByField('pros_email', $email)->current();
+    }
+
+    private function getUserSiteLabel($siteId)
+    {
+        $siteTbl = $this->getServiceLocator()->get('MelisEngineTableSite');
+        $siteName = null;
+        // get site data
+        $siteData = $siteTbl->getEntryById($siteId)->current();
+        if (! empty($siteData)) {
+            // set site name
+            $siteName = $siteData->site_label ?? $siteData->site_name;
+        }
+
+        return $siteName;
     }
 
     /**
-     * @param $email
-     * @return null
+     * @param $tags
+     * @param $userData
+     * @return array
      */
-    private function getUserSiteIdByEmail($email)
+    private function assigningValueOfTags($tags, $userData)
     {
-        $data = $this->getServiceLocator()->get('MelisProspects')->getEntryByField('pros_email',$email)->current();
-        if (! empty($data)) {
-            return $data->pros_site_id;
+        $userData['pros_site_id'] = $this->getUserSiteLabel($userData['pros_site_id']);
+        foreach ($tags as $tag => $dbField) {
+            if (isset($userData[$dbField])) {
+                $tags[$tag] = $userData[$dbField] ?? null;
+            } else {
+                if ($tags[$tag] != "%revalidation_link%") {
+                    // for tags that are not the db field
+                    $tags[$tag] = null;
+                }
+            }
         }
 
-        return null;
+        return $tags;
     }
-
 }

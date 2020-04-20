@@ -42,11 +42,11 @@ return array(
                 'rightsDisplay' => 'none',
                 'gdpr' => [
                     'tags' => [
-                        'SITE_NAME',
-                        'NAME',
-                        'DATE_REGISTERED',
-                        'COMPANY',
-                        'URL_VALIDATION'
+                        'SITE_NAME'       => 'pros_site_id',
+                        'NAME'            => 'pros_name',
+                        'DATE_REGISTERED' => 'pros_contact_date',
+                        'COMPANY'         => 'pros_company',
+                        'URL_VALIDATION'  => '%revalidation_link%'
                     ]
                 ]
             ),
