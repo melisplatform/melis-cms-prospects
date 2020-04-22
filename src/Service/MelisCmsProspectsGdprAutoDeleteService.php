@@ -118,7 +118,9 @@ class MelisCmsProspectsGdprAutoDeleteService extends MelisCoreGeneralService imp
      */
     public function removeOldUnvalidatedUsers($autoDeleteConfig)
     {
-        $deletedUsers = [];
+        $deletedUsers = [
+            self::MODULE_NAME => []
+        ];
         if ($autoDeleteConfig['mgdprc_module_name'] == self::MODULE_NAME) {
             foreach ($this->getUsersWithTagsAndConfig("user-deleted") as $email => $val) {
                 // check if user belongs to the config site
@@ -130,7 +132,7 @@ class MelisCmsProspectsGdprAutoDeleteService extends MelisCoreGeneralService imp
                         // perform delete
                         if ($this->getServiceLocator()->get('MelisProspects')->deleteById($data->pros_id)) {
                             // return deleted email with its opeions
-                            $deletedUsers[$email] = $val;
+                            $deletedUsers[self::MODULE_NAME][$email] = $val;
                         }
                         // trigger event for other modules
                         $this->getEventManager()->trigger('melis_cms_prospects_gdpr_auto_delete_action_delete', $this, $data);
