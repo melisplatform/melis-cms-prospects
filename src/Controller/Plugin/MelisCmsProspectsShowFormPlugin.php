@@ -224,7 +224,7 @@ class MelisCmsProspectsShowFormPlugin extends MelisTemplatingPlugin
                         }
 
                         if($responseData){
-                            $melisEngineGeneralService = $this->getServiceManager()->get('MelisEngineGeneralService');
+                            $melisEngineGeneralService = $this->getServiceManager()->get('MelisGeneralService');
                             $melisEngineGeneralService->sendEvent('meliscms_prospects_plugin_save', $post);
                             $success = 1;
 
