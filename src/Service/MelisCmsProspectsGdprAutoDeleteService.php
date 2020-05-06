@@ -135,9 +135,9 @@ class MelisCmsProspectsGdprAutoDeleteService extends MelisCoreGeneralService imp
                                 // return deleted email with its opeions
                                 $deletedUsers[self::MODULE_NAME][$email] = $val;
                             }
+                            // trigger event for other modules
+                            $this->getEventManager()->trigger('melis_cms_prospects_gdpr_auto_delete_action_delete', $this, $data);
                         }
-                        // trigger event for other modules
-                        $this->getEventManager()->trigger('melis_cms_prospects_gdpr_auto_delete_action_delete', $this, $data);
                     }
                 }
             }
