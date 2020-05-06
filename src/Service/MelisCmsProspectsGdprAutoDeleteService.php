@@ -100,14 +100,16 @@ class MelisCmsProspectsGdprAutoDeleteService extends MelisCoreGeneralService imp
      */
     public function updateGdprUserStatus($validationKey)
     {
+        $id = null;
         // get user
         $user = $this->getUserPerValidationKey($validationKey);
-        // update the last date of the user
-        if ($this->getServiceLocator()->get('MelisProspects')->save(['pros_gdpr_lastdate' => date('Y-m-d H:i:s')], $user->pros_id)) {
-            return true;
+        if (! empty($user)) {
+            // update the last date of the user
+            $this->getServiceLocator()->get('MelisProspects')->save(['pros_gdpr_lastdate' => date('Y-m-d H:i:s')], $user->pros_id);
+            $id = $user->pros_id ;
         }
 
-        return false;
+        return $id;
     }
 
     /**
