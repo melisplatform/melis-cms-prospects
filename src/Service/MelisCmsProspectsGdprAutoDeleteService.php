@@ -129,10 +129,12 @@ class MelisCmsProspectsGdprAutoDeleteService extends MelisCoreGeneralService imp
                     if ($this->getDaysDiff($val['config']['last_date'], date('Y-m-d')) > $autoDeleteConfig['mgdprc_delete_days']) {
                         // get user data
                         $data = $this->getUserByEmail($email);
-                        // perform delete
-                        if ($this->getServiceLocator()->get('MelisProspects')->deleteById($data->pros_id)) {
-                            // return deleted email with its opeions
-                            $deletedUsers[self::MODULE_NAME][$email] = $val;
+                        if (! empty($data)) {
+                            // perform delete
+                            if ($this->getServiceLocator()->get('MelisProspects')->deleteById($data->pros_id)) {
+                                // return deleted email with its opeions
+                                $deletedUsers[self::MODULE_NAME][$email] = $val;
+                            }
                         }
                         // trigger event for other modules
                         $this->getEventManager()->trigger('melis_cms_prospects_gdpr_auto_delete_action_delete', $this, $data);
