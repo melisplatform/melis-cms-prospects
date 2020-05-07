@@ -174,19 +174,20 @@ class MelisCmsProspectsGdprAutoDeleteService extends MelisCoreGeneralService imp
         if (! empty($users)) {
             foreach ($users as $i => $data) {
                 // setup user data
-                $userList[$data['pros_email']] = [
+                if (! empty($data['pros_email'])) {
+                    $userList[$data['pros_email']] = [
                     // append tags with value
                     'tags' => $this->assigningValueOfTags($prospectsTags, $data),
                     // append config
-                    'config' => [
-                        'lang'       => 1,
-                        'site_id'    => $data['pros_site_id'],
-                        'last_date'  => $data['pros_gdpr_lastdate'],
-                        'account_id' => $data['pros_id'],
-                        'validationKey' => md5(implode('', array_keys($prospectsTags)) . $type . $data['pros_email'])
-                    ]
-                ];
-
+                     'config' => [
+                            'lang'       => 1,
+                            'site_id'    => $data['pros_site_id'],
+                            'last_date'  => $data['pros_gdpr_lastdate'],
+                            'account_id' => $data['pros_id'],
+                            'validationKey' => md5(implode('', array_keys($prospectsTags)) . $type . $data['pros_email'])
+                        ]
+                    ];
+                }
             }
         }
 
