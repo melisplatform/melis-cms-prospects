@@ -124,18 +124,18 @@ class MelisCmsProspectsGdprAutoDeleteService extends MelisCoreGeneralService imp
             self::MODULE_NAME => []
         ];
         if ($autoDeleteConfig['mgdprc_module_name'] == self::MODULE_NAME) {
-            foreach ($this->getUsersWithTagsAndConfig("user-deleted") as $email => $val) {
+            foreach ($this->getUsersWithTagsAndConfig("user-deleted") as $id => $val) {
                 // check if user belongs to the config site
                 if ($autoDeleteConfig['mgdprc_site_id'] == $val['config']['site_id']) {
                     // delete if users days of inactivity is already pas sed the set
                     if ($this->getDaysDiff($val['config']['last_date'], date('Y-m-d')) > $autoDeleteConfig['mgdprc_delete_days']) {
                         // get user data
-                        $data = $this->getUserByEmail($email);
+                        $data = $this->getUserById($id);
                         if (! empty($data)) {
                             // perform delete
                             if ($this->getServiceLocator()->get('MelisProspects')->deleteById($data->pros_id)) {
                                 // return deleted email with its opeions
-                                $deletedUsers[self::MODULE_NAME][$email] = $val;
+                                $deletedUsers[self::MODULE_NAME][$id] = $val;
                             }
                             // trigger event for other modules
                             $this->getEventManager()->trigger('melis_cms_prospects_gdpr_auto_delete_action_delete', $this, $data);
@@ -173,21 +173,23 @@ class MelisCmsProspectsGdprAutoDeleteService extends MelisCoreGeneralService imp
         $userList = [];
         if (! empty($users)) {
             foreach ($users as $i => $data) {
-                // setup user data
-           #     if (! empty($data['pros_email'])) {
-                    $userList[$data['pros_email']] = [
+                // tags
+                $tags = $this->assigningValueOfTags($prospectsTags, $data);
+                $config = [
+                    'lang'       => 1,
+                    'site_id'    => $data['pros_site_id'],
+                    'last_date'  => $data['pros_gdpr_lastdate'],
+                    'account_id' => $data['pros_id'],
+                    'validationKey' => md5(implode('', array_keys($prospectsTags)) . $type . $data['pros_email'] . $data['pros_id']),
+                    'email' => $data['pros_email'] ?? null
+                ];
+
+                $userList[$data['pros_id']] = [
                     // append tags with value
-                    'tags' => $this->assigningValueOfTags($prospectsTags, $data),
+                    'tags' => $tags, 
                     // append config
-                     'config' => [
-                            'lang'       => 1,
-                            'site_id'    => $data['pros_site_id'],
-                            'last_date'  => $data['pros_gdpr_lastdate'],
-                            'account_id' => $data['pros_id'],
-                            'validationKey' => md5(implode('', array_keys($prospectsTags)) . $type . $data['pros_email'])
-                        ]
-                    ];
-                #}
+                    'config' => $config 
+                ];
             }
         }
 
@@ -203,6 +205,15 @@ class MelisCmsProspectsGdprAutoDeleteService extends MelisCoreGeneralService imp
     {
         return $this->getServiceLocator()->get('MelisProspects')->getEntryByField('pros_email', $email)->current();
     }
+    /**
+     * @param $id
+     *
+     */
+    private function getUserById($id)
+    {
+        return $this->getServiceLocator()->get('MelisProspects')->getEntryById($id)->current();
+    }
+
 
     /**
      * @param $siteId
