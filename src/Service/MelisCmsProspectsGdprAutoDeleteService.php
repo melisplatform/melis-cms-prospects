@@ -70,13 +70,13 @@ class MelisCmsProspectsGdprAutoDeleteService extends MelisCoreGeneralService imp
         $configUsers = array_merge($this->getWarningListOfUsers(),$this->getSecondWarningListOfUsers());
         foreach ($configUsers as $warningType => $modules) {
             foreach ($modules as $module => $emails) {
-                foreach ($emails as $email => $emailOpts) {
+                foreach ($emails as $id => $emailOpts) {
                     // check user existence
                     if (isset($emailOpts['config']['last_date']) && !empty($emailOpts['config']['last_date'])) {
                         // search for the validation key
                         if ($emailOpts['config']['validationKey'] == $validationKey) {
                             // return user data
-                            $userData = $this->getUserByEmail($email);
+                            $userData = $this->getUserById($id);
                             if (! empty($userData)) {
                                 // include user config options
                                 $userData->config = $emailOpts['config'];
@@ -180,7 +180,7 @@ class MelisCmsProspectsGdprAutoDeleteService extends MelisCoreGeneralService imp
                     'site_id'    => $data['pros_site_id'],
                     'last_date'  => $data['pros_gdpr_lastdate'],
                     'account_id' => $data['pros_id'],
-                    'validationKey' => md5(implode('', array_keys($prospectsTags)) . $type . $data['pros_email'] . $data['pros_id']),
+                    'validationKey' => md5(implode('', array_keys($prospectsTags)) . $type . $data['pros_id']),
                     'email' => $data['pros_email'] ?? null
                 ];
 
