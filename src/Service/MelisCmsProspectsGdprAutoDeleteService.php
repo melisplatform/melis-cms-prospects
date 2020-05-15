@@ -201,7 +201,7 @@ class MelisCmsProspectsGdprAutoDeleteService extends MelisCoreGeneralService imp
      * @param $email
      * @return mixed
      */
-    private function getUserByEmail($email)
+    private function getUserByEmail($email)    
     {
         return $this->getServiceLocator()->get('MelisProspects')->getEntryByField('pros_email', $email)->current();
     }
@@ -209,7 +209,7 @@ class MelisCmsProspectsGdprAutoDeleteService extends MelisCoreGeneralService imp
      * @param $id
      *
      */
-    private function getUserById($id)
+    public function getUserById($id)
     {
         return $this->getServiceLocator()->get('MelisProspects')->getEntryById($id)->current();
     }
