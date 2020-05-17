@@ -32,4 +32,4 @@ class MelisCmsProspectsGdprAutoDeleteWarningListUsersListener extends MelisCoreG
 
         $this->listeners[] = $callBackHandler;
     }
-}
+
