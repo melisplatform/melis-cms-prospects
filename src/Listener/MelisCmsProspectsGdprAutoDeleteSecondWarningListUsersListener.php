@@ -26,7 +26,7 @@ class MelisCmsProspectsGdprAutoDeleteSecondWarningListUsersListener extends Meli
             MelisCoreGdprAutoDeleteService::SECOND_WARNING_EVENT,
             function ($e) {
                 // get the first list of warning users
-                return $e->getTarget()->getServiceLocator()->get('MelisProspectsGdprAutoDeleteService')->getSecondWarningListOfUsers($e->getParams());
+                return $e->getTarget()->getServiceLocator()->get('MelisProspectsGdprAutoDeleteService')->getSecondWarningListOfUsers();
             },
             -1000);
 

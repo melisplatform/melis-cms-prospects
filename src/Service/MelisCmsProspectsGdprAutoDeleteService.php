@@ -35,44 +35,9 @@ class MelisCmsProspectsGdprAutoDeleteService extends MelisCoreGeneralService imp
     }
 
     /**
-     * @param  $type
      * @return array
      */
-    private function getUsersWithTagsAndConfig($type)
-    {
-        $users = $this->getServiceLocator()->get('MelisProspects')->fetchAll()->toArray();
-        // get all tags
-        $prospectsTags = $this->getServiceLocator()->get('MelisConfig')->getItem('/MelisCmsProspects/conf/gdpr/tags');
-        $userList = [];
-        if (! empty($users)) {
-            foreach ($users as $i => $data) {
-                // tags
-                $tags = $this->assigningValueOfTags($prospectsTags, $data);
-                $config = [
-                    'lang'       => 1,
-                    'site_id'    => $data['pros_site_id'],
-                    'last_date'  => $data['pros_gdpr_lastdate'],
-                    'account_id' => $data['pros_id'],
-                    'validationKey' => md5(implode('', array_keys($prospectsTags)) . $type . $data['pros_id']),
-                    'email' => $data['pros_email'] ?? null
-                ];
-
-                $userList[$data['pros_id']] = [
-                    // append tags with value
-                    'tags' => $tags, 
-                    // append config
-                    'config' => $config 
-                ];
-            }
-        }
-
-
-        return $userList;
-    }
-    /**
-     * @return array
-     */
-    public function getWarningListOfUsers($autoDeleteConfig)
+    public function getWarningListOfUsers()
     {
         return [
             Gdpr::WARNING_LIST_KEY => [
@@ -84,7 +49,7 @@ class MelisCmsProspectsGdprAutoDeleteService extends MelisCoreGeneralService imp
     /**
      * @return array
      */
-    public function getSecondWarningListOfUsers($autoDeleteConfig)
+    public function getSecondWarningListOfUsers()
     {
         return [
             Gdpr::SECOND_WARNING_LIST_KEY => [
@@ -196,6 +161,41 @@ class MelisCmsProspectsGdprAutoDeleteService extends MelisCoreGeneralService imp
        # return round((strtotime($date2) - strtotime($date1)) / (60 * 60 * 24));
     }
 
+    /**
+     * @param  $type
+     * @return array
+     */
+    private function getUsersWithTagsAndConfig($type)
+    {
+        $users = $this->getServiceLocator()->get('MelisProspects')->fetchAll()->toArray();
+        // get all tags
+        $prospectsTags = $this->getServiceLocator()->get('MelisConfig')->getItem('/MelisCmsProspects/conf/gdpr/tags');
+        $userList = [];
+        if (! empty($users)) {
+            foreach ($users as $i => $data) {
+                // tags
+                $tags = $this->assigningValueOfTags($prospectsTags, $data);
+                $config = [
+                    'lang'       => 1,
+                    'site_id'    => $data['pros_site_id'],
+                    'last_date'  => $data['pros_gdpr_lastdate'],
+                    'account_id' => $data['pros_id'],
+                    'validationKey' => md5(implode('', array_keys($prospectsTags)) . $type . $data['pros_id']),
+                    'email' => $data['pros_email'] ?? null
+                ];
+
+                $userList[$data['pros_id']] = [
+                    // append tags with value
+                    'tags' => $tags, 
+                    // append config
+                    'config' => $config 
+                ];
+            }
+        }
+
+
+        return $userList;
+    }
 
     /**
      * @param $email
