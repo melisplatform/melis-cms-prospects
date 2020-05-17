@@ -26,10 +26,10 @@ class MelisCmsProspectsGdprAutoDeleteWarningListUsersListener extends MelisCoreG
             MelisCoreGdprAutoDeleteService::WARNING_EVENT,
             function ($e) {
                 // get the first list of warning users
-                return $e->getTarget()->getServiceLocator()->get('MelisProspectsGdprAutoDeleteService')->getWarningListOfUsers();
+                return $e->getTarget()->getServiceLocator()->get('MelisProspectsGdprAutoDeleteService')->getWarningListOfUsers($e->getParams());
             },
             -1000);
 
         $this->listeners[] = $callBackHandler;
     }
-}
+
