@@ -10,7 +10,7 @@
 namespace MelisCmsProspects\Listener;
 
 use MelisCmsProspects\Service\MelisCmsProspectsGdprAutoDeleteService;
-use MelisCore\Service\MelisCoreGdprAutoDeleteService;
+use MelisCore\Service\MelisCoreGdprAutoDeleteService as Gdpr;
 use Zend\EventManager\EventManagerInterface;
 use Zend\EventManager\ListenerAggregateInterface;
 use MelisCore\Listener\MelisCoreGeneralListener;
@@ -33,7 +33,9 @@ class MelisCmsProspectsGdprAutoDeleteGetEmailListener extends MelisCoreGeneralLi
                     $userData = $sm->get('MelisProspectsGdprAutoDeleteService')->getUserById($params['id']);
                     $result['module'] = $params['module'];
                     if (! empty($userData)) {
-                        $result['email'] = $userData->pros_email ?? null;
+                        if ($userData->pros_email != Gdpr::ANO_VALUE) {
+                            $result['email'] = $userData->pros_email;
+                        }
                     }
 
                     return $result;

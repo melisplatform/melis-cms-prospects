@@ -120,7 +120,7 @@ class MelisCmsProspectsGdprAutoDeleteService extends MelisCoreGeneralService imp
      */
     public function removeOldUnvalidatedUsers($autoDeleteConfig)
     {
-        $deletedUsers = [
+        $anoUsers = [
             self::MODULE_NAME => []
         ];
         if ($autoDeleteConfig['mgdprc_module_name'] == self::MODULE_NAME) {
@@ -132,11 +132,19 @@ class MelisCmsProspectsGdprAutoDeleteService extends MelisCoreGeneralService imp
                         // get user data
                         $data = $this->getUserById($id);
                         if (! empty($data)) {
-                            // perform delete
-                            if ($this->getServiceLocator()->get('MelisProspects')->deleteById($data->pros_id)) {
-                                // return deleted email with its opeions
-                                $deletedUsers[self::MODULE_NAME][$id] = $val;
-                            }
+                            $tmpVal = Gdpr::ANO_VALUE; 
+                            $anonymizedData = [
+                                'pros_email' => $tmpVal,
+                                'pros_company' => $tmpVal, 
+                                'pros_telephone' => $tmpVal, 
+                                'pros_message' => $tmpVal, 
+                                'pros_name' => $tmpVal,
+                                'pros_country' => $tmpVal 
+                            ];
+                            // perform update
+                            $this->getServiceLocator()->get('MelisProspects')->save($anonymizedData, $id);
+                            // return deleted email with its opeions
+                            $anoUsers[self::MODULE_NAME][$id] = $val;
                             // trigger event for other modules
                             $this->getEventManager()->trigger('melis_cms_prospects_gdpr_auto_delete_action_delete', $this, $data);
                         }
@@ -145,7 +153,7 @@ class MelisCmsProspectsGdprAutoDeleteService extends MelisCoreGeneralService imp
             }
         }
 
-        return $deletedUsers;
+        return $anoUsers;
     }
 
     /**
@@ -173,23 +181,27 @@ class MelisCmsProspectsGdprAutoDeleteService extends MelisCoreGeneralService imp
         $userList = [];
         if (! empty($users)) {
             foreach ($users as $i => $data) {
-                // tags
-                $tags = $this->assigningValueOfTags($prospectsTags, $data);
-                $config = [
-                    'lang'       => 1,
-                    'site_id'    => $data['pros_site_id'],
-                    'last_date'  => $data['pros_gdpr_lastdate'],
-                    'account_id' => $data['pros_id'],
-                    'validationKey' => md5(implode('', array_keys($prospectsTags)) . $type . $data['pros_id']),
-                    'email' => $data['pros_email'] ?? null
-                ];
+                // do not include data that was already anonymized
+                if ($data['pros_email'] != Gdpr::ANO_VALUE) {
+                    // tags
+                    $tags = $this->assigningValueOfTags($prospectsTags, $data);
+                    $config = [
+                        'lang'       => 1,
+                        'site_id'    => $data['pros_site_id'],
+                        'last_date'  => $data['pros_gdpr_lastdate'],
+                        'account_id' => $data['pros_id'],
+                        'validationKey' => md5(implode('', array_keys($prospectsTags)) . $type . $data['pros_id']),
+                        'email' => $data['pros_email'] ?? null
+                    ];
 
-                $userList[$data['pros_id']] = [
-                    // append tags with value
-                    'tags' => $tags, 
-                    // append config
-                    'config' => $config 
-                ];
+                    $userList[$data['pros_id']] = [
+                        // append tags with value
+                        'tags' => $tags, 
+                        // append config
+                        'config' => $config 
+                    ]; 
+
+                } 
             }
         }
 
