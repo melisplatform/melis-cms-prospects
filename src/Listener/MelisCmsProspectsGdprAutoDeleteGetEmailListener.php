@@ -33,7 +33,7 @@ class MelisCmsProspectsGdprAutoDeleteGetEmailListener extends MelisCoreGeneralLi
                     $userData = $sm->get('MelisProspectsGdprAutoDeleteService')->getUserById($params['id']);
                     $result['module'] = $params['module'];
                     if (! empty($userData)) {
-                        if ($userData->pros_email != Gdpr::ANO_VALUE) {
+                        if (!$userData->pros_anonymized) {
                             $result['email'] = $userData->pros_email;
                         }
                     }

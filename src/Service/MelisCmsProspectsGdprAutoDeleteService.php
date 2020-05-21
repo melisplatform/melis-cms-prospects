@@ -139,7 +139,8 @@ class MelisCmsProspectsGdprAutoDeleteService extends MelisCoreGeneralService imp
                                 'pros_telephone' => $tmpVal, 
                                 'pros_message' => $tmpVal, 
                                 'pros_name' => $tmpVal,
-                                'pros_country' => $tmpVal 
+                                'pros_country' => $tmpVal, 
+                                'pros_anonymized' => true 
                             ];
                             // perform update
                             $this->getServiceLocator()->get('MelisProspects')->save($anonymizedData, $id);
@@ -182,7 +183,7 @@ class MelisCmsProspectsGdprAutoDeleteService extends MelisCoreGeneralService imp
         if (! empty($users)) {
             foreach ($users as $i => $data) {
                 // do not include data that was already anonymized
-                if ($data['pros_email'] != Gdpr::ANO_VALUE) {
+                if (!$data['pros_anonymized']) {
                     // tags
                     $tags = $this->assigningValueOfTags($prospectsTags, $data);
                     $config = [
