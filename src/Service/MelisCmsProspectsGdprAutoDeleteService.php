@@ -12,6 +12,7 @@ namespace MelisCmsProspects\Service;
 use MelisCore\Service\MelisCoreGdprAutoDeleteInterface;
 use MelisCore\Service\MelisCoreGdprAutoDeleteService as Gdpr;
 use MelisCore\Service\MelisCoreGeneralService;
+use Zend\Session\Container;
 
 class MelisCmsProspectsGdprAutoDeleteService extends MelisCoreGeneralService implements MelisCoreGdprAutoDeleteInterface
 {
@@ -158,7 +159,7 @@ class MelisCmsProspectsGdprAutoDeleteService extends MelisCoreGeneralService imp
     }
 
     /**
-     * calculate the diffrence of two dates in days
+     * calculatey the diffrence of two dates in days
      *
      * @param $date1
      * @param $date2
@@ -176,33 +177,41 @@ class MelisCmsProspectsGdprAutoDeleteService extends MelisCoreGeneralService imp
      */
     private function getUsersWithTagsAndConfig($type)
     {
+        $container = new Container('melis_auto_delete_gdpr');
         $users = $this->getServiceLocator()->get('MelisProspects')->fetchAll()->toArray();
         // get all tags
         $prospectsTags = $this->getServiceLocator()->get('MelisConfig')->getItem('/MelisCmsProspects/conf/gdpr/tags');
         $userList = [];
         if (! empty($users)) {
-            foreach ($users as $i => $data) {
-                // do not include data that was already anonymized
-                if (!$data['pros_anonymized']) {
-                    // tags
-                    $tags = $this->assigningValueOfTags($prospectsTags, $data);
-                    $config = [
-                        'lang'       => 1,
-                        'site_id'    => $data['pros_site_id'],
-                        'last_date'  => $data['pros_gdpr_lastdate'],
-                        'account_id' => $data['pros_id'],
-                        'validationKey' => md5(implode('', array_keys($prospectsTags)) . $type . $data['pros_id']),
-                        'email' => $data['pros_email'] ?? null
-                    ];
+            if ($container['config']['mgdprc_module_name'] == self::MODULE_NAME) {
+                $langAvailable = $container['config']['available_lang']['alert_email'] ?? 1;
+                // if for delete
+                if ($type == 'user-deleted'){
+                    $langAvailable = $container['config']['available_lang']['delete_email'] ?? 1;
+                }
+                foreach ($users as $i => $data) {
+                    // do not include data that was already anonymized
+                    if (!$data['pros_anonymized']) {
+                        // tags
+                        $tags = $this->assigningValueOfTags($prospectsTags, $data);
+                        $config = [
+                            'lang'       => $langAvailable, 
+                            'site_id'    => $data['pros_site_id'],
+                            'last_date'  => $data['pros_gdpr_lastdate'],
+                            'account_id' => $data['pros_id'],
+                            'validationKey' => md5(implode('', array_keys($prospectsTags)) . $type . $data['pros_id']),
+                            'email' => $data['pros_email'] ?? null
+                        ];
 
-                    $userList[$data['pros_id']] = [
-                        // append tags with value
-                        'tags' => $tags, 
-                        // append config
-                        'config' => $config 
-                    ]; 
+                        $userList[$data['pros_id']] = [
+                            // append tags with value
+                            'tags' => $tags, 
+                            // append config
+                            'config' => $config 
+                        ]; 
 
-                } 
+                    } 
+                }
             }
         }
 
