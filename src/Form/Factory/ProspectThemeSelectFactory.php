@@ -9,7 +9,6 @@
 
 namespace MelisCmsProspects\Form\Factory;
 
-use Laminas\ServiceManager\ServiceLocatorInterface;
 use Laminas\ServiceManager\ServiceManager;
 use MelisCore\Form\Factory\MelisSelectFactory;
 
@@ -22,7 +21,6 @@ class ProspectThemeSelectFactory extends MelisSelectFactory
      */
     protected function loadValueOptions(ServiceManager $serviceManager)
     {
-
         $themesTable    = $serviceManager->get('MelisCmsProspectsThemeTable');
         $themesData     = $themesTable->fetchAll();
 

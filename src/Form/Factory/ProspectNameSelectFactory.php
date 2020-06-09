@@ -10,7 +10,7 @@
 namespace MelisCmsProspects\Form\Factory;
 
 use Laminas\Form\Element\Select;
-use Laminas\ServiceManager\ServiceLocatorInterface;
+use Laminas\ServiceManager\ServiceManager;
 use MelisCore\Form\Factory\MelisSelectFactory;
 use Psr\Container\ContainerInterface;
 
@@ -31,12 +31,11 @@ class ProspectNameSelectFactory extends MelisSelectFactory
     }
 
     /**
-     * @param ServiceLocatorInterface $formElementManager
+     * @param ServiceManager $serviceManager
      * @return array
      */
-    protected function loadValueOptions(ServiceLocatorInterface $formElementManager)
+    protected function loadValueOptions(ServiceManager $serviceManager)
     {
-        $serviceManager = $formElementManager->getServiceLocator();
         $prospectTbl    = $serviceManager->get('MelisProspects');
 
         $valueoptions   = [];

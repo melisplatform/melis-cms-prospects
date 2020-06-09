@@ -11,7 +11,6 @@ namespace MelisCmsProspects\Form\Factory;
 
 use Interop\Container\ContainerInterface;
 use Laminas\Form\Element\Select;
-use Laminas\ServiceManager\ServiceLocatorInterface;
 use Laminas\ServiceManager\FactoryInterface;
 
 /**
