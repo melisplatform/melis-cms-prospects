@@ -11,14 +11,14 @@ namespace MelisCmsProspects\Controller;
 
 use Laminas\View\Model\ViewModel;
 use Laminas\View\Model\JsonModel;
-use MelisCore\Controller\AbstractActionController;
+use MelisCore\Controller\MelisAbstractActionController;
 use MelisCore\Service\MelisCoreRightsService;
 use Laminas\Session\Container;
 
 /**
  * This controller handles the display of the Prospect Tool
  */
-class ToolProspectsController extends AbstractActionController
+class ToolProspectsController extends MelisAbstractActionController
 {
     const ToolProspectsAppConfigPath = 'melistoolprospects/tools/melistoolprospects_tool_prospects';
     const TOOL_KEY = 'melistoolprospects_tool_prospects';

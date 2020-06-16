@@ -12,12 +12,12 @@ namespace MelisCmsProspects\Controller;
 use Laminas\Session\Container;
 use Laminas\View\Model\JsonModel;
 use Laminas\View\Model\ViewModel;
-use MelisCore\Controller\AbstractActionController;
+use MelisCore\Controller\MelisAbstractActionController;
 
 /**
  * This controller handles the display of the Prospect Theme Item Tool
  */
-class MelisCmsProspectsThemeItemsController extends AbstractActionController
+class MelisCmsProspectsThemeItemsController extends MelisAbstractActionController
 {
     const LOG_ADD = 'CMS_PROSPECTS_THEME_ITEM_ADD';
     const LOG_UPDATE = 'CMS_PROSPECTS_THEME_ITEM_UPDATE';
