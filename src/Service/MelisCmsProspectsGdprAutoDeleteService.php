@@ -167,8 +167,7 @@ class MelisCmsProspectsGdprAutoDeleteService extends MelisCoreGeneralService imp
      */
     private function getDaysDiff($date1, $date2)
     {
-        return round((time() - strtotime($date1)) / 60);
-       # return round((strtotime($date2) - strtotime($date1)) / (60 * 60 * 24));
+        return $this->getServiceLocator()->get('MelisCoreGdprAutoDeleteService')->getDaysDiff($date1, $date2);
     }
 
     /**
