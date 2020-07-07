@@ -14,19 +14,17 @@ use Laminas\EventManager\ListenerAggregateInterface;
 use MelisCore\Listener\MelisGeneralListener;
 use Laminas\ServiceManager\ServiceManager;
 
-class MelisCmsProspectsGdprUserInfoListener extends MelisGeneralListener implements ListenerAggregateInterface
+class MelisCmsProspectsGdprUserInfoListener extends MelisGeneralListener
 {
     protected $sl;
 
     public function attach(EventManagerInterface $events, $priority = 1)
     {
-        $sharedEvents = $events->getSharedManager();
-
-        $callBackHandler = $sharedEvents->attach(
+        $this->attachEventListener(
+            $events,
             '*',
             'melis_core_gdpr_user_info_event',
-            function($e)
-            {
+            function($e) {
                 $parameters = $e->getParams();
                 $moduleName = $this->getModuleName();
                 $this->sl = $e->getTarget()->getServiceManager();
@@ -41,8 +39,8 @@ class MelisCmsProspectsGdprUserInfoListener extends MelisGeneralListener impleme
                     //send data back
                     $parameters['results'][$moduleName] = $dataConfig;
                 }
-            });
-        $this->listeners[] = $callBackHandler;
+            }
+        );
     }
 
     /**

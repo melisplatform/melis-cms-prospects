@@ -11,16 +11,14 @@ namespace MelisCmsProspects\Listener;
 
 use Laminas\EventManager\EventInterface;
 use Laminas\EventManager\EventManagerInterface;
-use Laminas\EventManager\ListenerAggregateInterface;
 use MelisCore\Listener\MelisGeneralListener;
 
 /**
  * This listener listen to prospects events in order to add entries in the
  * flash messenger
  */
-class MelisCmsProspectFlashMessengerListener extends MelisGeneralListener implements ListenerAggregateInterface
+class MelisCmsProspectFlashMessengerListener extends MelisGeneralListener
 {
-	
     public function attach(EventManagerInterface $events, $priority = 1)
     {
         $identifier = '*';
@@ -36,6 +34,5 @@ class MelisCmsProspectFlashMessengerListener extends MelisGeneralListener implem
         $priority = -1000;
 
         $this->attachEventListener($events, $identifier, $eventsName, [$this, 'logMessages'], $priority);
-
     }
 }

@@ -10,20 +10,17 @@
 namespace MelisCmsProspects\Listener;
 
 use Laminas\EventManager\EventManagerInterface;
-use Laminas\EventManager\ListenerAggregateInterface;
 use MelisCore\Listener\MelisGeneralListener;
-use Laminas\ServiceManager\ServiceManager;
 
 /**
  *
  */
-class MelisCmsProspectsGdprUserDeleteListener extends MelisGeneralListener implements ListenerAggregateInterface
+class MelisCmsProspectsGdprUserDeleteListener extends MelisGeneralListener
 {
     public function attach(EventManagerInterface $events, $priority = 1)
     {
-        $sharedEvents = $events->getSharedManager();
-
-        $callBackHandler = $sharedEvents->attach(
+        $this->attachEventListener(
+            $events,
             '*',
             'melis_core_gdpr_user_delete_event',
             function($e){
@@ -57,8 +54,8 @@ class MelisCmsProspectsGdprUserDeleteListener extends MelisGeneralListener imple
                     $noErrors = ($countOfDeletedProspects == count($ids)) ? true : false;
                     $parameters['results'][$moduleName] = $noErrors;
                 }
-            });
-        $this->listeners[] = $callBackHandler;
+            }
+        );
     }
 
     /**

@@ -23,7 +23,13 @@ use MelisCmsProspects\Listener\MelisCmsProspectsGdprUserInfoListener;
 use MelisCmsProspects\Listener\MelisCmsProspectsGdprUserExtractListener;
 use MelisCmsProspects\Listener\MelisCmsProspectsGdprUserDeleteListener;
 use MelisCmsProspects\Listener\MelisCmsProspectsTableColumnDisplayListener;
+use MelisCmsProspects\Listener\MelisCmsProspectsGdprAutoDeleteGetEmailListener;
 use MelisCmsProspects\Listener\MelisCmsProspectsToolCreatorEditionTypeListener;
+use MelisCmsProspects\Listener\MelisCmsProspectsGdprAutoDeleteModuleListListener;
+use MelisCmsProspects\Listener\MelisCmsProspectsGdprAutoDeleteActionDeleteUserListener;
+use MelisCmsProspects\Listener\MelisCmsProspectsGdprAutoDeleteSecondWarningListUsersListener;
+use MelisCmsProspects\Listener\MelisCmsProspectsGdprAutoDeleteTagsListListener;
+use MelisCmsProspects\Listener\MelisCmsProspectsGdprAutoDeleteWarningListUsersListener;
 use Laminas\Mvc\Router\Http\RouteMatch;
 /**
  * Class Module
@@ -43,72 +49,71 @@ class Module
         $sm = $e->getApplication()->getServiceManager();
         $routeMatch = $sm->get('router')->match($sm->get('request'));
         
-        if (!empty($routeMatch))
-        {
+        if (!empty($routeMatch)) {
             $this->createTranslations($e, $routeMatch);
             
             $routeName = $routeMatch->getMatchedRouteName();
             $moduleName = explode('/', $routeName);
             
-            if (!empty($moduleName[0]))
-	        {
+            if (!empty($moduleName[0])) {
 
-		        if ($moduleName[0] == 'melis-backoffice')
-		        {
+                if ($moduleName[0] == 'melis-backoffice') {
                     (new MelisCmsProspectFlashMessengerListener())->attach($eventManager);
                     (new MelisCmsProspectsGdprUserInfoListener())->attach($eventManager);
                     (new MelisCmsProspectsGdprUserExtractListener())->attach($eventManager);
                     (new MelisCmsProspectsGdprUserDeleteListener())->attach($eventManager);
                     (new MelisCmsProspectsToolCreatorEditionTypeListener())->attach($eventManager);
                     (new MelisCmsProspectsTableColumnDisplayListener())->attach($eventManager);
-		        }
-	        }
+                    (new MelisCmsProspectsGdprAutoDeleteGetEmailListener())->attach($eventManager);
+                }
+            }
+            // module listing for auto delete gdpr
+            (new MelisCmsProspectsGdprAutoDeleteModuleListListener())->attach($eventManager);
+            // tags list
+            (new MelisCmsProspectsGdprAutoDeleteTagsListListener())->attach($eventManager);
+            // first warning list of users
+            (new MelisCmsProspectsGdprAutoDeleteWarningListUsersListener())->attach($eventManager);
+            // second warning list of users
+            (new MelisCmsProspectsGdprAutoDeleteSecondWarningListUsersListener())->attach($eventManager);
+            // for deleting the user account
+            (new MelisCmsProspectsGdprAutoDeleteActionDeleteUserListener())->attach($eventManager);
         }
-    }
-    
-    public function init(ModuleManager $manager)
-    {
     }
 
     public function getConfig()
     {
-    	$config = array();
-    	$configFiles = array(
-			include __DIR__ . '/../config/module.config.php',
-
-    	    // interface design Melis
-			include __DIR__ . '/../config/app.interface.php',
-    	    include __DIR__ . '/../config/app.tools.php',
-    	    include __DIR__ . '/../config/app.microservice.php',
-    	    
-    	    // Tests
-			include __DIR__ . '/../config/diagnostic.config.php',
-    	    
-    	    // Templating plugins
-    	    include __DIR__ . '/../config/plugins/MelisCmsProspectsShowFormPlugin.config.php',
-    	    
-    	    include __DIR__ . '/../config/dashboard-plugins/MelisCmsProspectsStatisticsPlugin.config.php',
-
+        $config = [];
+        $configFiles = [
+            include __DIR__ . '/../config/module.config.php',
+            // interface design Melis
+            include __DIR__ . '/../config/app.interface.php',
+            include __DIR__ . '/../config/app.tools.php',
+            include __DIR__ . '/../config/app.microservice.php',
+            // Tests
+            include __DIR__ . '/../config/diagnostic.config.php',
+            // Templating plugins
+            include __DIR__ . '/../config/plugins/MelisCmsProspectsShowFormPlugin.config.php',
+            include __DIR__ . '/../config/dashboard-plugins/MelisCmsProspectsStatisticsPlugin.config.php',
             //gdpr
             include __DIR__ . '/../config/app.gdpr.php'
-    	);
-    	
-    	foreach ($configFiles as $file) {
-    		$config = ArrayUtils::merge($config, $file);
-    	} 
-    	
-    	return $config;
+        ];
+        
+        foreach ($configFiles as $file) {
+            $config = ArrayUtils::merge($config, $file);
+        } 
+        
+        return $config;
     }
 
     public function getAutoloaderConfig()
     {
-        return array(
-            'Laminas\Loader\StandardAutoloader' => array(
-                'namespaces' => array(
+        return [
+            'Laminas\Loader\StandardAutoloader' => [
+                'namespaces' => [
                     __NAMESPACE__ => __DIR__ . '/src/' . __NAMESPACE__,
-                ),
-            ),
-        );
+                ],
+            ],
+        ];
     }
     
     public function createTranslations($e, $routeMatch)
@@ -132,11 +137,11 @@ class Module
             $sm = $e->getApplication()->getServiceManager();
             $translator = $sm->get('translator');
             
-            $translationType = array(
+            $translationType = [
                 'interface',
-            );
-            	
-            $translationList = array();
+            ];
+                
+            $translationList = [];
             if(file_exists($_SERVER['DOCUMENT_ROOT'].'/../module/MelisModuleConfig/config/translation.list.php')){
                 $translationList = include 'module/MelisModuleConfig/config/translation.list.php';
             }

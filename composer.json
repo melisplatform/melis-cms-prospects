@@ -5,18 +5,18 @@
   "license": "OSL-3.0",
   "homepage": "https://github.com/melisplatform/melis-cms-prospects",
   "support": {
-	"email": "contact@melistechnology.com",
+    "email": "contact@melistechnology.com",
     "source": "https://github.com/melisplatform/melis-cms-prospects",
     "issues": "https://github.com/melisplatform/melis-cms-prospects/issues",
-	"docs": "https://www.melistechnology.com/melistechnology/resources/download-documentation/id/17#documentation"
+    "docs": "https://www.melistechnology.com/melistechnology/resources/download-documentation/id/17#documentation"
   },
   "authors": [
-	{
-		"name": "Melis Technology",
-		"email": "contact@melistechnology.com",
-		"homepage": "https://www.melistechnology.com",
-		"role": "Developer"
-	}
+    {
+      "name": "Melis Technology",
+      "email": "contact@melistechnology.com",
+      "homepage": "https://www.melistechnology.com",
+      "role": "Developer"
+    }
   ],
   "keywords": [
     "cms",
@@ -28,14 +28,10 @@
     "module-name": "MelisCmsProspects",
     "dbdeploy": true,
     "melis-site": false,
-    "melis-module-category": "cms"	  
+    "melis-module-category": "cms"
   },
   "require": {
-    "php": "^7.0",
-    "ext-openssl": "*",
-    "ext-json": "*",
-    "ext-pdo_mysql": "*",
-    "justinrainbow/json-schema": "5.2.1",
+    "php": "^7.1.3|^7.2|^7.3",
     "laminas/laminas-mvc-plugin-flashmessenger": "^1.2",
     "melisplatform/melis-core": "*",
     "melisplatform/melis-engine": "*",

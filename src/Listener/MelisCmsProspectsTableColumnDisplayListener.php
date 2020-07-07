@@ -10,16 +10,14 @@
 namespace MelisCmsProspects\Listener;
 
 use Laminas\EventManager\EventManagerInterface;
-use Laminas\EventManager\ListenerAggregateInterface;
 use MelisCore\Listener\MelisGeneralListener;
 
-class MelisCmsProspectsTableColumnDisplayListener extends MelisGeneralListener implements ListenerAggregateInterface
+class MelisCmsProspectsTableColumnDisplayListener extends MelisGeneralListener
 {
     public function attach(EventManagerInterface $events, $priority = 1)
     {
-        $sharedEvents      = $events->getSharedManager();
-
-        $this->listeners[] = $sharedEvents->attach(
+        $this->attachEventListener(
+            $events,
             '*',
             'melis_toolcreator_col_display_options',
             function ($e) {
@@ -30,7 +28,8 @@ class MelisCmsProspectsTableColumnDisplayListener extends MelisGeneralListener i
             }
         );
 
-        $this->listeners[] = $sharedEvents->attach(
+        $this->attachEventListener(
+            $events,
             '*',
             'melis_tool_column_display_prospect_name',
             function($e){

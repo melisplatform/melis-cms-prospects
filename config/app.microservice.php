@@ -1,216 +1,216 @@
 <?php 
 
-return array(
-	'plugins' => array(
-		'microservice' => array(
+return [
+	'plugins' => [
+		'microservice' => [
 			//Module Name
-			'MelisCmsProspects' => array( 
+			'MelisCmsProspects' => [ 
 				//MelisCmsSliderService.php
-				'MelisCmsProspectsService' => array(
+				'MelisCmsProspectsService' => [
 					/**
 					 *  method getProspectsDataForWidgets
 					 * 	@param widgetId
 					 */
-					'getProspectsDataForWidgets' => array(
-						'attributes' => array(
+					'getProspectsDataForWidgets' => [
+						'attributes' => [
 							'name'	=> 'microservice_form',
 							'id'	=> 'microservice_form',
 							'method'=> 'POST',
 							'action'=> $_SERVER['REQUEST_URI'],
-						),
+						],
 						'hydrator' => 'Laminas\Hydrator\ArraySerializable',
-						'elements' => array(
-							array(
-								'spec' => array(
+						'elements' => [
+							[
+								'spec' => [
 									'name' => 'widgetId',
 									'type' => 'Select',
-									'options' => array(
+									'options' => [
 										'label' => 'widgetId',
-										'value_options' => array(
+										'value_options' => [
 											'numPropects' => 'numPropects',
 											'numPropectsMonth' => 'numPropectsMonth',
 											'numPropectsMonthAvg' => 'numPropectsMonthAvg',
-										),
-									),
-									'attributes' => array(
+										],
+									],
+									'attributes' => [
 										'id' => 'widgetId',
 										'value' => '',
 										'class' => '',
 										'placeholder' => 'Enter widgetId',
 										'style' 	=> 'width : 10%'
-									),
-								),
-							),
-						),
-						'input_filter' => array(
-							'widgetId' => array(
+									],
+								],
+							],
+						],
+						'input_filter' => [
+							'widgetId' => [
 								'name' => 'widgetId',
 								'required' => false,
-								'validators' => array(
-									array(
+								'validators' => [
+									[
 										'name' => 'NotEmpty',
-										'option' => array(
-											'messages' => array(
+										'option' => [
+											'messages' => [
 												\Laminas\Validator\NotEmpty::INTEGER => 'Please enter widgetId'
-											),
-										),
-									),
-								),
-								'filters' => array(
-									array('name' => 'StripTags'),
-									array('name' => 'StringTrim')
-								),
-							),
-						),
-					),
+											],
+										],
+									],
+								],
+								'filters' => [
+									['name' => 'StripTags'],
+									['name' => 'StringTrim']
+								],
+							],
+						],
+					],
 					/**
 					 *  method getProspectsDataByDate
 					 * 	@param type
-					 * 	@param date (required)
+					 * 	@param date (required]
 					 */
-					'getProspectsDataByDate' => array(
-						'attributes' => array(
+					'getProspectsDataByDate' => [
+						'attributes' => [
 							'name'	=> 'microservice_form',
 							'id'	=> 'microservice_form',
 							'method'=> 'POST',
 							'action'=> $_SERVER['REQUEST_URI'],
-						),
+						],
 						'hydrator' => 'Laminas\Hydrator\ArraySerializable',
-						'elements' => array(
-							array(
-								'spec' => array(
+						'elements' => [
+							[
+								'spec' => [
 									'name' => 'type',
 									'type' => 'Select',
-									'options' => array(
+									'options' => [
 										'label' => 'type',
-										'value_options' => array(
+										'value_options' => [
 											'daily' => 'daily',
 											'monthly' => 'monthly',
 											'yearly' => 'yearly',
-										),
-									),
-									'attributes' => array(
+										],
+									],
+									'attributes' => [
 										'id' => 'type',
 										'value' => '',
 										'class' => '',
 										'placeholder' => 'Enter type',
 										'style' => 'width: 10%' 
-									),
-								),
-							),
-							array(
-								'spec' => array(
+									],
+								],
+							],
+							[
+								'spec' => [
 									'name' => 'date',
 									'type' => 'Text',
-									'options' => array(
+									'options' => [
 										'label' => 'date',
-									),
-									'attributes' => array(
+									],
+									'attributes' => [
 										'id' => 'date',
 										'value' => '',
 										'class' => '',
 										'placeholder' => '2017-03-24',
 										'data-type' => 'date'
-									),
-								),
-							),
-						),
-						'input_filter' => array(
-							'widgetId' => array(
+									],
+								],
+							],
+						],
+						'input_filter' => [
+							'widgetId' => [
 								'name' => 'widgetId',
 								'required' => false,
-								'validators' => array(
-									array(
+								'validators' => [
+									[
 										'name' => 'NotEmpty',
-										'options' => array(
-											'message' => array(
+										'options' => [
+											'message' => [
 												\Laminas\Validator\NotEmpty::IS_EMPTY => 'Please enter widgetId'
-											),
-										),
-									),
-								),
-								'filters' => array(
-									array('name' => 'StripTags'),
-									array('name' => 'StringTrim')
-								),
-							),
-							'date' => array(
+											],
+										],
+									],
+								],
+								'filters' => [
+									['name' => 'StripTags'],
+									['name' => 'StringTrim']
+								],
+							],
+							'date' => [
 								'name' => 'date',
 								'required' => true,
-								'validators' => array(
-									array(
+								'validators' => [
+									[
 										'name' => 'NotEmpty',
-										'options' => array(
-											'message' => array(
+										'options' => [
+											'message' => [
 												\Laminas\Validator\NotEmpty::IS_EMPTY => 'Please enter date'
-											),
-										),
-									),
-								),
-								'filters' => array(
-									array('name' => 'StripTags'),
-									array('name' => 'StringTrim')
-								),
-							),
-						),
-					),
+											],
+										],
+									],
+								],
+								'filters' => [
+									['name' => 'StripTags'],
+									['name' => 'StringTrim']
+								],
+							],
+						],
+					],
 					/**
 					 *  method getWidgetProspects
-					 * 	@param identifier (required)
+					 * 	@param identifier (required]
 					 */
-					'getWidgetProspects' => array(
-						'attributes' => array(
+					'getWidgetProspects' => [
+						'attributes' => [
 							'name'	=> 'microservice_form',
 							'id'	=> 'microservice_form',
 							'method'=> 'POST',
 							'action'=> $_SERVER['REQUEST_URI'],
-						),
+						],
 						'hydrator' => 'Laminas\Hydrator\ArraySerializable',
-						'elements' => array(
-							array(
-								'spec' => array(
+						'elements' => [
+							[
+								'spec' => [
 									'name' => 'identifier',
 									'type' => 'Select',
-									'options' => array(
+									'options' => [
 										'label' => 'identifier',
-										'value_options' => array(
+										'value_options' => [
 											'curMonth' => 'curMonth',
 											'avgMonth' => 'avgMonth',
-										),
-									),
-									'attributes' => array(
+										],
+									],
+									'attributes' => [
 										'id' => 'identifier',
 										'value' => '',
 										'class' => '',
 										'placeholder' => 'Enter identifier',
 										'style' => 'width: 10%' 
-									),
-								),
-							),
-						),
-						'input_filter' => array(
-							'identifier' => array(
+									],
+								],
+							],
+						],
+						'input_filter' => [
+							'identifier' => [
 								'name' => 'identifier',
 								'required' => true,
-								'validators' => array(
-									array(
+								'validators' => [
+									[
 										'name' => 'NotEmpty',
-										'options' => array(
-											'messages' => array(
+										'options' => [
+											'messages' => [
 												\Laminas\Validator\NotEmpty::IS_EMPTY => 'Please enter identifier'
-											),
-										),
-									),
-								),
-								'filters' => array(
-									array('name' => 'StripTags'),
-									array('name' => 'StringTrim')
-								),
-							),
-						),
-					),
-				),
-			),
-		),
-	),
-);
+											],
+										],
+									],
+								],
+								'filters' => [
+									['name' => 'StripTags'],
+									['name' => 'StringTrim']
+								],
+							],
+						],
+					],
+				],
+			],
+		],
+	],
+];
