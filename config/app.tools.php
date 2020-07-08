@@ -368,6 +368,14 @@ return array(
                                                 ),
                                             ),
                                         ),
+                                        [
+                                            'name' => 'regex', false,
+                                            'options' => [
+                                                'pattern' => '/^[a-zA-Z0-9]+([._@]?[a-zA-Z0-9])*$/',
+                                                'messages' => [\Zend\Validator\Regex::NOT_MATCH => 'tr_meliscore_tool_user_invalid_email'],
+                                                'encoding' => 'UTF-8',
+                                            ],
+                                        ],
                                     ),
                                     'filters'  => array(
                                         array('name' => 'StripTags'),

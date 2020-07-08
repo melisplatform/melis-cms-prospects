@@ -64,6 +64,7 @@ return array(
             'MelisCmsProspectsThemeTable'     => 'MelisCmsProspects\Model\Tables\Factory\MelisCmsProspectsThemeTableFactory',
             'MelisCmsProspectsThemeItemTable' => 'MelisCmsProspects\Model\Tables\Factory\MelisCmsProspectsThemeItemTableFactory',
             'MelisCmsProspectsThemeItemTransTable' => 'MelisCmsProspects\Model\Tables\Factory\MelisCmsProspectsThemeItemTransTableFactory',
+            'MelisProspectsGdprAutoDeleteService' => 'MelisCmsProspects\Service\Factory\MelisCmsProspectsGdprAutoDeleteServiceFactory',
         ),
     ),
     'controllers' => array(
@@ -84,6 +85,7 @@ return array(
         'factories' => array(
             'MelisCmsProspectThemeSelect' => 'MelisCmsProspects\Form\Factory\ProspectThemeSelectFactory',
             'MelisCmsProspectThemeItemSelect' => 'MelisCmsProspects\Form\Factory\ProspectThemeItemSelectFactory',
+            'MelisCmsProspectName' => 'MelisCmsProspects\Form\Factory\ProspectNameSelectFactory',
         ),
     ),
     'view_manager' => array(

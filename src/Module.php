@@ -9,6 +9,11 @@
 
 namespace MelisCmsProspects;
 
+use MelisCmsProspects\Listener\MelisCmsProspectsGdprAutoDeleteModuleListListener;
+use MelisCmsProspects\Listener\MelisCmsProspectsGdprAutoDeleteActionDeleteUserListener;
+use MelisCmsProspects\Listener\MelisCmsProspectsGdprAutoDeleteSecondWarningListUsersListener;
+use MelisCmsProspects\Listener\MelisCmsProspectsGdprAutoDeleteTagsListListener;
+use MelisCmsProspects\Listener\MelisCmsProspectsGdprAutoDeleteWarningListUsersListener;
 use Zend\Mvc\ModuleRouteListener;
 use Zend\Mvc\MvcEvent;
 use Zend\ModuleManager\ModuleManager;
@@ -23,6 +28,9 @@ use MelisCmsProspects\Listener\MelisCmsProspectFlashMessengerListener;
 use MelisCmsProspects\Listener\MelisCmsProspectsGdprUserInfoListener;
 use MelisCmsProspects\Listener\MelisCmsProspectsGdprUserExtractListener;
 use MelisCmsProspects\Listener\MelisCmsProspectsGdprUserDeleteListener;
+use MelisCmsProspects\Listener\MelisCmsProspectsTableColumnDisplayListener;
+use MelisCmsProspects\Listener\MelisCmsProspectsGdprAutoDeleteGetEmailListener;
+use MelisCmsProspects\Listener\MelisCmsProspectsToolCreatorEditionTypeListener;
 use Zend\Mvc\Router\Http\RouteMatch;
 /**
  * Class Module
@@ -58,8 +66,21 @@ class Module
                     $eventManager->attach(new MelisCmsProspectsGdprUserInfoListener());
                     $eventManager->attach(new MelisCmsProspectsGdprUserExtractListener());
                     $eventManager->attach(new MelisCmsProspectsGdprUserDeleteListener());
+                    $eventManager->attach(new MelisCmsProspectsToolCreatorEditionTypeListener());
+                    $eventManager->attach(new MelisCmsProspectsTableColumnDisplayListener());
+                    $eventManager->attach(new MelisCmsProspectsGdprAutoDeleteGetEmailListener());
 		        }
 	        }
+            // module listing for auto delete gdpr
+            $eventManager->attach(new MelisCmsProspectsGdprAutoDeleteModuleListListener());
+            // tags list
+            $eventManager->attach(new MelisCmsProspectsGdprAutoDeleteTagsListListener());
+            // first warning list of users
+            $eventManager->attach(new MelisCmsProspectsGdprAutoDeleteWarningListUsersListener());
+            // second warning list of users
+            $eventManager->attach(new MelisCmsProspectsGdprAutoDeleteSecondWarningListUsersListener());
+            // for deleting the user account
+            $eventManager->attach(new MelisCmsProspectsGdprAutoDeleteActionDeleteUserListener());
         }
     }
     
