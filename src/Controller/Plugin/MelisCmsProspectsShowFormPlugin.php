@@ -10,10 +10,10 @@
 namespace MelisCmsProspects\Controller\Plugin;
 
 use MelisEngine\Controller\Plugin\MelisTemplatingPlugin;
-use Zend\View\Model\ViewModel;
-use Zend\View\Model\JsonModel;
-use Zend\Stdlib\ArrayUtils;
-use Zend\Session\Container;
+use Laminas\View\Model\ViewModel;
+use Laminas\View\Model\JsonModel;
+use Laminas\Stdlib\ArrayUtils;
+use Laminas\Session\Container;
 /**
  * This plugin implements the business logic of the
  * "prospectsForm" plugin.
@@ -63,10 +63,10 @@ class MelisCmsProspectsShowFormPlugin extends MelisTemplatingPlugin
      */
     public function front()
     {
-        $translator = $this->getServiceLocator()->get('translator');
+        $translator = $this->getServiceManager()->get('translator');
 
         $appConfigForm = (!empty($this->pluginFrontConfig['forms']['contact_us'])) ? $this->pluginFrontConfig['forms']['contact_us'] : array();
-        $factory       = new \Zend\Form\Factory();
+        $factory       = new \Laminas\Form\Factory();
 
         $config = $this->pluginFrontConfig;
         $theme  = '';
@@ -109,11 +109,11 @@ class MelisCmsProspectsShowFormPlugin extends MelisTemplatingPlugin
 
         }
 
-        $formElements = $this->getServiceLocator()->get('FormElementManager');
+        $formElements = $this->getServiceManager()->get('FormElementManager');
         $factory->setFormElementManager($formElements);
         $prospectsForm = $factory->createForm($appConfigForm);
 
-        $themeItemTable = $this->getServiceLocator()->get('MelisCmsProspectsThemeItemTable');
+        $themeItemTable = $this->getServiceManager()->get('MelisCmsProspectsThemeItemTable');
         $container = new Container('melisplugins');
 
         /**
@@ -140,7 +140,7 @@ class MelisCmsProspectsShowFormPlugin extends MelisTemplatingPlugin
         $errors = array();
 
         // form submission
-        $request  = $this->getServiceLocator()->get('request');
+        $request  = $this->getServiceManager()->get('request');
 
         if($request->isPost()) {
             
@@ -199,7 +199,7 @@ class MelisCmsProspectsShowFormPlugin extends MelisTemplatingPlugin
 
                         if(is_null($selectedSiteId) && empty($selectedSiteId))
                         {
-                            $pageTreeService = $this->getServiceLocator()->get('MelisEngineTree');
+                            $pageTreeService = $this->getServiceManager()->get('MelisEngineTree');
                             $site = $pageTreeService->getSiteByPageId($pageId);
 
                             if (!empty($site)) {
@@ -214,7 +214,7 @@ class MelisCmsProspectsShowFormPlugin extends MelisTemplatingPlugin
                         $post['pros_site_id']      = $siteId;
                         
                         // Saving the Prospects from Contactus form using the Prospects Service
-                        $prospectService = $this->getServiceLocator()->get('MelisProspectsService');
+                        $prospectService = $this->getServiceManager()->get('MelisProspectsService');
                         $responseData = $prospectService->saveProspectsDatas($post);
                         
                         // Resting form elements after saving prospects
@@ -224,12 +224,12 @@ class MelisCmsProspectsShowFormPlugin extends MelisTemplatingPlugin
                         }
 
                         if($responseData){
-                            $melisEngineGeneralService = $this->getServiceLocator()->get('MelisEngineGeneralService');
+                            $melisEngineGeneralService = $this->getServiceManager()->get('MelisGeneralService');
                             $melisEngineGeneralService->sendEvent('meliscms_prospects_plugin_save', $post);
                             $success = 1;
 
                             if (!$request->isXmlHttpRequest()) {
-                                $router = $this->getServiceLocator()->get('router');
+                                $router = $this->getServiceManager()->get('router');
                                 $uri = $router->getRequestUri();
 
                                 // Add Flash success message to flag the Success result
@@ -289,18 +289,18 @@ class MelisCmsProspectsShowFormPlugin extends MelisTemplatingPlugin
     public function createOptionsForms()
     {
         // construct form
-        $factory = new \Zend\Form\Factory();
-        $formElements = $this->getServiceLocator()->get('FormElementManager');
+        $factory = new \Laminas\Form\Factory();
+        $formElements = $this->getServiceManager()->get('FormElementManager');
         $factory->setFormElementManager($formElements);
         $formConfig = $this->pluginBackConfig['modal_form'];
-        $translator = $this->getServiceLocator()->get('translator');
+        $translator = $this->getServiceManager()->get('translator');
 
         $response = [];
         $render   = [];
         if (!empty($formConfig)) {
             foreach ($formConfig as $formKey => $config) {
                 $form = $factory->createForm($config);
-                $request = $this->getServiceLocator()->get('request');
+                $request = $this->getServiceManager()->get('request');
                 $parameters = $request->getQuery()->toArray();
 
                 if (!isset($parameters['validate'])) {
@@ -319,7 +319,7 @@ class MelisCmsProspectsShowFormPlugin extends MelisTemplatingPlugin
                     
                     $viewModelTab->frontConfig = $this->pluginFrontConfig;
 
-                    $viewRender = $this->getServiceLocator()->get('ViewRenderer');
+                    $viewRender = $this->getServiceManager()->get('ViewRenderer');
                     $html = $viewRender->render($viewModelTab);
                     array_push($render, [
                             'name' => $config['tab_title'],
@@ -456,7 +456,7 @@ class MelisCmsProspectsShowFormPlugin extends MelisTemplatingPlugin
     {
         $form       = $this->pluginFrontConfig['forms']['contact_us'];
         $elements   = [];
-        $translator = $this->getServiceLocator()->get('translator');
+        $translator = $this->getServiceManager()->get('translator');
         foreach($form['elements'] as $spec) {
             $element = $spec['spec']['name'];
             $elements[$element] = $translator->translate($spec['spec']['options']['label']);

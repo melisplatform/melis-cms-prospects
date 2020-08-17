@@ -10,31 +10,36 @@
 namespace MelisCmsProspects\Model\Tables;
 
 use MelisEngine\Model\Tables\MelisGenericTable;
-use Zend\Db\TableGateway\TableGateway;
-use Zend\Db\Metadata\Metadata;
+use Laminas\Db\TableGateway\TableGateway;
+use Laminas\Db\Metadata\Metadata;
 
 class MelisProspectTable extends MelisGenericTable 
 {
-    protected $tableGateway;
-    protected $idField;
-    
-    public function __construct(TableGateway $tableGateway)
+    /**
+     * Table name
+     */
+    const TABLE = 'melis_cms_prospects';
+    /**
+     * Primary key
+     */
+    const PRIMARY_KEY = 'pros_id';
+
+    public function __construct()
     {
-        parent::__construct($tableGateway);
-        $this->idField = 'pros_id';
+        $this->idField = self::PRIMARY_KEY;
     }
     
     /**
      * Gets the number of prospect per day 
      * 
      * @param int $maxDays How many past days you want
-     * @return NULL|\Zend\Db\ResultSet\ResultSetInterface
+     * @return NULL|\Laminas\Db\ResultSet\ResultSetInterface
      */
     public function getNumberProspectsPerDay($maxDays = 30)
     {
     	$select = $this->tableGateway->getSql()->select();
 
-    	$select->columns(array(new \Zend\Db\Sql\Expression('COUNT("pros_id") AS nb'), "pros_contact_date"));
+    	$select->columns(array(new \Laminas\Db\Sql\Expression('COUNT("pros_id") AS nb'), "pros_contact_date"));
     	$select->group("pros_contact_date");
     	$select->limit($maxDays);
     	
@@ -134,8 +139,6 @@ class MelisProspectTable extends MelisGenericTable
          */
          if (!empty($startDate) && !empty($endDate)) {
             //select entries >= startDate && <= endDate
-            $startDate = implode("-", explode("/", $startDate));
-            $endDate = implode("-", explode("/", $endDate));
             $select->where->nest()->greaterThanOrEqualTo('pros_contact_date', date_format(date_create($startDate), "Y-m-d H:i:s"))
                 ->and->lessThanOrEqualTo('pros_contact_date', date_format(date_create($endDate . '23:59:59'), "Y-m-d H:i:s"))
                 ->unnest();

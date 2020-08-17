@@ -7,29 +7,26 @@ namespace MelisCmsProspects\Listener;
  *
  */
 
-use MelisCmsUserAccount\Service\MelisCmsUserAccountGdprAutoDeleteService;
 use MelisCore\Service\MelisCoreGdprAutoDeleteService;
-use Zend\EventManager\EventManagerInterface;
-use Zend\EventManager\ListenerAggregateInterface;
-use MelisCore\Listener\MelisCoreGeneralListener;
+use Laminas\EventManager\EventManagerInterface;
+use Laminas\EventManager\ListenerAggregateInterface;
+use MelisCore\Listener\MelisGeneralListener;
 
-class MelisCmsProspectsGdprAutoDeleteTagsListListener extends MelisCoreGeneralListener implements ListenerAggregateInterface
+class MelisCmsProspectsGdprAutoDeleteTagsListListener extends MelisGeneralListener
 {
-	
-    public function attach(EventManagerInterface $events)
+    public function attach(EventManagerInterface $events, $priority = 1)
     {
-        $sharedEvents      = $events->getSharedManager();
-        $callBackHandler = $sharedEvents->attach(
-        	'*',
+        $this->attachEventListener(
+            $events,
+            '*',
             MelisCoreGdprAutoDeleteService::TAGS_EVENT,
-        	function($e){
-        	    /*
-        	     * get list of tags
-        	     */
-                return $e->getTarget()->getServiceLocator()->get('MelisProspectsGdprAutoDeleteService')->getListOfTags();
-        	},
-        -1000);
-        
-        $this->listeners[] = $callBackHandler;
+            function($e){
+                /*
+                * get list of tags
+                */
+                return $e->getTarget()->getServiceManager()->get('MelisProspectsGdprAutoDeleteService')->getListOfTags();
+            },
+            -1000
+        );
     }
 }

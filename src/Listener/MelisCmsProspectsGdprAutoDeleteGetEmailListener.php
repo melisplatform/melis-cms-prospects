@@ -11,24 +11,22 @@ namespace MelisCmsProspects\Listener;
 
 use MelisCmsProspects\Service\MelisCmsProspectsGdprAutoDeleteService;
 use MelisCore\Service\MelisCoreGdprAutoDeleteService as Gdpr;
-use Zend\EventManager\EventManagerInterface;
-use Zend\EventManager\ListenerAggregateInterface;
-use MelisCore\Listener\MelisCoreGeneralListener;
+use Laminas\EventManager\EventManagerInterface;
+use MelisCore\Listener\MelisGeneralListener;
 
-class MelisCmsProspectsGdprAutoDeleteGetEmailListener extends MelisCoreGeneralListener implements ListenerAggregateInterface
+class MelisCmsProspectsGdprAutoDeleteGetEmailListener extends MelisGeneralListener
 {
-	
-    public function attach(EventManagerInterface $events)
+    public function attach(EventManagerInterface $events, $priority = 1)
     {
-        $sharedEvents      = $events->getSharedManager();
-        $callBackHandler = $sharedEvents->attach(
-        	'*',
+        $this->attachEventListener(
+            $events,
+            '*',
             'melis_core_gdpr_auto_delete_log_get_user_email',
-        	function($e){
+            function($e){
                 $params = $e->getParams();
                 if ($params['module'] == MelisCmsProspectsGdprAutoDeleteService::MODULE_NAME) {
                     // get service manager
-                    $sm = $e->getTarget()->getServiceLocator();
+                    $sm = $e->getTarget()->getServiceManager();
                     // melis prospects gdpr service
                     $userData = $sm->get('MelisProspectsGdprAutoDeleteService')->getUserById($params['id']);
                     $result['module'] = $params['module'];
@@ -41,8 +39,7 @@ class MelisCmsProspectsGdprAutoDeleteGetEmailListener extends MelisCoreGeneralLi
                     return $result;
                 }  
             },
-        -1000);
-
-        $this->listeners[] = $callBackHandler;
+            -1000
+        );
     }
 }

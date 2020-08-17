@@ -9,19 +9,29 @@
 
 namespace MelisCmsProspects\Form\Factory;
 
-use Zend\Form\Element\Select;
-use Zend\ServiceManager\ServiceLocatorInterface;
-use Zend\ServiceManager\FactoryInterface;
+use Interop\Container\ContainerInterface;
+use Laminas\Form\Element\Select;
+use Laminas\ServiceManager\FactoryInterface;
+
 /**
  * Prospect theme select factory
  */
-class ProspectThemeItemSelectFactory extends Select implements FactoryInterface
+class ProspectThemeItemSelectFactory extends Select
 {
-    public function createService(ServiceLocatorInterface $formElementManager)
+    /**
+     * @param ContainerInterface $container
+     * @param string $requestedName
+     * @return $this|object
+     */
+    public function __invoke(ContainerInterface $container, $requestedName)
     {
         return $this;
     }
 
+    /**
+     * @param $data
+     * @param bool $exludeThemName
+     */
     public function loadValueOptions($data, $exludeThemName = false)
     {
         if(!empty($data)) {
@@ -45,8 +55,4 @@ class ProspectThemeItemSelectFactory extends Select implements FactoryInterface
             $this->setValueOptions($valueoptions);
         }
     }
-
-
-
-
 }

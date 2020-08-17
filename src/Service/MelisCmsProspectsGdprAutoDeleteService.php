@@ -11,10 +11,10 @@ namespace MelisCmsProspects\Service;
 
 use MelisCore\Service\MelisCoreGdprAutoDeleteInterface;
 use MelisCore\Service\MelisCoreGdprAutoDeleteService as Gdpr;
-use MelisCore\Service\MelisCoreGeneralService;
-use Zend\Session\Container;
+use MelisCore\Service\MelisGeneralService;
+use Laminas\Session\Container;
 
-class MelisCmsProspectsGdprAutoDeleteService extends MelisCoreGeneralService implements MelisCoreGdprAutoDeleteInterface
+class MelisCmsProspectsGdprAutoDeleteService extends MelisGeneralService implements MelisCoreGdprAutoDeleteInterface
 {
     /**
      * @var
@@ -29,7 +29,7 @@ class MelisCmsProspectsGdprAutoDeleteService extends MelisCoreGeneralService imp
         return [
             Gdpr::TAG_LIST_KEY => [
                 self::MODULE_NAME=> [
-                    Gdpr::TAG_KEY  => $this->getServiceLocator()->get('MelisConfig')->getItem('/MelisCmsProspects/conf/gdpr/tags')
+                    Gdpr::TAG_KEY  => $this->getServiceManager()->get('MelisConfig')->getItem('/MelisCmsProspects/conf/gdpr/tags')
                 ]
             ]
         ];
@@ -106,7 +106,7 @@ class MelisCmsProspectsGdprAutoDeleteService extends MelisCoreGeneralService imp
         $user = $this->getUserPerValidationKey($validationKey);
         if (! empty($user)) {
             // update the last date of the user
-            $this->getServiceLocator()->get('MelisProspects')->save(['pros_gdpr_lastdate' => date('Y-m-d H:i:s')], $user->pros_id);
+            $this->getServiceManager()->get('MelisProspects')->save(['pros_gdpr_lastdate' => date('Y-m-d H:i:s')], $user->pros_id);
             $id = $user->pros_id ;
         }
 
@@ -144,7 +144,7 @@ class MelisCmsProspectsGdprAutoDeleteService extends MelisCoreGeneralService imp
                                 'pros_anonymized' => true 
                             ];
                             // perform update
-                            $this->getServiceLocator()->get('MelisProspects')->save($anonymizedData, $id);
+                            $this->getServiceManager()->get('MelisProspects')->save($anonymizedData, $id);
                             // return deleted email with its opeions
                             $anoUsers[self::MODULE_NAME][$id] = $val;
                             // trigger event for other modules
@@ -167,7 +167,7 @@ class MelisCmsProspectsGdprAutoDeleteService extends MelisCoreGeneralService imp
      */
     private function getDaysDiff($date1, $date2)
     {
-        return $this->getServiceLocator()->get('MelisCoreGdprAutoDeleteService')->getDaysDiff($date1, $date2);
+        return $this->getServiceManager()->get('MelisCoreGdprAutoDeleteService')->getDaysDiff($date1, $date2);
     }
 
     /**
@@ -177,9 +177,9 @@ class MelisCmsProspectsGdprAutoDeleteService extends MelisCoreGeneralService imp
     private function getUsersWithTagsAndConfig($type)
     {
         $container = new Container('melis_auto_delete_gdpr');
-        $users = $this->getServiceLocator()->get('MelisProspects')->fetchAll()->toArray();
+        $users = $this->getServiceManager()->get('MelisProspects')->fetchAll()->toArray();
         // get all tags
-        $prospectsTags = $this->getServiceLocator()->get('MelisConfig')->getItem('/MelisCmsProspects/conf/gdpr/tags');
+        $prospectsTags = $this->getServiceManager()->get('MelisConfig')->getItem('/MelisCmsProspects/conf/gdpr/tags');
         $userList = [];
         if (! empty($users)) {
             if ($container['config']['mgdprc_module_name'] == self::MODULE_NAME) {
@@ -214,7 +214,6 @@ class MelisCmsProspectsGdprAutoDeleteService extends MelisCoreGeneralService imp
             }
         }
 
-
         return $userList;
     }
 
@@ -224,7 +223,7 @@ class MelisCmsProspectsGdprAutoDeleteService extends MelisCoreGeneralService imp
      */
     private function getUserByEmail($email)    
     {
-        return $this->getServiceLocator()->get('MelisProspects')->getEntryByField('pros_email', $email)->current();
+        return $this->getServiceManager()->get('MelisProspects')->getEntryByField('pros_email', $email)->current();
     }
     /**
      * @param $id
@@ -232,7 +231,7 @@ class MelisCmsProspectsGdprAutoDeleteService extends MelisCoreGeneralService imp
      */
     public function getUserById($id)
     {
-        return $this->getServiceLocator()->get('MelisProspects')->getEntryById($id)->current();
+        return $this->getServiceManager()->get('MelisProspects')->getEntryById($id)->current();
     }
 
 
@@ -242,7 +241,7 @@ class MelisCmsProspectsGdprAutoDeleteService extends MelisCoreGeneralService imp
      */
     private function getUserSiteLabel($siteId)
     {
-        $siteTbl = $this->getServiceLocator()->get('MelisEngineTableSite');
+        $siteTbl = $this->getServiceManager()->get('MelisEngineTableSite');
         $siteName = null;
         // get site data
         $siteData = $siteTbl->getEntryById($siteId)->current();

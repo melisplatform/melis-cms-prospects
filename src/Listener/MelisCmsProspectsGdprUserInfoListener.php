@@ -9,29 +9,25 @@
 
 namespace MelisCmsProspects\Listener;
 
-use Zend\EventManager\EventManagerInterface;
-use Zend\EventManager\ListenerAggregateInterface;
-use MelisCore\Listener\MelisCoreGeneralListener;
-use Zend\ServiceManager\ServiceManager;
+use Laminas\EventManager\EventManagerInterface;
+use Laminas\EventManager\ListenerAggregateInterface;
+use MelisCore\Listener\MelisGeneralListener;
+use Laminas\ServiceManager\ServiceManager;
 
-class MelisCmsProspectsGdprUserInfoListener extends MelisCoreGeneralListener implements ListenerAggregateInterface
+class MelisCmsProspectsGdprUserInfoListener extends MelisGeneralListener
 {
     protected $sl;
 
-    public function attach(EventManagerInterface $events)
+    public function attach(EventManagerInterface $events, $priority = 1)
     {
-        $sharedEvents = $events->getSharedManager();
-
-        $callBackHandler = $sharedEvents->attach(
+        $this->attachEventListener(
+            $events,
             '*',
-            [
-                'melis_core_gdpr_user_info_event',
-            ],
-            function($e)
-            {
+            'melis_core_gdpr_user_info_event',
+            function($e) {
                 $parameters = $e->getParams();
                 $moduleName = $this->getModuleName();
-                $this->sl = $e->getTarget()->getServiceLocator();
+                $this->sl = $e->getTarget()->getServiceManager();
                 $dataConfig = $this->getConfig($moduleName);
                 $tableColumns = array_keys($dataConfig['values']['columns']);
                 $specificSearch = isset($parameters['search']['specific-search']) ? true : false;
@@ -43,8 +39,8 @@ class MelisCmsProspectsGdprUserInfoListener extends MelisCoreGeneralListener imp
                     //send data back
                     $parameters['results'][$moduleName] = $dataConfig;
                 }
-            });
-        $this->listeners[] = $callBackHandler;
+            }
+        );
     }
 
     /**

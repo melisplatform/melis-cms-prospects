@@ -1,24 +1,14 @@
 <?php
 
-return array(
-
-    'plugins' => array(
-        'diagnostic' => array(
-            'MelisCmsProspects' => array(
+return [
+    'plugins' => [
+        'diagnostic' => [
+            'MelisCmsProspects' => [
                 'testFolder' => 'test',
                 'moduleTestName' => 'MelisCmsProspectsTest',
-                'db' => array(
-
-                ),
-                'methods' => array(
-
-                ),
-            ),
-        
-        ),
-
-    ),
-
-
-);
-
+                'db' => [],
+                'methods' => [],
+            ],
+        ],
+    ],
+];

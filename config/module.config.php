@@ -7,103 +7,92 @@
  *
  */
 
-return array(
-    'router' => array(
-        'routes' => array(
-        	'melis-backoffice' => array(
-        		'type'    => 'Segment',
-        		'options' => array(
-        			'route'    => '/melis[/]',
-        		),
-                'child_routes' => array(
-                    'application-MelisCmsProspects' => array(
+return [
+    'router' => [
+        'routes' => [
+            'melis-backoffice' => [
+                'type'    => 'Segment',
+                'options' => [
+                    'route'    => '/melis[/]',
+                ],
+                'child_routes' => [
+                    'application-MelisCmsProspects' => [
                         'type'    => 'Literal',
-                        'options' => array(
+                        'options' => [
                             'route'    => 'MelisCmsProspects',
-                            'defaults' => array(
+                            'defaults' => [
                                 '__NAMESPACE__' => 'MelisCmsProspects\Controller',
                                 'controller'    => 'ToolProspects',
                                 'action'        => 'renderProspects',
-                            ),
-                        ),
+                            ],
+                        ],
                         'may_terminate' => true,
-                        'child_routes' => array(
-                            'default' => array(
+                        'child_routes' => [
+                            'default' => [
                                 'type'    => 'Segment',
-                                'options' => array(
+                                'options' => [
                                     'route'    => '/[:controller[/:action]]',
-                                    'constraints' => array(
+                                    'constraints' => [
                                         'controller' => '[a-zA-Z][a-zA-Z0-9_-]*',
                                         'action'     => '[a-zA-Z][a-zA-Z0-9_-]*',
-                                    ),
-                                    'defaults' => array(
-                                    ),
-                                ),
-                            ),
-                        ),
-                    ), 
-                ),
-            ),            
-        ),
-    ),
-    'translator' => array(
-    	'locale' => 'en_EN',
-	),
-    'service_manager' => array(
-        'invokables' => array(
-            'MelisCmsProspects\Service\MelisCmsProspectsServiceInterface' => 'MelisCmsProspects\Service\MelisCmsProspectsService',
-        ),
-        'aliases' => array(
-            'translator' => 'MvcTranslator',
-            'MelisProspects' => 'MelisCmsProspects\Model\Tables\MelisProspectTable',
-            'MelisCmsProspectsService' => 'MelisCmsProspects\Service\MelisCmsProspectsService',
-        ),
-        'factories' => array(
-            'MelisProspectsService' => 'MelisCmsProspects\Service\Factory\MelisCmsProspectsServiceFactory',
-            'MelisCmsProspects\Model\Tables\MelisProspectTable' => 'MelisCmsProspects\Model\Tables\Factory\MelisProspectsTableFactory',
-            'MelisCmsProspectsThemeTable'     => 'MelisCmsProspects\Model\Tables\Factory\MelisCmsProspectsThemeTableFactory',
-            'MelisCmsProspectsThemeItemTable' => 'MelisCmsProspects\Model\Tables\Factory\MelisCmsProspectsThemeItemTableFactory',
-            'MelisCmsProspectsThemeItemTransTable' => 'MelisCmsProspects\Model\Tables\Factory\MelisCmsProspectsThemeItemTransTableFactory',
-            'MelisProspectsGdprAutoDeleteService' => 'MelisCmsProspects\Service\Factory\MelisCmsProspectsGdprAutoDeleteServiceFactory',
-        ),
-    ),
-    'controllers' => array(
-        'invokables' => array(
-            'MelisCmsProspects\Controller\ProspectThemes' => 'MelisCmsProspects\Controller\MelisCmsProspectsThemesController',
-            'MelisCmsProspects\Controller\ProspectThemeItems' => 'MelisCmsProspects\Controller\MelisCmsProspectsThemeItemsController',
-            'MelisCmsProspects\Controller\ToolProspects'    => 'MelisCmsProspects\Controller\ToolProspectsController',
-        ),
-    ),
-    'controller_plugins' => array(
-        'invokables' => array(
-            'MelisCmsProspectsShowFormPlugin' => 'MelisCmsProspects\Controller\Plugin\MelisCmsProspectsShowFormPlugin',
+                                    ],
+                                    'defaults' => [],
+                                ],
+                            ],
+                        ],
+                    ], 
+                ],
+            ],            
+        ],
+    ],
+    'service_manager' => [
+        'aliases' => [
+            // Services
+            'MelisCmsProspectsService'              => \MelisCmsProspects\Service\MelisCmsProspectsService::class,
+            'MelisProspectsService'                 => \MelisCmsProspects\Service\MelisCmsProspectsService::class,
+            'MelisProspectsGdprAutoDeleteService'   => \MelisCmsProspects\Service\MelisCmsProspectsGdprAutoDeleteService::class,
+            // Tables
+            'MelisProspects'                        => \MelisCmsProspects\Model\Tables\MelisProspectTable::class,
+            'MelisCmsProspectsThemeTable'           => \MelisCmsProspects\Model\Tables\MelisCmsProspectsThemeTable::class,
+            'MelisCmsProspectsThemeItemTable'       => \MelisCmsProspects\Model\Tables\MelisCmsProspectsThemeItemTable::class,
+            'MelisCmsProspectsThemeItemTransTable'  => \MelisCmsProspects\Model\Tables\MelisCmsProspectsThemeItemTransTable::class,
+        ],
+    ],
+    'controllers' => [
+        'invokables' => [
+            'MelisCmsProspects\Controller\ProspectThemes'       => \MelisCmsProspects\Controller\MelisCmsProspectsThemesController::class,
+            'MelisCmsProspects\Controller\ProspectThemeItems'   => \MelisCmsProspects\Controller\MelisCmsProspectsThemeItemsController::class,
+            'MelisCmsProspects\Controller\ToolProspects'        => \MelisCmsProspects\Controller\ToolProspectsController::class,
+        ],
+    ],
+    'controller_plugins' => [
+        'invokables' => [
+            'MelisCmsProspectsShowFormPlugin'   => \MelisCmsProspects\Controller\Plugin\MelisCmsProspectsShowFormPlugin::class,
             // Dashboard plugins
-            'MelisCmsProspectsStatisticsPlugin' => 'MelisCmsProspects\Controller\DashboardPlugins\MelisCmsProspectsStatisticsPlugin'
-        ),
-    ),
-    'form_elements' => array(
-        'factories' => array(
-            'MelisCmsProspectThemeSelect' => 'MelisCmsProspects\Form\Factory\ProspectThemeSelectFactory',
-            'MelisCmsProspectThemeItemSelect' => 'MelisCmsProspects\Form\Factory\ProspectThemeItemSelectFactory',
-            'MelisCmsProspectName' => 'MelisCmsProspects\Form\Factory\ProspectNameSelectFactory',
-        ),
-    ),
-    'view_manager' => array(
-        'display_not_found_reason' => true,
-        'display_exceptions'       => true,
-        'doctype'                  => 'HTML5',
-        'template_map' => array(
-            'MelisCmsProspects/prospects-form' => __DIR__ . '/../view/melis-cms-prospects/plugins/prospects-form.phtml',
-            'MelisCmsProspects/prospects-form/melis/form_tab1' => __DIR__ . '/../view/melis-cms-prospects/plugins/prospect-melis-modal-form-tab-1.phtml',
-            'MelisCmsProspects/prospects-form/melis/form_tab2' => __DIR__ . '/../view/melis-cms-prospects/plugins/prospect-melis-modal-form-tab-2.phtml',
+            'MelisCmsProspectsStatisticsPlugin' => \MelisCmsProspects\Controller\DashboardPlugins\MelisCmsProspectsStatisticsPlugin::class
+        ],
+    ],
+    'form_elements' => [
+        'factories' => [
+            'MelisCmsProspectThemeSelect'       => \MelisCmsProspects\Form\Factory\ProspectThemeSelectFactory::class,
+            'MelisCmsProspectThemeItemSelect'   => \MelisCmsProspects\Form\Factory\ProspectThemeItemSelectFactory::class,
+            'MelisCmsProspectName'              => \MelisCmsProspects\Form\Factory\ProspectNameSelectFactory::class,
+        ],
+    ],
+    'view_manager' => [
+        'doctype' => 'HTML5',
+        'template_map' => [
+            'MelisCmsProspects/prospects-form'                  => __DIR__ . '/../view/melis-cms-prospects/plugins/prospects-form.phtml',
+            'MelisCmsProspects/prospects-form/melis/form_tab1'  => __DIR__ . '/../view/melis-cms-prospects/plugins/prospect-melis-modal-form-tab-1.phtml',
+            'MelisCmsProspects/prospects-form/melis/form_tab2'  => __DIR__ . '/../view/melis-cms-prospects/plugins/prospect-melis-modal-form-tab-2.phtml',
             
             'melis-cmsprospects/dashboard/prospects-statistics' => __DIR__ . '/../view/melis-cms-prospects/dashboard-plugins/prospects-statistics.phtml',
-        ),
-        'template_path_stack' => array(
+        ],
+        'template_path_stack' => [
             __DIR__ . '/../view',
-        ),
-        'strategies' => array(
+        ],
+        'strategies' => [
             'ViewJsonStrategy',
-        ),
-    ),
-);
+        ],
+    ],
+];

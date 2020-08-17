@@ -9,27 +9,23 @@ namespace MelisCmsProspects\Listener;
  *
  */
 
-use MelisCmsUserAccount\Service\MelisCmsUserAccountGdprAutoDeleteService;
 use MelisCore\Service\MelisCoreGdprAutoDeleteService;
-use Zend\EventManager\EventManagerInterface;
-use Zend\EventManager\ListenerAggregateInterface;
-use MelisCore\Listener\MelisCoreGeneralListener;
+use Laminas\EventManager\EventManagerInterface;
+use MelisCore\Listener\MelisGeneralListener;
 
-class MelisCmsProspectsGdprAutoDeleteSecondWarningListUsersListener extends MelisCoreGeneralListener implements ListenerAggregateInterface
+class MelisCmsProspectsGdprAutoDeleteSecondWarningListUsersListener extends MelisGeneralListener
 {
-
-    public function attach(EventManagerInterface $events)
+    public function attach(EventManagerInterface $events, $priority = 1)
     {
-        $sharedEvents = $events->getSharedManager();
-        $callBackHandler = $sharedEvents->attach(
+        $this->attachEventListener(
+            $events,
             '*',
             MelisCoreGdprAutoDeleteService::SECOND_WARNING_EVENT,
             function ($e) {
                 // get the first list of warning users
-                return $e->getTarget()->getServiceLocator()->get('MelisProspectsGdprAutoDeleteService')->getSecondWarningListOfUsers();
+                return $e->getTarget()->getServiceManager()->get('MelisProspectsGdprAutoDeleteService')->getSecondWarningListOfUsers();
             },
-            -1000);
-
-        $this->listeners[] = $callBackHandler;
+            -1000
+        );
     }
 }

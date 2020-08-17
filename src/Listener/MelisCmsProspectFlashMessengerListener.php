@@ -9,43 +9,30 @@
 
 namespace MelisCmsProspects\Listener;
 
-use Zend\EventManager\EventManagerInterface;
-use Zend\EventManager\ListenerAggregateInterface;
-use MelisCore\Listener\MelisCoreGeneralListener;
+use Laminas\EventManager\EventInterface;
+use Laminas\EventManager\EventManagerInterface;
+use MelisCore\Listener\MelisGeneralListener;
 
 /**
  * This listener listen to prospects events in order to add entries in the
  * flash messenger
  */
-class MelisCmsProspectFlashMessengerListener extends MelisCoreGeneralListener implements ListenerAggregateInterface
+class MelisCmsProspectFlashMessengerListener extends MelisGeneralListener
 {
-	
-    public function attach(EventManagerInterface $events)
+    public function attach(EventManagerInterface $events, $priority = 1)
     {
-        $sharedEvents      = $events->getSharedManager();
-        
-        $callBackHandler = $sharedEvents->attach(
-        	'*',
-        	array(
+        $identifier = '*';
+        $eventsName = [
             'meliscmsprospects_toolprospects_save_end',
             'meliscmsprospects_toolprospects_delete_end',
             'meliscmsprospects_theme_save_end',
             'meliscmsprospects_theme_delete_end',
             'meliscmsprospects_theme_item_save_end',
             'meliscmsprospects_theme_code_save_end',
-            ),
-        	function($e){
+        ];
 
-        		$sm = $e->getTarget()->getServiceLocator();
-        		$flashMessenger = $sm->get('MelisCoreFlashMessenger');
-        		
-        		$params = $e->getParams();
-        		$results = $e->getTarget()->forward()->dispatch(
-        		    'MelisCore\Controller\MelisFlashMessenger',
-        		    array_merge(array('action' => 'log'), $params))->getVariables();
-        	},
-        -1000);
-        
-        $this->listeners[] = $callBackHandler;
+        $priority = -1000;
+
+        $this->attachEventListener($events, $identifier, $eventsName, [$this, 'logMessages'], $priority);
     }
 }

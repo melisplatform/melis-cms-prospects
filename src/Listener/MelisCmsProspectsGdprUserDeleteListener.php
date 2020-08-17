@@ -9,25 +9,20 @@
 
 namespace MelisCmsProspects\Listener;
 
-use Zend\EventManager\EventManagerInterface;
-use Zend\EventManager\ListenerAggregateInterface;
-use MelisCore\Listener\MelisCoreGeneralListener;
-use Zend\ServiceManager\ServiceManager;
+use Laminas\EventManager\EventManagerInterface;
+use MelisCore\Listener\MelisGeneralListener;
 
 /**
  *
  */
-class MelisCmsProspectsGdprUserDeleteListener extends MelisCoreGeneralListener implements ListenerAggregateInterface
+class MelisCmsProspectsGdprUserDeleteListener extends MelisGeneralListener
 {
-    public function attach(EventManagerInterface $events)
+    public function attach(EventManagerInterface $events, $priority = 1)
     {
-        $sharedEvents = $events->getSharedManager();
-
-        $callBackHandler = $sharedEvents->attach(
+        $this->attachEventListener(
+            $events,
             '*',
-            [
-                'melis_core_gdpr_user_delete_event',
-            ],
+            'melis_core_gdpr_user_delete_event',
             function($e){
                 $moduleName = $this->getModuleName($this);
                 $parameters = $e->getParams();
@@ -36,7 +31,7 @@ class MelisCmsProspectsGdprUserDeleteListener extends MelisCoreGeneralListener i
 
                 if (isset($parameters['selected']) && isset($parameters['selected'][$moduleName])) {
                     $ids = $parameters['selected'][$moduleName];
-                    $prospectsTable = $e->getTarget()->getServiceLocator()->get('MelisProspects');
+                    $prospectsTable = $e->getTarget()->getServiceManager()->get('MelisProspects');
 
                     try {
                         $countOfDeletedProspects = $prospectsTable->deleteByField('pros_id', $ids);
@@ -59,8 +54,8 @@ class MelisCmsProspectsGdprUserDeleteListener extends MelisCoreGeneralListener i
                     $noErrors = ($countOfDeletedProspects == count($ids)) ? true : false;
                     $parameters['results'][$moduleName] = $noErrors;
                 }
-            });
-        $this->listeners[] = $callBackHandler;
+            }
+        );
     }
 
     /**

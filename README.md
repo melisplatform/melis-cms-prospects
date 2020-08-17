@@ -15,48 +15,52 @@ This will automatically be done when using composer.
 ### Installing
 
 Run the composer command:
+
 ```
 composer require melisplatform/melis-cms-prospects
 ```
 
-### Database    
+### Database
 
 Database model is accessible on the MySQL Workbench file:  
 /melis-cms-prospects/install/sql/model  
 Database will be installed through composer and its hooks.  
 In case of problems, SQL files are located here:  
-/melis-cms-prospects/install/sql  
+/melis-cms-prospects/install/sql
 
 ## Tools & Elements provided
 
-* Prospects Tool
-* Themes Tool
-* Melis Templating Prospect Plugin (contact form & management)
-* Dashboard item for prospects registration overview
+- Prospects Tool
+- Themes Tool
+- Melis Templating Prospect Plugin (contact form & management)
+- Dashboard item for prospects registration overview
 
 ## Running the code
 
-### MelisCmsProspects Services  
+### MelisCmsProspects Services
 
-MelisCmsProspects provides many services to be used in other modules:  
+MelisCmsProspects provides many services to be used in other modules:
 
-* MelisCmsProspects  
-Services to retrieve lists of prospects, prospects details and save a new prospect  
-File: /melis-cms-prospects/src/Service/MelisCmsProspectsService.php  
+- MelisCmsProspects  
+  Services to retrieve lists of prospects, prospects details and save a new prospect  
+  File: /melis-cms-prospects/src/Service/MelisCmsProspectsService.php
+
 ```
 // Get the service
-$melisProspectsService = $this->getServiceLocator()->get('MelisProspectsService');  
+$melisProspectsService = $this->getServiceManager()->get('MelisProspectsService');
 // Get the number of prospects per month
-$nb = $melisProspectsService->getProspectsDataByDate('monthly', '2017-10-04 12:00:00');  
+$nb = $melisProspectsService->getProspectsDataByDate('monthly', '2017-10-04 12:00:00');
 ```
 
-### MelisCmsProspects Forms  
+### MelisCmsProspects Forms
 
 #### Forms factories
+
 All Melis CMS News forms are built using Form Factories.  
-All form configuration are available in the file: /melis-cms-prospects/config/app.tools.php   
-Any module can override or add items in this form by building the keys in an array and marge it in the Module.php config creation part.  
-``` 
+All form configuration are available in the file: /melis-cms-prospects/config/app.tools.php  
+Any module can override or add items in this form by building the keys in an array and marge it in the Module.php config creation part.
+
+```
 return array(
 	'plugins' => array(
 
@@ -65,7 +69,7 @@ return array(
 
 			// Form key
 			'forms' => array(
-	
+
 				// MelisCmsProspects update form
 				'melistoolprospects_tool_prospects_update' => array(
 					'attributes' => array(
@@ -74,39 +78,42 @@ return array(
 						'method' => 'POST',
 						'action' => '',
 					),
-					'hydrator'  => 'Zend\Stdlib\Hydrator\ArraySerializable',
-					'elements' => array(  
+					'hydrator'  => 'Laminas\Hydrator\ArraySerializable',
+					'elements' => array(
 						array(
 							'spec' => array(
 								...
 							),
 						),
 					),
-					'input_filter' => array(      
+					'input_filter' => array(
 						'pros_id' => array(
 							...
-						),   
+						),
 					),
 				),
-			), 
-		), 
+			),
+		),
 	),
 ),
-``` 
+```
 
 #### Forms elements
-MelisCmsProspects provides form elements to be used in forms:  
-* MelisCmsProspectThemeSelect: a dropdown to select a theme  
-* MelisCmsProspectThemeItemSelect: a dropdown to select a theme item  
 
+MelisCmsProspects provides form elements to be used in forms:
 
-### Listening to services and update behavior with custom code  
-Most services trigger events so that the behavior can be modified.  
-```  
+- MelisCmsProspectThemeSelect: a dropdown to select a theme
+- MelisCmsProspectThemeItemSelect: a dropdown to select a theme item
+
+### Listening to services and update behavior with custom code
+
+Most services trigger events so that the behavior can be modified.
+
+```
 public function attach(EventManagerInterface $events)
 {
 	$sharedEvents      = $events->getSharedManager();
-    
+
 	$callBackHandler = $sharedEvents->attach(
 		'MelisCmsProspects',
 		array(
@@ -114,24 +121,22 @@ public function attach(EventManagerInterface $events)
 		),
 		function($e){
 
-    		$sm = $e->getTarget()->getServiceLocator();
+    		$sm = $e->getTarget()->getServiceManager();
     		$params = $e->getParams();
-    		
+
     		// Custom code
     	},
     100);
 
     $this->listeners[] = $callBackHandler;
 }
-```  
-
+```
 
 ## Authors
 
-* **Melis Technology** - [www.melistechnology.com](https://www.melistechnology.com/)
+- **Melis Technology** - [www.melistechnology.com](https://www.melistechnology.com/)
 
 See also the list of [contributors](https://github.com/melisplatform/melis-cms-prospects/contributors) who participated in this project.
-
 
 ## License
 

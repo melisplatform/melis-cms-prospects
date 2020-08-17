@@ -10,24 +10,21 @@ namespace MelisCmsProspects\Listener;
  */
 
 use MelisCore\Service\MelisCoreGdprAutoDeleteService;
-use Zend\EventManager\EventManagerInterface;
-use Zend\EventManager\ListenerAggregateInterface;
-use MelisCore\Listener\MelisCoreGeneralListener;
+use Laminas\EventManager\EventManagerInterface;
+use MelisCore\Listener\MelisGeneralListener;
 
-class MelisCmsProspectsGdprAutoDeleteActionDeleteUserListener extends MelisCoreGeneralListener implements ListenerAggregateInterface
+class MelisCmsProspectsGdprAutoDeleteActionDeleteUserListener extends MelisGeneralListener
 {
-
-    public function attach(EventManagerInterface $events)
+    public function attach(EventManagerInterface $events, $priority = 1)
     {
-        $sharedEvents = $events->getSharedManager();
-        $callBackHandler = $sharedEvents->attach(
+        $this->attachEventListener(
+            $events,
             '*',
             MelisCoreGdprAutoDeleteService::DELETE_ACTION_EVENT,
             function ($e) {
-                return $e->getTarget()->getServiceLocator()->get('MelisProspectsGdprAutoDeleteService')->removeOldUnvalidatedUsers($e->getParams());
+                return $e->getTarget()->getServiceManager()->get('MelisProspectsGdprAutoDeleteService')->removeOldUnvalidatedUsers($e->getParams());
             },
-            -1000);
-
-        $this->listeners[] = $callBackHandler;
+            -1000
+        );
     }
 }

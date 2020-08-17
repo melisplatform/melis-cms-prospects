@@ -10,25 +10,30 @@
 namespace MelisCmsProspects\Model\Tables;
 
 use MelisCore\Model\Tables\MelisGenericTable;
-use Zend\Db\TableGateway\TableGateway;
-use Zend\Db\Sql\Predicate\Expression;
-use Zend\Db\Sql\Select;
-use Zend\Db\Metadata\Metadata;
-use Zend\Db\Sql\Where;
-use Zend\Db\Sql\Predicate\PredicateSet;
-use Zend\Db\Sql\Predicate\Like;
-use Zend\Db\Sql\Predicate\Operator;
-use Zend\Db\Sql\Predicate\Predicate;
+use Laminas\Db\TableGateway\TableGateway;
+use Laminas\Db\Sql\Predicate\Expression;
+use Laminas\Db\Sql\Select;
+use Laminas\Db\Metadata\Metadata;
+use Laminas\Db\Sql\Where;
+use Laminas\Db\Sql\Predicate\PredicateSet;
+use Laminas\Db\Sql\Predicate\Like;
+use Laminas\Db\Sql\Predicate\Operator;
+use Laminas\Db\Sql\Predicate\Predicate;
 
 class MelisCmsProspectsThemeItemTable extends MelisGenericTable
 {
-    protected $tableGateway;
-    protected $idField;
+    /**
+     * Table name
+     */
+    const TABLE = 'melis_cms_prospects_theme_items';
+    /**
+     * Primary key
+     */
+    const PRIMARY_KEY = 'pros_theme_item_id';
 
-    public function __construct(TableGateway $tableGateway)
+    public function __construct()
     {
-        parent::__construct($tableGateway);
-        $this->idField = 'pros_theme_item_id';
+        $this->idField = self::PRIMARY_KEY;
     }
 
     public function getItemByThemeId($themeId, $langId , $includeTheme = false)
@@ -146,7 +151,7 @@ class MelisCmsProspectsThemeItemTable extends MelisGenericTable
              
             if(!empty($dateFilterSql))
             {
-                $filters = array(new PredicateSet($likes,PredicateSet::COMBINED_BY_OR), new \Zend\Db\Sql\Predicate\Expression($dateFilterSql));
+                $filters = array(new PredicateSet($likes,PredicateSet::COMBINED_BY_OR), new \Laminas\Db\Sql\Predicate\Expression($dateFilterSql));
             }
             else
             {
