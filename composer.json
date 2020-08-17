@@ -1,49 +1,46 @@
 {
-  "name": "melisplatform/melis-cms-prospects",
-  "description": "Melis Platform prospects module",
-  "type": "melisplatform-module",
-  "license": "OSL-3.0",
-  "homepage": "https://github.com/melisplatform/melis-cms-prospects",
-  "support": {
-    "email": "contact@melistechnology.com",
-    "source": "https://github.com/melisplatform/melis-cms-prospects",
-    "issues": "https://github.com/melisplatform/melis-cms-prospects/issues",
-    "docs": "https://www.melistechnology.com/melistechnology/resources/download-documentation/id/17#documentation"
-  },
-  "authors": [
-    {
-      "name": "Melis Technology",
-      "email": "contact@melistechnology.com",
-      "homepage": "https://www.melistechnology.com",
-      "role": "Developer"
-    }
-  ],
-  "keywords": [
-    "cms",
-    "melis",
-    "zf2",
-    "module"
-  ],
-  "extra": {
-    "module-name": "MelisCmsProspects",
-    "dbdeploy": true,
-    "melis-site": false,
-    "melis-module-category": "cms"
-  },
-  "require": {
-    "php": "^7.1.3|^7.2|^7.3",
-    "laminas/laminas-mvc-plugin-flashmessenger": "^1.2",
-    "melisplatform/melis-core": "*",
-    "melisplatform/melis-engine": "*",
-    "melisplatform/melis-front": "*",
-    "melisplatform/melis-cms": "*"
-  },
-  "require-dev": {
-    "phpunit/phpunit": "~4.8"
-  },
-  "autoload": {
-    "psr-4": {
-      "MelisCmsProspects\\": "src/"
-    }
-  }
+	"name": "melisplatform/melis-cms-prospects",
+	"description": "Melis Platform prospects module",
+	"type": "melisplatform-module",
+	"license": "OSL-3.0",
+	"homepage": "https://github.com/melisplatform/melis-cms-prospects",
+	"support": {
+		"email": "contact@melistechnology.com",
+		"source": "https://github.com/melisplatform/melis-cms-prospects",
+		"issues": "https://github.com/melisplatform/melis-cms-prospects/issues",
+		"docs": "https://www.melistechnology.com/melistechnology/resources/download-documentation/id/17#documentation"
+	},
+	"authors": [
+		{
+			"name": "Melis Technology",
+			"email": "contact@melistechnology.com",
+			"homepage": "https://www.melistechnology.com",
+			"role": "Developer"
+		}
+	],
+	"keywords": [
+		"cms",
+		"melis",
+		"zf2",
+		"module"
+	],
+	"extra": {
+		"module-name": "MelisCmsProspects",
+		"dbdeploy": true,
+		"melis-site": false,
+		"melis-module-category": "cms"
+	},
+	"require": {
+		"php": "^7.1.3|^7.2|^7.3",
+		"laminas/laminas-mvc-plugin-flashmessenger": "^1.2",
+		"melisplatform/melis-core": "*",
+		"melisplatform/melis-engine": "*",
+		"melisplatform/melis-front": "*",
+		"melisplatform/melis-cms": "*"
+	},
+	"autoload": {
+		"psr-4": {
+			"MelisCmsProspects\\": "src/"
+		}
+	}
 }
