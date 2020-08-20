@@ -27,6 +27,11 @@
 	display: none;
 }
 
+#MelisCmsProspectsShowFormPlugin_select_field .module-cont .has-switch {
+	top: 0;
+}
+
+/* dashboard plugin */
 .cms-pros-dash-chart-bar-graph .legend table,
 .cms-pros-dash-chart-line-graph .legend table {
     border: 1px solid #e5e5e5;
@@ -37,12 +42,15 @@
     border: 0 !important;
 }
 
-#MelisCmsProspectsShowFormPlugin_select_field .module-cont .has-switch {
-	top: 0;
+.cms-pros-dash-chart-line-graph.flotchart-holder {
+	overflow: visible;
+}
+
+.cms-pros-dash-chart-line-graph.flotchart-holder .legend table {
+	top: -75px !important;
 }
 
 /* @CHARSET "ISO-8859-1"; */
-
 @media (min-width: 1600px) and (max-width: 1840px) {
 	.pros-dash-lbl {
 	    overflow: hidden;
@@ -54,7 +62,6 @@
 		padding-left: 10px;
 	}
 }
-
 @media (min-width: 1200px) and (max-width: 1600px) {
 	.dashboard-prospects-label {
 	    font-size: 17px;
