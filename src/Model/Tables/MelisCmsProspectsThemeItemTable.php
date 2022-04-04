@@ -100,7 +100,7 @@ class MelisCmsProspectsThemeItemTable extends MelisGenericTable
         return $resultSet;
     }
     
-    public function getItemData(array $options, $fixedCriteria = null, $themeId, $langId)
+    public function getItemData(array $options, $fixedCriteria, $themeId, $langId)
     {
         $select = $this->tableGateway->getSql()->select();
         $result = $this->tableGateway->select();
