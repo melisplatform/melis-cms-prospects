@@ -81,7 +81,7 @@ class MelisCmsProspectsStatisticsPlugin extends MelisCoreDashboardTemplatingPlug
         
         if($this->getController()->getRequest()->isPost()) {
             
-            $chartFor = get_object_vars($this->getController()->getRequest()->getPost());
+            $chartFor = $this->getController()->getRequest()->getPost()->toArray();
             $chartFor = isset($chartFor['chartFor']) ? $chartFor['chartFor'] : 'monthly';
             
             $melisProspectsService = $this->getServiceManager()->get('MelisProspectsService');
