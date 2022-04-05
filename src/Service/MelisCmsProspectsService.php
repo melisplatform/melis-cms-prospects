@@ -152,7 +152,7 @@ class MelisCmsProspectsService extends MelisGeneralService implements MelisCmsPr
 	 * @param string $date, if specified this will return only from the date to the current date
 	 * @return number
 	 */
-	public function getProspectsDataByDate($type = 'daily', $date){
+	public function getProspectsDataByDate($type, $date){
 	    
 	    $prospectsTable = $this->getServiceManager()->get('MelisProspects');
 	    $dataProspects = $prospectsTable->getProspectsOrderByDate('DESC');
