@@ -170,7 +170,7 @@ class MelisCmsProspectsThemesController extends MelisAbstractActionController
         $draw              = 0;
         if($request->isPost()) {
 
-            $post           = get_object_vars($request->getPost());
+            $post           = $request->getPost()->toArray();
             $columns        = array_keys($this->tool()->getColumns());
             $draw           = (int) $post['draw'];
             $selColOrder    = $columns[(int) $post['order'][0]['column']];
