@@ -72,6 +72,7 @@ class MelisCmsProspectsShowFormPlugin extends MelisTemplatingPlugin
         $theme  = '';
         if(!empty($config)) {
             $fields    = $config['fields'] ? explode(',', $config['fields']) : array();
+            $fields = array_filter($fields);//remove empty values, happens when the user hides some of the prospect fields from the plugin form
             $theme     = $config['theme'];
             $elements  = $appConfigForm['elements'];
             $validator = $appConfigForm['input_filter'];
@@ -147,8 +148,8 @@ class MelisCmsProspectsShowFormPlugin extends MelisTemplatingPlugin
             $post = $request->getPost()->toArray();
 
             // to avoid conflict in melis edition mode
-            if (!empty($post))
-            {
+            if (!empty($post)) {
+
                 /**
                  * Checking if the posted fields are the same
                  * with the fields set for plugin form
@@ -156,8 +157,7 @@ class MelisCmsProspectsShowFormPlugin extends MelisTemplatingPlugin
                  * form submission from the front page
                  */
                 $postedFields = array();
-                foreach ($post As $key => $val)
-                {
+                foreach ($post As $key => $val) {
                     array_push($postedFields, $key);
                 }
 
@@ -174,21 +174,17 @@ class MelisCmsProspectsShowFormPlugin extends MelisTemplatingPlugin
                     array_unshift($fields, 'pros_type');
                 }
 
-                if ($postedFields == $fields|| empty($fields))
-                {
+                if ($postedFields == $fields || empty($fields)) {
                     $prospectsForm->setData($post);
                     
                     $requiredFields = $this->pluginFrontConfig['required_fields'] ? explode(',', $this->pluginFrontConfig['required_fields']) : array();
-                    foreach ($prospectsForm->getElements() As $key => $val)
-                    {
-                        if (!in_array($key, $requiredFields))
-                        {
+                    foreach ($prospectsForm->getElements() As $key => $val) {
+                        if (!in_array($key, $requiredFields)) {
                             $prospectsForm->getInputFilter()->remove($key);
                         }
                     }
                     
-                    if($prospectsForm->isValid())
-                    {
+                    if ($prospectsForm->isValid()) {                       
                         $siteId = null;
 
                         /**
@@ -197,8 +193,7 @@ class MelisCmsProspectsShowFormPlugin extends MelisTemplatingPlugin
                         $pageId = (!empty($this->getFormData()['pageId'])) ? $this->getFormData()['pageId'] :$this->getController()->params()->fromRoute('idpage');
                         $selectedSiteId = (!empty(($this->getFormData()['pros_site_id']))) ? $this->getFormData()['pros_site_id'] : null;
 
-                        if(is_null($selectedSiteId) && empty($selectedSiteId))
-                        {
+                        if (is_null($selectedSiteId) && empty($selectedSiteId)) {
                             $pageTreeService = $this->getServiceManager()->get('MelisEngineTree');
                             $site = $pageTreeService->getSiteByPageId($pageId);
 
@@ -218,8 +213,7 @@ class MelisCmsProspectsShowFormPlugin extends MelisTemplatingPlugin
                         $responseData = $prospectService->saveProspectsDatas($post);
                         
                         // Resting form elements after saving prospects
-                        foreach ($prospectsForm->getElements() As $key => $val)
-                        {
+                        foreach ($prospectsForm->getElements() As $key => $val) {
                             $val->setValue(null);
                         }
 
@@ -239,24 +233,18 @@ class MelisCmsProspectsShowFormPlugin extends MelisTemplatingPlugin
                                 $this->getController()->redirect()->toUrl($uri);
                             }
                         }
-                    }
-                    else
-                    {
+                    } else {                        
                         $errors = $prospectsForm->getMessages();
                         
                         $appConfigForm = $appConfigForm['elements'];
-                        foreach ($errors as $keyError => $valueError)
-                        {
-                            foreach ($appConfigForm as $keyForm => $valueForm)
-                            {
-                                if ($valueForm['spec']['name'] == $keyError && !empty($valueForm['spec']['options']['label']))
-                                {
+                        foreach ($errors as $keyError => $valueError) {
+                            foreach ($appConfigForm as $keyForm => $valueForm) {
+                                if ($valueForm['spec']['name'] == $keyError && !empty($valueForm['spec']['options']['label'])) {
                                     $errors[$keyError]['label'] = $translator->translate($valueForm['spec']['options']['label']);
                                 }
                             }
                             
-                            foreach ($valueError As $evKey => $evVal)
-                            {
+                            foreach ($valueError As $evKey => $evVal) {
                                 $errors[$keyError][$evKey] = $translator->translate($evVal);
                             }
                         }
@@ -311,8 +299,7 @@ class MelisCmsProspectsShowFormPlugin extends MelisTemplatingPlugin
                     $viewModelTab->modalForm   = $form;
                     $viewModelTab->cbElements  = $this->getFormElements();
                     
-                    if ($formKey == 'plugin_prospect_tab_02')
-                    {
+                    if ($formKey == 'plugin_prospect_tab_02') {
                         $this->pluginFrontConfig['fields'] = !empty($this->pluginFrontConfig['fields']) ? explode(',', $this->pluginFrontConfig['fields']) : ['pros_name', 'pros_company', 'pros_country', 'pros_telephone', 'pros_email', 'pros_theme', 'pros_message'];
                         $this->pluginFrontConfig['required_fields'] = $this->pluginFrontConfig['required_fields'] ? explode(',', $this->pluginFrontConfig['required_fields']) : array();
                     }
@@ -327,21 +314,17 @@ class MelisCmsProspectsShowFormPlugin extends MelisTemplatingPlugin
                             'html' => $html
                         ]
                     );
-                }
-                else 
-                {
+                } else  {
                     // validate the forms and send back an array with errors by tabs
                     $post = $request->getPost()->toArray();
                     $success = false;
                     $errors = array();
                     
-                    if ($formKey == 'plugin_prospect_tab_02')
-                    {
+                    if ($formKey == 'plugin_prospect_tab_02') {
                         /**
                          * Checking if has field set as mandatory 
                          */
-                        if (empty($post['required_fields']))
-                        {
+                        if (empty($post['required_fields'])) {
                             $errors['fields'] = array(
                                 'label' => $translator->translate('tr_melis_cms_prospects_plugin_config_fields'),
                                 'noMandatoryField' => $translator->translate('tr_melis_cms_prospects_plugin_config_no_mandatory'),
@@ -351,33 +334,25 @@ class MelisCmsProspectsShowFormPlugin extends MelisTemplatingPlugin
                         /**
                          * Checking if has field shown atleast one
                          */
-                        if (empty($post['fields']))
-                        {
+                        if (empty($post['fields'])) {
                             $err = array(
                                 'label' => $translator->translate('tr_melis_cms_prospects_plugin_config_fields'),
                                 'noMandatoryField' => $translator->translate('tr_melis_cms_prospects_plugin_config_no_field'),
                             );
                             
-                            if (!isset($errors['fields']))
-                            {
+                            if (!isset($errors['fields'])) {
                                 $errors['fields'] = $err;
-                            }
-                            else 
-                            {
+                            } else {
                                 $errors['fields']['noShownField'] = $translator->translate('tr_melis_cms_prospects_plugin_config_no_field');
                             }
                         }
-                    }
-                    elseif ($formKey == 'plugin_prospect_tab_03')
-                    {
+                    } elseif ($formKey == 'plugin_prospect_tab_03') {
                         /**
                          * Removing validation on theme field if the
                          * field is set to Hide status
                          */
-                        if (!empty($post['fields']))
-                        {
-                            if (!in_array('pros_theme', $post['fields']))
-                            {
+                        if (!empty($post['fields'])) {
+                            if (!in_array('pros_theme', $post['fields'])) {
                                 $form->getInputFilter()->remove('theme');
                             }
                         }
@@ -385,10 +360,8 @@ class MelisCmsProspectsShowFormPlugin extends MelisTemplatingPlugin
                     
                     $form->setData($post);
                     
-                    if ($form->isValid()) 
-                    {
-                        if (empty($errors))
-                        {
+                    if ($form->isValid())  {
+                        if (empty($errors)) {
                             $elements = isset($post['elements']) ? $post['elements'] : null;
                             if(!empty($elements)) {
                                 
@@ -406,15 +379,10 @@ class MelisCmsProspectsShowFormPlugin extends MelisTemplatingPlugin
                                 ]);
                             }
                         }
-                    } 
-                    else 
-                    {
-                        if (!empty($errors))
-                        {
+                    } else {
+                        if (!empty($errors)) {
                             $errors = ArrayUtils::merge($errors, $form->getMessages());
-                        }
-                        else 
-                        {
+                        } else {
                             $errors = $form->getMessages();
                         }
                         
@@ -428,8 +396,7 @@ class MelisCmsProspectsShowFormPlugin extends MelisTemplatingPlugin
                         }
                     }
                     
-                    if (!empty($errors))
-                    {
+                    if (!empty($errors)) {
                         array_push($response, [
                             'name' => $this->pluginBackConfig['modal_form'][$formKey]['tab_title'],
                             'success' => $success,
@@ -441,12 +408,9 @@ class MelisCmsProspectsShowFormPlugin extends MelisTemplatingPlugin
             }
         }
 
-        if (!isset($parameters['validate'])) 
-        {
+        if (!isset($parameters['validate'])) {
             return $render;
-        }
-        else 
-        {
+        } else {
             return $response;
         }
 
@@ -474,6 +438,7 @@ class MelisCmsProspectsShowFormPlugin extends MelisTemplatingPlugin
             $tmp = [];
 
             foreach($fields as $idx => $name) {
+                if (!empty($name))
                 $tmp[$name] = $elements[$name];
             }
             $elements = ArrayUtils::merge($tmp, $elements);
@@ -503,8 +468,7 @@ class MelisCmsProspectsShowFormPlugin extends MelisTemplatingPlugin
         $configValues = array();
         
         $xml = simplexml_load_string($this->pluginXmlDbValue);
-        if ($xml)
-        {
+        if ($xml) {
             if (!empty($xml->template_path))
                 $configValues['template_path'] = (string)$xml->template_path;
             if (!empty($xml->pros_site_id))
