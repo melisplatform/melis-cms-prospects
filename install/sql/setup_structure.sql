@@ -41,7 +41,7 @@ CREATE TABLE IF NOT EXISTS `melis_cms_prospects` (
   PRIMARY KEY (`pros_id`),
   INDEX `fk_theme_id_idx` (`pros_theme` ASC))
 ENGINE = InnoDB
-DEFAULT CHARACTER SET = utf8;
+DEFAULT CHARACTER SET = utf8mb4;
 
 
 -- -----------------------------------------------------
