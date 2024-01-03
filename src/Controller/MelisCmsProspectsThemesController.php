@@ -250,16 +250,20 @@ class MelisCmsProspectsThemesController extends MelisAbstractActionController
                 if (!$checkData && !$id) {
                     $allowSave = true;
                 } elseif ($id && $checkData) {
-                    $currentCode = $this->themeTable()->getEntryById($id)->current()->pros_theme_code;
-                    if ($currentCode != $data['pros_theme_code']) {
-                        // recheck if the code exists
-                        $checkData = $this->themeTable()->getEntryByField('pros_theme_code', $data['pros_theme_code'])->current();
-                        if (empty($checkData)) {
-                            $allowSave = true;
+                    if(!empty($data['pros_theme_code'])) {
+                        $currentCode = $this->themeTable()->getEntryById($id)->current()->pros_theme_code;
+                        if ($currentCode != $data['pros_theme_code']) {
+                            // recheck if the code exists
+                            $checkData = $this->themeTable()->getEntryByField('pros_theme_code', $data['pros_theme_code'])->current();
+                            if (empty($checkData)) {
+                                $allowSave = true;
+                            } else {
+                                $message = 'tr_melis_cms_prospects_theme_code_exists';
+                            }
                         } else {
-                            $message = 'tr_melis_cms_prospects_theme_code_exists';
+                            $allowSave = true;
                         }
-                    } else {
+                    }else{
                         $allowSave = true;
                     }
                 } else {
