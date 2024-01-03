@@ -9,9 +9,8 @@
 
 namespace MelisCmsProspects\Form\Factory;
 
-use Interop\Container\ContainerInterface;
 use Laminas\Form\Element\Select;
-use Laminas\ServiceManager\FactoryInterface;
+use Psr\Container\ContainerInterface;
 
 /**
  * Prospect theme select factory
