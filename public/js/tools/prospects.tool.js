@@ -8,7 +8,10 @@ var prospectDateFilterStart = "",
 $(function() {
     var $body = $("body");
         // for edit button
-        $body.on("click", '.btnEditProspect', function() {
+        $body.on("click", '.btnEditProspect', function(e) {
+            // removed href="#modal-prospect" from view/melis-cms-prospects/tool-prospects/render-tool-prospects-action-edit.phtml
+            e.preventDefault();
+
             var $this   = $(this),
                 id      = $this.parents("tr").attr("id");
 
