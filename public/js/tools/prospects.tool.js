@@ -147,7 +147,10 @@ var toolProspects = {
             }).done(function(data){
                 if(data.success) {
                     toolProspects.refreshTable();
-                    $(".modal").modal("hide");
+
+                    // $(".modal").modal("hide");
+                    melisCoreTool.hideModal( $(".modal").attr("id") );
+
                     melisCoreTool.resetLabels("#idformprospectdata");
                     melisHelper.melisOkNotification(data.textTitle, data.textMessage);
                 }
