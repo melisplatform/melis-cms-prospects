@@ -8,7 +8,10 @@ var prospectDateFilterStart = "",
 $(function() {
     var $body = $("body");
         // for edit button
-        $body.on("click", '.btnEditProspect', function() {
+        $body.on("click", '.btnEditProspect', function(e) {
+            // removed href="#modal-prospect" from view/melis-cms-prospects/tool-prospects/render-tool-prospects-action-edit.phtml
+            e.preventDefault();
+
             var $this   = $(this),
                 id      = $this.parents("tr").attr("id");
 
@@ -144,7 +147,10 @@ var toolProspects = {
             }).done(function(data){
                 if(data.success) {
                     toolProspects.refreshTable();
-                    $(".modal").modal("hide");
+
+                    // $(".modal").modal("hide");
+                    melisCoreTool.hideModal( $(".modal").attr("id") );
+
                     melisCoreTool.resetLabels("#idformprospectdata");
                     melisHelper.melisOkNotification(data.textTitle, data.textMessage);
                 }

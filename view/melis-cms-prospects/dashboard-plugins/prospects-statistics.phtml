@@ -4,10 +4,10 @@
     <div class="widget-head">
         <ul class="nav nav-tabs">
             <li class="nav-item active">
-            	<a class="glyphicons stats nav-link active" href="#chart-simple-lines-<?php echo $this->pluginConfig['plugin_id']?>" data-toggle="tab"><i></i></a>
+            	<a class="glyphicons stats nav-link active" data-bs-target="#chart-simple-lines-<?php echo $this->pluginConfig['plugin_id']?>" href="#chart-simple-lines-<?php echo $this->pluginConfig['plugin_id']?>" data-bs-toggle="tab"><i></i></a>
             </li>
             <li class="nav-item">
-            	<a class="glyphicons charts chart-simple-lines-tab nav-link" href="#chart-simple-bars-<?php echo $this->pluginConfig['plugin_id']?>" data-toggle="tab"><i></i></a>
+            	<a class="glyphicons charts chart-simple-lines-tab nav-link" data-bs-target="#chart-simple-bars-<?php echo $this->pluginConfig['plugin_id']?>" href="#chart-simple-bars-<?php echo $this->pluginConfig['plugin_id']?>" data-bs-toggle="tab"><i></i></a>
             </li>
         </ul>
     </div>
@@ -20,31 +20,31 @@
 		<div class="innerAll">
 			<div class="tab-content">
 				<div class="tab-pane active" id="chart-simple-lines-<?php echo $this->pluginConfig['plugin_id']?>">
-					<div class="btn-group float-right" data-toggle="buttons">
-                      	<label class="btn btn-default btn-sm active">
-                        	<input type="radio" class="cms-pros-dash-chart-line" name="cms-pros-dash-chart-line" value="daily"><?php echo $this->translate('tr_melistoolprospects_dashboard_Prospects Statistics_daily')?>
-                      	</label>
-                      	<label class="btn btn-default btn-sm">
-                        	<input type="radio" class="cms-pros-dash-chart-line" name="cms-pros-dash-chart-line" value="monthly"><?php echo $this->translate('tr_melistoolprospects_dashboard_Prospects Statistics_monthly')?>
-                      	</label>
-                      	<label class="btn btn-default btn-sm">
-                        	<input type="radio" class="cms-pros-dash-chart-line" name="cms-pros-dash-chart-line" value="yearly"><?php echo $this->translate('tr_melistoolprospects_dashboard_Prospects Statistics_yearly')?>
-                      	</label>
+					<div class="btn-group float-right" data-bs-toggle="buttons" role="group">
+						<!-- active -->
+						<input type="radio" class="cms-pros-dash-chart-line btn-check" id="chart-simple-lines-daily" name="cms-pros-dash-chart-line" value="daily" autocomplete="off" checked>
+                      	<label class="btn btn-default btn-sm" for="chart-simple-lines-daily"><?php echo $this->translate('tr_melistoolprospects_dashboard_Prospects Statistics_daily')?></label>
+
+						<input type="radio" class="cms-pros-dash-chart-line btn-check" id="chart-simple-lines-monthly" name="cms-pros-dash-chart-line" value="monthly" autocomplete="off">
+                      	<label class="btn btn-default btn-sm" for="chart-simple-lines-monthly"><?php echo $this->translate('tr_melistoolprospects_dashboard_Prospects Statistics_monthly')?></label>
+
+						<input type="radio" class="cms-pros-dash-chart-line btn-check" id="chart-simple-lines-yearly" name="cms-pros-dash-chart-line" value="yearly" autocomplete="off">
+                      	<label class="btn btn-default btn-sm" for="chart-simple-lines-yearly"><?php echo $this->translate('tr_melistoolprospects_dashboard_Prospects Statistics_yearly')?></label>
                     </div>
                     <div class="separator bottom"></div>
 	            	<div class="flotchart-holder cms-pros-dash-chart-line-graph" id="cms-pros-dash-chart-line-graph-<?php echo $this->pluginConfig['plugin_id']?>"></div>
 				</div>
 				<div class="tab-pane" id="chart-simple-bars-<?php echo $this->pluginConfig['plugin_id']?>">
-					<div class="btn-group float-right" data-toggle="buttons">
-                      	<label class="btn btn-default btn-sm active">
-                        	<input type="radio" class="cms-pros-dash-chart-bar" name="cms-pros-dash-chart-bar" value="daily"><?php echo $this->translate('tr_melistoolprospects_dashboard_Prospects Statistics_daily')?>
-                      	</label>
-                      	<label class="btn btn-default btn-sm">
-                        	<input type="radio" class="cms-pros-dash-chart-bar" name="cms-pros-dash-chart-bar" value="monthly"><?php echo $this->translate('tr_melistoolprospects_dashboard_Prospects Statistics_monthly')?>
-                      	</label>
-                      	<label class="btn btn-default btn-sm">
-                        	<input type="radio" class="cms-pros-dash-chart-bar" name="cms-pros-dash-chart-bar" value="yearly"><?php echo $this->translate('tr_melistoolprospects_dashboard_Prospects Statistics_yearly')?>
-                      	</label>
+					<div class="btn-group float-right" data-bs-toggle="buttons" role="group">
+						<!-- active -->
+						<input type="radio" class="cms-pros-dash-chart-bar btn-check" id="chart-simple-bars-daily" name="cms-pros-dash-chart-bar" value="daily" autocomplete="off" checked>
+                      	<label class="btn btn-default btn-sm" for="chart-simple-bars-daily"><?php echo $this->translate('tr_melistoolprospects_dashboard_Prospects Statistics_daily')?></label>
+
+						<input type="radio" class="cms-pros-dash-chart-bar btn-check" id="chart-simple-bars-monthly" name="cms-pros-dash-chart-bar" value="monthly" autocomplete="off">
+                      	<label class="btn btn-default btn-sm" for="chart-simple-bars-monthly"><?php echo $this->translate('tr_melistoolprospects_dashboard_Prospects Statistics_monthly')?></label>
+
+						<input type="radio" class="cms-pros-dash-chart-bar btn-check" id="chart-simple-bars-yearly" name="cms-pros-dash-chart-bar" value="yearly" autocomplete="off">
+                      	<label class="btn btn-default btn-sm" for="chart-simple-bars-yearly"><?php echo $this->translate('tr_melistoolprospects_dashboard_Prospects Statistics_yearly')?></label>
                     </div>
                     <div class="separator bottom"></div>
 	    			<div class="flotchart-holder cms-pros-dash-chart-bar-graph" id="cms-pros-dash-chart-bar-graph-<?php echo $this->pluginConfig['plugin_id']?>"></div>

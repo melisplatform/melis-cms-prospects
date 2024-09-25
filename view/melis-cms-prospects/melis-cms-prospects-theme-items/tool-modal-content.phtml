@@ -13,7 +13,9 @@ if (!empty($this->zoneconfig['conf']['id']))
             <div class="widget widget-tabs widget-tabs-double widget-tabs-responsive margin-none border-none">
                 <div class="widget-head">
                     <ul class="nav nav-tabs">
-                        <li class="active"><a href="#<?php echo $this->zoneconfig['conf']['id'] ?>" class="glyphicons pencil" data-toggle="tab" aria-expanded="true"><i></i> <?php echo sprintf($this->translate('tr_melis_cms_prospects_theme_items_edit'), !empty($this->code) ? strtoupper($this->code) : null); ?></a></li>
+                        <li class="nav-item active">
+                            <a data-bs-target="#<?php echo $this->zoneconfig['conf']['id'] ?>" href="#<?php echo $this->zoneconfig['conf']['id'] ?>" class="nav-link glyphicons pencil" data-bs-toggle="tab" aria-expanded="true"><i></i> <?php echo sprintf($this->translate('tr_melis_cms_prospects_theme_items_edit'), !empty($this->code) ? strtoupper($this->code) : null); ?></a>
+                        </li>
                     </ul>
                 </div>
                 <div class="widget-body innerAll inner-2x">
@@ -21,10 +23,10 @@ if (!empty($this->zoneconfig['conf']['id']))
                         <div class="row">
                             <div class="col-xs-12 col-md-4">
                                 <div class="product-text-tab-container">
-                                    <ul class="nav-tabs product-text-tab">
+                                    <ul class="nav nav-tabs product-text-tab">
                                         <?php foreach($this->languages as $idx => $lang) {?>
-                                            <li class="">
-                                                <a class="clearfix" data-toggle="tab" href="#<?= $lang['lang_cms_name']; ?>-log-type-details" aria-expanded="false">
+                                            <li class="nav-item">
+                                                <a class="nav-link clearfix" data-bs-toggle="tab" data-bs-target="#<?= $lang['lang_cms_name']; ?>-log-type-details" href="#<?= $lang['lang_cms_name']; ?>-log-type-details" aria-expanded="false">
                                                     <span><?= $lang['lang_cms_name']; ?></span>
                                                     <?php
                                                     $img = $lang['lang_cms_locale'];
@@ -64,7 +66,7 @@ if (!empty($this->zoneconfig['conf']['id']))
                             </div>
                         </div>
                         <div class="footer-modal d-flex flex-row justify-content-between">
-                            <button data-dismiss="modal" class="btn btn-danger"><i class="fa fa-times"></i> <?php echo $this->translate('tr_meliscore_common_close')?></button>
+                            <button data-bs-dismiss="modal" class="btn btn-danger"><i class="fa fa-times"></i> <?php echo $this->translate('tr_meliscore_common_close')?></button>
                             <button class="btn btn-success" id="btn-save-theme-items"><i class="fa fa-save"></i>  <?php echo $this->translate('tr_meliscore_tool_gen_save'); ?></button>
                         </div>
                     </div>

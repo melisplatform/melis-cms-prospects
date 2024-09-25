@@ -40,14 +40,14 @@ if (!empty($this->zoneconfig['conf']['id']))
 			
 			
 			<script type="text/javascript">
-			// this script cannot be separated to this file since all table configuration and initialization are done here
-			// render table to DataTable plugin
-            $(document).ready(function() {
-                <?= $this->getToolDataTableConfig; ?>
-                $(toolProspects.table()).on("init.dt", function(e, settings) {
-                    toolProspects.initProspectsDataTable();
-                });
-            });
+				// this script cannot be separated to this file since all table configuration and initialization are done here
+				// render table to DataTable plugin
+				$(function() {
+					<?= $this->getToolDataTableConfig; ?>
+					$(toolProspects.table()).on("init.dt", function(e, settings) {
+						toolProspects.initProspectsDataTable();
+					});
+				});
 			</script>
 	</div>
 </div>
