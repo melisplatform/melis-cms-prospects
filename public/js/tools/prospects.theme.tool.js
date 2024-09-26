@@ -56,11 +56,8 @@ $(function() {
                 }).done(function(data){
                     if(data.success) {
                         // $(".modal").modal("hide");
-                        var modalId = $(".modal").attr("id")[0];
-                            
-                            if ( $("#"+modalId).length ) {
-                                melisCoreTool.hideModal(modalId);
-                            }
+                        //var modalId = $(".modal").attr("id");
+                            melisCoreTool.hideModal("id_MelisCmsProspects_tool_themes_modal_content_container");
 
                         $("a.melis-refreshTable").trigger("click");
                         melisHelper.melisOkNotification(data.textTitle, data.textMessage);
@@ -167,8 +164,8 @@ $(function() {
                 }).done(function(data){
                     if(data.success) {
                         // $(".modal").modal("hide");
-                        var modalId = $(".modal").attr("id")[0];
-                            melisCoreTool.hideModal(modalId);
+                        // var modalId = $(".modal").attr("id");
+                            melisCoreTool.hideModal("id_MelisCmsProspects_tool_theme_items_modal_content_container");
 
                         $("a.melis-refreshTableThemeItem").trigger("click");
                         melisHelper.melisOkNotification(data.textTitle, data.textMessage);
@@ -205,7 +202,7 @@ $(function() {
                 }).done(function(data){
                     if(data.success) {
                         // $(".modal").modal("hide");
-                        var modalId = $(".modal").attr("id")[0];
+                        var modalId = $(".modal").attr("id");
                             melisCoreTool.hideModal(modalId);
 
                         $("a.melis-refreshTableThemeItem").trigger("click");
