@@ -55,7 +55,13 @@ $(function() {
                     encode		: true,
                 }).done(function(data){
                     if(data.success) {
-                        $(".modal").modal("hide");
+                        // $(".modal").modal("hide");
+                        var modalId = $(".modal").attr("id")[0];
+                            
+                            if ( $("#"+modalId).length ) {
+                                melisCoreTool.hideModal(modalId);
+                            }
+
                         $("a.melis-refreshTable").trigger("click");
                         melisHelper.melisOkNotification(data.textTitle, data.textMessage);
                     }
@@ -64,7 +70,7 @@ $(function() {
                         melisCoreTool.highlightErrors(data.success, data.errors, "prospects_theme_form");
                     }
                     melisCore.flashMessenger();
-                    $(formId + " input, button").not("input#pros_theme_id").removeAttr("disabled");
+                    $(formId + " input, button").not("input#pros_theme_id").prop("disabled", false);
                 }).fail(function() {
                     alert( translations.tr_meliscore_error_message );
                 });
@@ -160,7 +166,10 @@ $(function() {
                     encode		: true
                 }).done(function(data){
                     if(data.success) {
-                        $(".modal").modal("hide");
+                        // $(".modal").modal("hide");
+                        var modalId = $(".modal").attr("id")[0];
+                            melisCoreTool.hideModal(modalId);
+
                         $("a.melis-refreshTableThemeItem").trigger("click");
                         melisHelper.melisOkNotification(data.textTitle, data.textMessage);
                     }
@@ -195,7 +204,10 @@ $(function() {
                     encode		: true,
                 }).done(function(data){
                     if(data.success) {
-                        $(".modal").modal("hide");
+                        // $(".modal").modal("hide");
+                        var modalId = $(".modal").attr("id")[0];
+                            melisCoreTool.hideModal(modalId);
+
                         $("a.melis-refreshTableThemeItem").trigger("click");
 
                         melisHelper.melisOkNotification(data.textTitle, data.textMessage);
