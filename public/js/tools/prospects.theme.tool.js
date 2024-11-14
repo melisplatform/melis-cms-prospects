@@ -203,7 +203,9 @@ $(function() {
                     if(data.success) {
                         // $(".modal").modal("hide");
                         var modalId = $(".modal").attr("id");
-                            melisCoreTool.hideModal(modalId);
+                            if (modalId != "" && modalId != "undefined") {
+                                melisCoreTool.hideModal(modalId);
+                            }
 
                         $("a.melis-refreshTableThemeItem").trigger("click");
 

@@ -149,7 +149,10 @@ var toolProspects = {
                     toolProspects.refreshTable();
 
                     // $(".modal").modal("hide");
-                    melisCoreTool.hideModal( $(".modal").attr("id") );
+                    var modalId = $(".modal").attr("id");
+                    if (modalId != "" && modalId != "undefined") {
+                        melisCoreTool.hideModal(modalId);
+                    }
 
                     melisCoreTool.resetLabels("#idformprospectdata");
                     melisHelper.melisOkNotification(data.textTitle, data.textMessage);
