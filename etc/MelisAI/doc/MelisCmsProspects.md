@@ -147,12 +147,12 @@ Per-row actions:
 - **Delete** (`renderToolProspectsActionDeleteAction` / `removeProspectDataAction`); a
   bulk `removeAllProspectDataAction` also exists.
 
-![Prospects tool — widgets, filters and the prospects list](./images/prospects-list.png)
+![Prospects tool — widgets, filters and the prospects list](./images/meliscmsprospects-tool-prospects-list.png)
 *Caption: the Prospects tool — the three stat widgets (total, this month, monthly average),
 the left filters (limit, date range, site, type), search, CSV export, and the prospects
 table (id, site, name, email, type, telephone, contact date, theme, message).*
 
-![Edit-prospect modal (update form)](./images/prospects-edit-modal.png)
+![Edit-prospect modal (update form)](./images/meliscmsprospects-tool-prospects-edit-modal.png)
 *Caption: the edit-prospect modal — the update form for a single lead's fields.*
 
 ---
@@ -167,21 +167,38 @@ Manage the **themes** used to classify prospects.
 
 A list of themes with **Add** (`toolHeaderAddAction`), **Edit** (`editAction`) and
 **Delete** (`deleteAction` / `removeAction`) — create/edit via a modal
-(`toolModalContentAction`, `saveAction` → theme name + code).
+(`toolModalContentAction`, `saveAction` → theme name + code). **Editing a theme opens its
+item list** (the theme's "categories" — see §3.3).
+
+![Themes tool — list of themes](./images/meliscmsprospects-tool-themes-list.png)
+*Caption: the Themes tool — the list of themes (name, code) with Add / Edit / Delete.*
+
+![New-theme modal](./images/meliscmsprospects-tool-themes-new-modal.png)
+*Caption: the new-theme modal — theme name and code.*
 
 ---
 
-### 3.3 Theme Items tool (back-office)
+### 3.3 Theme items (inside a theme)
 
-Manage the **items** of a theme, with **translatable** text per language.
+Each theme holds a list of **items** (the theme's "categories"), with **translatable**
+text per language. The item list is reached by **editing a theme** (§3.2).
 
 - **Controller**: `src/Controller/MelisCmsProspectsThemeItemsController.php`
 - **Views**: `view/melis-cms-prospects/melis-cms-prospects-theme-items/*.phtml`
 
-A list of items for a theme with **Add** (`toolHeaderAddAction`), **Edit** (`editAction`),
-**Delete** (`deleteAction`) and a **code** modal (`toolModalCodeContainerAction`). Items
-are saved via `saveItemAction`; their translations live in
-`melis_cms_prospects_theme_items_trans`.
+Within a theme, the item list offers **Add** (`toolHeaderAddAction`), **Edit**
+(`editAction`), **Delete** (`deleteAction`) and a **code** modal
+(`toolModalCodeContainerAction`). Items are saved via `saveItemAction`; their translations
+live in `melis_cms_prospects_theme_items_trans`.
+
+![Theme item list (when editing a theme)](./images/meliscmsprospects-tool-themes-edit-themecategorylist.png)
+*Caption: editing a theme — its item ("category") list, with Add / Edit / Delete.*
+
+![New theme-item modal](./images/meliscmsprospects-tool-themes-edit-themecategorylist-new-modal.png)
+*Caption: the new theme-item modal — the item's per-language text.*
+
+![Edit theme-item modal](./images/meliscmsprospects-tool-themes-edit-themecategorylist-edit-modal.png)
+*Caption: the edit theme-item modal — updating an existing item's per-language text.*
 
 ---
 
@@ -231,20 +248,20 @@ Standard plugin lifecycle: `front()`, `createOptionsForms()` / `getFormData()`,
 
 Plugin selector thumbnail: `public/plugins/images/MelisCmsProspectsShowFormPlugin_thumb.jpg`.
 
-![Show Form plugin in the page editor's plugin selector](./images/prospects-page-menu-plugins-selector.png)
+![Show Form plugin in the page editor's plugin selector](./images/meliscmsprospects-page-menu-plugins-selector.png)
 *Caption: the Melis page editor's plugin selector (MelisMarketing section) showing the Show
 Form plugin thumbnail.*
 
-![Show Form plugin config — Properties tab](./images/prospects-plugin-contactus-config-tab-properties.png)
+![Show Form plugin config — Properties tab](./images/meliscmsprospects-page-plugin-showform-config-tab-properties.png)
 *Caption: Show Form › Properties tab — rendering template and source site.*
 
-![Show Form plugin config — Fields tab](./images/prospects-plugin-contactus-config-tab-fieldlist.png)
+![Show Form plugin config — Fields tab](./images/meliscmsprospects-page-plugins-showform-config-tab-fieldlist.png)
 *Caption: Show Form › Fields tab — the field-builder table: one row per field with a
 Show/Hide switch (Status), a Mandatory checkbox (enabled only when shown), and drag-to-
 reorder rows. This is where the user chooses which fields appear on the contact form, which
 are required, and in what order.*
 
-![Show Form plugin config — Theme tab](./images/prospects-plugin-contactus-config-tab-themes.png)
+![Show Form plugin config — Theme tab](./images/meliscmsprospects-page-plugin-showform-config-tab-themes.png)
 *Caption: Show Form › Theme tab — the theme driving the form's subject options.*
 
 ---
@@ -259,7 +276,7 @@ are required, and in what order.*
   *MelisMarketing*) using Flot charts
   (`public/assets/flotchart/dashboard-line-chart.js`, `dashboard-bar-chart.js`).
 
-![Prospects Statistics dashboard widget](./images/prospects-dashboardplugins-prospectsstatistics.png)
+![Prospects Statistics dashboard widget](./images/meliscmsprospects-dashboard-plugin-prospectsstatistics.png)
 *Caption: the Prospects Statistics dashboard widget — a chart of prospect registrations
 over time.*
 
@@ -456,13 +473,18 @@ each row's caption in the body gives the text-only description of what the image
 
 | Image file | Content |
 |---|---|
-| `prospects-list.png` | Prospects tool — widgets, filters and the prospects list |
-| `prospects-edit-modal.png` | Edit-prospect modal (update form) |
-| `prospects-page-menu-plugins-selector.png` | Show Form plugin in the page editor's plugin selector |
-| `prospects-plugin-contactus-config-tab-properties.png` | Show Form plugin config — Properties tab |
-| `prospects-plugin-contactus-config-tab-fieldlist.png` | Show Form plugin config — Fields tab |
-| `prospects-plugin-contactus-config-tab-themes.png` | Show Form plugin config — Theme tab |
-| `prospects-dashboardplugins-prospectsstatistics.png` | Prospects Statistics dashboard widget |
+| `meliscmsprospects-tool-prospects-list.png` | Prospects tool — widgets, filters and the prospects list |
+| `meliscmsprospects-tool-prospects-edit-modal.png` | Edit-prospect modal (update form) |
+| `meliscmsprospects-tool-themes-list.png` | Themes tool — list of themes |
+| `meliscmsprospects-tool-themes-new-modal.png` | New-theme modal (name + code) |
+| `meliscmsprospects-tool-themes-edit-themecategorylist.png` | Theme item ("category") list, shown when editing a theme |
+| `meliscmsprospects-tool-themes-edit-themecategorylist-new-modal.png` | New theme-item modal (per-language text) |
+| `meliscmsprospects-tool-themes-edit-themecategorylist-edit-modal.png` | Edit theme-item modal (per-language text) |
+| `meliscmsprospects-page-menu-plugins-selector.png` | Show Form plugin in the page editor's plugin selector |
+| `meliscmsprospects-page-plugin-showform-config-tab-properties.png` | Show Form plugin config — Properties tab |
+| `meliscmsprospects-page-plugins-showform-config-tab-fieldlist.png` | Show Form plugin config — Fields tab |
+| `meliscmsprospects-page-plugin-showform-config-tab-themes.png` | Show Form plugin config — Theme tab |
+| `meliscmsprospects-dashboard-plugin-prospectsstatistics.png` | Prospects Statistics dashboard widget |
 
 ---
 
