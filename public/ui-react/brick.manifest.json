@@ -1,0 +1,8 @@
+{
+  "id": "prospects",
+  "route": "/prospects",
+  "label": "Prospects",
+  "forwardKey": "MelisCmsProspects/ToolProspects",
+  "melisKey": "MelisCmsProspects_tool_prospects",
+  "entry": "brick.js"
+}
