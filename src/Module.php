@@ -89,6 +89,9 @@ class Module
             include __DIR__ . '/../config/app.interface.php',
             include __DIR__ . '/../config/app.tools.php',
             include __DIR__ . '/../config/app.microservice.php',
+            // React back-office : API REST + capacités de l'outil Prospects (brique modulaire)
+            include __DIR__ . '/../config/react-api.php',
+            include __DIR__ . '/../config/react.capabilities.php',
             // Tests
             include __DIR__ . '/../config/diagnostic.config.php',
             // Templating plugins

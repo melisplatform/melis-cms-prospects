@@ -4,5 +4,6 @@
   "label": "Prospects",
   "forwardKey": "MelisCmsProspects/ToolProspects",
   "melisKey": "MelisCmsProspects_tool_prospects",
-  "entry": "brick.js"
+  "entry": "brick.js",
+  "subTabs": true
 }
