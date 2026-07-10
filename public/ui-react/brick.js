@@ -9,6 +9,15 @@
 	* importer les modules de l'hôte (`@/lib/...`) — ce client est donc autonome.
 	*/
 	var XHR_HEADER = { "X-Requested-With": "XMLHttpRequest" };
+	var _prospectsListStale = false;
+	function markProspectsListStale() {
+		_prospectsListStale = true;
+	}
+	function consumeProspectsListStale() {
+		const stale = _prospectsListStale;
+		_prospectsListStale = false;
+		return stale;
+	}
 	async function apiFetch(url, opts) {
 		const res = await fetch(url, {
 			...opts,
@@ -655,6 +664,7 @@
 			cols_hidden: "Masquées",
 			drag_here: "Glisser ici",
 			reset: "Réinitialiser",
+			reset_filters: "Réinitialiser les filtres",
 			edit: "Modifier",
 			del: "Supprimer",
 			cancel: "Annuler",
@@ -723,6 +733,7 @@
 			cols_hidden: "Hidden",
 			drag_here: "Drag here",
 			reset: "Reset",
+			reset_filters: "Reset filters",
 			edit: "Edit",
 			del: "Delete",
 			cancel: "Cancel",
@@ -975,6 +986,40 @@
 		strokeLinecap: "round",
 		strokeLinejoin: "round",
 		children: /* @__PURE__ */ (0, react_jsx_runtime.jsx)("path", { d: "m6 9 6 6 6-6" })
+	});
+	var Columns3Icon = () => /* @__PURE__ */ (0, react_jsx_runtime.jsxs)("svg", {
+		style: sIcon,
+		viewBox: "0 0 24 24",
+		fill: "none",
+		stroke: "currentColor",
+		strokeWidth: "2",
+		strokeLinecap: "round",
+		strokeLinejoin: "round",
+		children: [/* @__PURE__ */ (0, react_jsx_runtime.jsx)("rect", {
+			width: "18",
+			height: "18",
+			x: "3",
+			y: "3",
+			rx: "2"
+		}), /* @__PURE__ */ (0, react_jsx_runtime.jsx)("path", { d: "M9 3v18M15 3v18" })]
+	});
+	var RotateCcwIcon = ({ spinning }) => /* @__PURE__ */ (0, react_jsx_runtime.jsxs)("svg", {
+		style: {
+			...sIcon,
+			animation: spinning ? "melis-prospects-spin 0.8s linear infinite" : void 0,
+			transformOrigin: "center"
+		},
+		viewBox: "0 0 24 24",
+		fill: "none",
+		stroke: "currentColor",
+		strokeWidth: "2",
+		strokeLinecap: "round",
+		strokeLinejoin: "round",
+		children: [
+			/* @__PURE__ */ (0, react_jsx_runtime.jsx)("style", { children: "@keyframes melis-prospects-spin { to { transform: rotate(360deg) } }" }),
+			/* @__PURE__ */ (0, react_jsx_runtime.jsx)("path", { d: "M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" }),
+			/* @__PURE__ */ (0, react_jsx_runtime.jsx)("path", { d: "M3 3v5h5" })
+		]
 	});
 	var COL_ORDER = [
 		"id",
@@ -1487,15 +1532,18 @@
 		const { id } = (0, react_router_dom.useParams)();
 		const location = (0, react_router_dom.useLocation)();
 		const base = id ? location.pathname.slice(0, location.pathname.length - id.length - 1) : location.pathname;
-		if (id) return /* @__PURE__ */ (0, react_jsx_runtime.jsx)(ProspectForm, {
+		return /* @__PURE__ */ (0, react_jsx_runtime.jsxs)(react_jsx_runtime.Fragment, { children: [/* @__PURE__ */ (0, react_jsx_runtime.jsx)("div", {
+			style: { display: id ? "none" : "block" },
+			children: /* @__PURE__ */ (0, react_jsx_runtime.jsx)(ProspectList, { base })
+		}), id && /* @__PURE__ */ (0, react_jsx_runtime.jsx)(ProspectForm, {
 			id,
 			base
-		});
-		return /* @__PURE__ */ (0, react_jsx_runtime.jsx)(ProspectList, { base });
+		})] });
 	}
 	function ProspectList({ base }) {
 		const t = useT();
 		const navigate = (0, react_router_dom.useNavigate)();
+		const location = (0, react_router_dom.useLocation)();
 		const [items, setItems] = (0, react.useState)([]);
 		const [stats, setStats] = (0, react.useState)(null);
 		const [sites, setSites] = (0, react.useState)([]);
@@ -1510,11 +1558,15 @@
 		const [sortAsc, setSortAsc] = (0, react.useState)(false);
 		const [toDelete, setToDelete] = (0, react.useState)(null);
 		const [tick, setTick] = (0, react.useState)(0);
+		const [refreshing, setRefreshing] = (0, react.useState)(false);
 		const [cols, setCols] = (0, react.useState)(loadCols);
 		const [showCols, setShowCols] = (0, react.useState)(false);
 		const [showExport, setShowExport] = (0, react.useState)(false);
 		const [mode, setMode] = (0, react.useState)("react");
 		const [frameLoaded, setFrameLoaded] = (0, react.useState)(false);
+		(0, react.useEffect)(() => {
+			if (location.pathname === base && consumeProspectsListStale()) setTick((x) => x + 1);
+		}, [location.pathname, base]);
 		(0, react.useEffect)(() => {
 			fetchProspectStats().then(setStats).catch(() => null);
 		}, [tick]);
@@ -1532,7 +1584,10 @@
 				type,
 				dateFrom,
 				dateTo
-			}).then((r) => setItems(r.items)).catch(() => null).finally(() => setLoading(false));
+			}).then((r) => setItems(r.items)).catch(() => null).finally(() => {
+				setLoading(false);
+				setRefreshing(false);
+			});
 		}, [
 			search,
 			site,
@@ -1542,6 +1597,23 @@
 			tick
 		]);
 		const sorted = (0, react.useMemo)(() => [...items].sort((a, b) => sortAsc ? a.id - b.id : b.id - a.id), [items, sortAsc]);
+		function handleRefresh() {
+			setItems([]);
+			setRefreshing(true);
+			setTick((x) => x + 1);
+		}
+		function resetFilters() {
+			setSearchInput("");
+			setSearch("");
+			setSite(null);
+			setType("");
+			setDateFrom("");
+			setDateTo("");
+			setSortAsc(false);
+			setItems([]);
+			setRefreshing(true);
+			setTick((x) => x + 1);
+		}
 		async function confirmDelete() {
 			if (!toDelete) return;
 			try {
@@ -1610,9 +1682,10 @@
 							}
 						}), /* @__PURE__ */ (0, react_jsx_runtime.jsx)("button", {
 							style: btnGhost,
-							onClick: () => setTick((x) => x + 1),
+							onClick: handleRefresh,
+							disabled: refreshing,
 							title: t("refresh"),
-							children: "↻"
+							children: /* @__PURE__ */ (0, react_jsx_runtime.jsx)(RotateCcwIcon, { spinning: refreshing })
 						})]
 					})]
 				}),
@@ -1632,7 +1705,7 @@
 							border: 0
 						},
 						title: "Prospects — Vue Melis",
-						sandbox: "allow-scripts allow-same-origin allow-forms allow-popups allow-modals"
+						sandbox: "allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox allow-downloads allow-modals"
 					})
 				}),
 				/* @__PURE__ */ (0, react_jsx_runtime.jsx)("div", {
@@ -1737,28 +1810,48 @@
 									}
 								}),
 								/* @__PURE__ */ (0, react_jsx_runtime.jsxs)("div", {
-									style: { position: "relative" },
-									children: [/* @__PURE__ */ (0, react_jsx_runtime.jsxs)("button", {
-										style: {
-											...btnGhost,
-											height: 36
-										},
-										onClick: () => setShowCols((v) => !v),
-										children: [/* @__PURE__ */ (0, react_jsx_runtime.jsx)(GripIcon, {}), t("columns")]
-									}), showCols && /* @__PURE__ */ (0, react_jsx_runtime.jsx)(ColManager, {
-										cols,
-										labelFor: (id) => t(COL_LABEL[id]),
-										onChange: setCols,
-										onClose: () => setShowCols(false)
-									})]
-								}),
-								can("export") && /* @__PURE__ */ (0, react_jsx_runtime.jsxs)("button", {
 									style: {
-										...btnGhost,
-										height: 36
+										display: "flex",
+										alignItems: "center",
+										gap: 8,
+										marginLeft: "auto"
 									},
-									onClick: () => setShowExport(true),
-									children: [/* @__PURE__ */ (0, react_jsx_runtime.jsx)(DownloadIcon, {}), t("export")]
+									children: [
+										/* @__PURE__ */ (0, react_jsx_runtime.jsxs)("button", {
+											style: {
+												...btnGhost,
+												height: 36
+											},
+											onClick: resetFilters,
+											disabled: refreshing,
+											title: t("reset_filters"),
+											children: [/* @__PURE__ */ (0, react_jsx_runtime.jsx)(RotateCcwIcon, { spinning: refreshing }), t("reset_filters")]
+										}),
+										/* @__PURE__ */ (0, react_jsx_runtime.jsxs)("div", {
+											style: { position: "relative" },
+											children: [/* @__PURE__ */ (0, react_jsx_runtime.jsxs)("button", {
+												style: {
+													...btnGhost,
+													height: 36
+												},
+												onClick: () => setShowCols((v) => !v),
+												children: [/* @__PURE__ */ (0, react_jsx_runtime.jsx)(Columns3Icon, {}), t("columns")]
+											}), showCols && /* @__PURE__ */ (0, react_jsx_runtime.jsx)(ColManager, {
+												cols,
+												labelFor: (id) => t(COL_LABEL[id]),
+												onChange: setCols,
+												onClose: () => setShowCols(false)
+											})]
+										}),
+										can("export") && /* @__PURE__ */ (0, react_jsx_runtime.jsxs)("button", {
+											style: {
+												...btnGhost,
+												height: 36
+											},
+											onClick: () => setShowExport(true),
+											children: [/* @__PURE__ */ (0, react_jsx_runtime.jsx)(DownloadIcon, {}), t("export")]
+										})
+									]
 								})
 							]
 						}),
@@ -1967,7 +2060,6 @@
 		const [loading, setLoading] = (0, react.useState)(false);
 		const [saving, setSaving] = (0, react.useState)(false);
 		const [error, setError] = (0, react.useState)(null);
-		const [saved, setSaved] = (0, react.useState)(false);
 		const subTabRegistered = (0, react.useRef)(false);
 		(0, react.useEffect)(() => {
 			if (!can("edit")) navigate(base);
@@ -2026,10 +2118,10 @@
 					country: country.trim(),
 					theme: theme === "" ? null : Number(theme)
 				});
-				setSaved(true);
+				markProspectsListStale();
 				notify("ok", t("title"), t("saved"));
 				window.__melisUpdateSubTabLabel?.(base, path, name.trim());
-				setTimeout(() => setSaved(false), 2e3);
+				setTimeout(() => navigate(base), 600);
 			} catch (e) {
 				setError(e instanceof Error ? e.message : t("err_save"));
 			} finally {
@@ -2090,24 +2182,18 @@
 							},
 							children: item?.name || t("edit_title")
 						})]
-					}), /* @__PURE__ */ (0, react_jsx_runtime.jsxs)("div", {
+					}), /* @__PURE__ */ (0, react_jsx_runtime.jsx)("div", {
 						style: {
 							display: "flex",
 							alignItems: "center",
 							gap: 10
 						},
-						children: [saved && /* @__PURE__ */ (0, react_jsx_runtime.jsx)("span", {
-							style: {
-								fontSize: 14,
-								color: "#059669"
-							},
-							children: t("saved")
-						}), /* @__PURE__ */ (0, react_jsx_runtime.jsx)("button", {
+						children: /* @__PURE__ */ (0, react_jsx_runtime.jsx)("button", {
 							style: btnPrimary,
 							onClick: submit,
 							disabled: saving || loading,
 							children: saving ? "…" : t("save")
-						})]
+						})
 					})]
 				}),
 				error && /* @__PURE__ */ (0, react_jsx_runtime.jsx)("div", {

@@ -9,6 +9,16 @@
 
 const XHR_HEADER = { 'X-Requested-With': 'XMLHttpRequest' } as const
 
+// La liste est montée en permanence (Shell, brique `persistent`) → elle ne se re-monte pas au
+// retour du formulaire. Le formulaire pose ce flag au save ; la liste le consomme au retour.
+let _prospectsListStale = false
+export function markProspectsListStale(): void { _prospectsListStale = true }
+export function consumeProspectsListStale(): boolean {
+  const stale = _prospectsListStale
+  _prospectsListStale = false
+  return stale
+}
+
 export interface ProspectItem {
   id: number
   siteId: number | null

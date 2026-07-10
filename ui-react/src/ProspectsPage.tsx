@@ -2,7 +2,8 @@ import { useEffect, useMemo, useRef, useState, type CSSProperties } from 'react'
 import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import {
   deleteProspect, fetchProspectById, fetchProspects, fetchProspectStats, fetchSites, fetchTypes, fetchThemes,
-  saveProspect, type ProspectItem, type ProspectStats, type SiteOption, type ThemeOption,
+  saveProspect, markProspectsListStale, consumeProspectsListStale,
+  type ProspectItem, type ProspectStats, type SiteOption, type ThemeOption,
 } from './prospects-api'
 import { ExportModal, DownloadIcon } from './ExportModal'
 import { ViewToggle, type ViewMode } from './ViewToggle'
@@ -49,6 +50,7 @@ const DICT: Record<Lang, Record<string, string>> = {
     col_id: 'ID', col_name: 'Nom', col_email: 'Email', col_phone: 'Téléphone', col_site: 'Site',
     col_type: 'Type', col_date: 'Date', col_theme: 'Thème', col_message: 'Message',
     columns: 'Colonnes', export: 'Exporter', cols_visible: 'Visibles', cols_hidden: 'Masquées', drag_here: 'Glisser ici', reset: 'Réinitialiser',
+    reset_filters: 'Réinitialiser les filtres',
     edit: 'Modifier', del: 'Supprimer', cancel: 'Annuler', save: 'Enregistrer', back: 'retour',
     refresh: 'Rafraîchir', loading: 'Chargement…', saved: 'Enregistré ✓',
     del_title: 'Supprimer le prospect', del_confirm: 'Supprimer « {u} » ? Cette action est irréversible.',
@@ -69,6 +71,7 @@ const DICT: Record<Lang, Record<string, string>> = {
     col_id: 'ID', col_name: 'Name', col_email: 'Email', col_phone: 'Phone', col_site: 'Site',
     col_type: 'Type', col_date: 'Date', col_theme: 'Theme', col_message: 'Message',
     columns: 'Columns', export: 'Export', cols_visible: 'Visible', cols_hidden: 'Hidden', drag_here: 'Drag here', reset: 'Reset',
+    reset_filters: 'Reset filters',
     edit: 'Edit', del: 'Delete', cancel: 'Cancel', save: 'Save', back: 'back',
     refresh: 'Refresh', loading: 'Loading…', saved: 'Saved ✓',
     del_title: 'Delete prospect', del_confirm: 'Delete “{u}”? This action is irreversible.',
@@ -112,6 +115,14 @@ const GripIcon = () => <svg style={{ width: 13, height: 13, flexShrink: 0, color
 const UserIcon = () => <svg style={{ width: 20, height: 20 }} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" /></svg>
 const CalendarIcon = () => <svg style={sIcon} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" /><path d="M16 2v4M8 2v4M3 10h18" /></svg>
 const ChevronDownIcon = () => <svg style={{ width: 12, height: 12, flexShrink: 0 }} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="m6 9 6 6 6-6" /></svg>
+const Columns3Icon = () => <svg style={sIcon} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="18" height="18" x="3" y="3" rx="2" /><path d="M9 3v18M15 3v18" /></svg>
+const RotateCcwIcon = ({ spinning }: { spinning?: boolean }) => (
+  <svg style={{ ...sIcon, animation: spinning ? 'melis-prospects-spin 0.8s linear infinite' : undefined, transformOrigin: 'center' }}
+    viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <style>{'@keyframes melis-prospects-spin { to { transform: rotate(360deg) } }'}</style>
+    <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" /><path d="M3 3v5h5" />
+  </svg>
+)
 
 // ── Colonnes (masquer + réordonner par glisser-déposer, persisté) ──
 type ColDef = { id: string; visible: boolean }
@@ -300,14 +311,23 @@ export default function ProspectsPage() {
   // base = route de la liste (pathname sans le segment /:id éventuel)
   const base = id ? location.pathname.slice(0, location.pathname.length - id.length - 1) : location.pathname
 
-  if (id) return <ProspectForm id={id} base={base} />
-  return <ProspectList base={base} />
+  // La liste reste montée en permanence (cachée en CSS quand le formulaire est ouvert) — comme les
+  // modules natifs persistants (ex. Languages) : évite de la démonter/refetch à chaque aller-retour.
+  return (
+    <>
+      <div style={{ display: id ? 'none' : 'block' }}>
+        <ProspectList base={base} />
+      </div>
+      {id && <ProspectForm id={id} base={base} />}
+    </>
+  )
 }
 
 // ── Liste ───────────────────────────────────────────────────────────────────
 function ProspectList({ base }: { base: string }) {
   const t = useT()
   const navigate = useNavigate()
+  const location = useLocation()
   const [items, setItems] = useState<ProspectItem[]>([])
   const [stats, setStats] = useState<ProspectStats | null>(null)
   const [sites, setSites] = useState<SiteOption[]>([])
@@ -322,11 +342,16 @@ function ProspectList({ base }: { base: string }) {
   const [sortAsc, setSortAsc] = useState(false)
   const [toDelete, setToDelete] = useState<ProspectItem | null>(null)
   const [tick, setTick] = useState(0)
+  const [refreshing, setRefreshing] = useState(false)
   const [cols, setCols] = useState<ColDef[]>(loadCols)
   const [showCols, setShowCols] = useState(false)
   const [showExport, setShowExport] = useState(false)
   const [mode, setMode] = useState<ViewMode>('react')
   const [frameLoaded, setFrameLoaded] = useState(false)
+
+  useEffect(() => {
+    if (location.pathname === base && consumeProspectsListStale()) setTick((x) => x + 1)
+  }, [location.pathname, base])
 
   useEffect(() => { fetchProspectStats().then(setStats).catch(() => null) }, [tick])
   useEffect(() => { fetchSites().then(setSites).catch(() => null) }, [])
@@ -334,10 +359,19 @@ function ProspectList({ base }: { base: string }) {
   useEffect(() => {
     setLoading(true)
     fetchProspects({ search, site, type, dateFrom, dateTo })
-      .then((r) => setItems(r.items)).catch(() => null).finally(() => setLoading(false))
+      .then((r) => setItems(r.items)).catch(() => null).finally(() => { setLoading(false); setRefreshing(false) })
   }, [search, site, type, dateFrom, dateTo, tick])
 
   const sorted = useMemo(() => [...items].sort((a, b) => sortAsc ? a.id - b.id : b.id - a.id), [items, sortAsc])
+
+  function handleRefresh() {
+    setItems([]); setRefreshing(true); setTick((x) => x + 1)
+  }
+
+  function resetFilters() {
+    setSearchInput(''); setSearch(''); setSite(null); setType(''); setDateFrom(''); setDateTo(''); setSortAsc(false)
+    setItems([]); setRefreshing(true); setTick((x) => x + 1)
+  }
 
   async function confirmDelete() {
     if (!toDelete) return
@@ -363,7 +397,7 @@ function ProspectList({ base }: { base: string }) {
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           <ViewToggle mode={mode} onChange={(m) => { setMode(m); if (m === 'iframe') setFrameLoaded(true) }} />
-          <button style={btnGhost} onClick={() => setTick((x) => x + 1)} title={t('refresh')}>↻</button>
+          <button style={btnGhost} onClick={handleRefresh} disabled={refreshing} title={t('refresh')}><RotateCcwIcon spinning={refreshing} /></button>
         </div>
       </div>
 
@@ -372,7 +406,7 @@ function ProspectList({ base }: { base: string }) {
         <div style={{ ...card, display: mode === 'iframe' ? 'flex' : 'none', flex: 1, minHeight: 480, overflow: 'hidden' }}>
           <iframe src={`/melis/react-tool-page?key=${encodeURIComponent(MELIS_KEY)}`}
             style={{ flex: 1, width: '100%', border: 0 }} title="Prospects — Vue Melis"
-            sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-modals" />
+            sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox allow-downloads allow-modals" />
         </div>
       )}
 
@@ -404,11 +438,16 @@ function ProspectList({ base }: { base: string }) {
           {types.map((tp) => <option key={tp} value={tp}>{tp}</option>)}
         </select>
         <DateRangeFilter from={dateFrom} to={dateTo} onChange={(f, tt) => { setDateFrom(f); setDateTo(tt) }} />
-        <div style={{ position: 'relative' }}>
-          <button style={{ ...btnGhost, height: 36 }} onClick={() => setShowCols((v) => !v)}><GripIcon />{t('columns')}</button>
-          {showCols && <ColManager cols={cols} labelFor={(id) => t(COL_LABEL[id])} onChange={setCols} onClose={() => setShowCols(false)} />}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginLeft: 'auto' }}>
+          <button style={{ ...btnGhost, height: 36 }} onClick={resetFilters} disabled={refreshing} title={t('reset_filters')}>
+            <RotateCcwIcon spinning={refreshing} />{t('reset_filters')}
+          </button>
+          <div style={{ position: 'relative' }}>
+            <button style={{ ...btnGhost, height: 36 }} onClick={() => setShowCols((v) => !v)}><Columns3Icon />{t('columns')}</button>
+            {showCols && <ColManager cols={cols} labelFor={(id) => t(COL_LABEL[id])} onChange={setCols} onClose={() => setShowCols(false)} />}
+          </div>
+          {can('export') && <button style={{ ...btnGhost, height: 36 }} onClick={() => setShowExport(true)}><DownloadIcon />{t('export')}</button>}
         </div>
-        {can('export') && <button style={{ ...btnGhost, height: 36 }} onClick={() => setShowExport(true)}><DownloadIcon />{t('export')}</button>}
       </div>
 
       {/* Table */}
@@ -526,7 +565,6 @@ function ProspectForm({ id, base }: { id: string; base: string }) {
   const [loading, setLoading] = useState(false)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [saved, setSaved] = useState(false)
   const subTabRegistered = useRef(false)
 
   useEffect(() => { if (!can('edit')) navigate(base) }, [base, navigate])
@@ -568,10 +606,10 @@ function ProspectForm({ id, base }: { id: string; base: string }) {
         message: message.trim(), company: company.trim(), country: country.trim(),
         theme: theme === '' ? null : Number(theme),
       })
-      setSaved(true)
+      markProspectsListStale()
       notify('ok', t('title'), t('saved'))
       window.__melisUpdateSubTabLabel?.(base, path, name.trim())
-      setTimeout(() => setSaved(false), 2000)
+      setTimeout(() => navigate(base), 600)
     } catch (e) {
       setError(e instanceof Error ? e.message : t('err_save'))
     } finally { setSaving(false) }
@@ -591,7 +629,6 @@ function ProspectForm({ id, base }: { id: string; base: string }) {
           <h1 style={{ fontSize: 20, fontWeight: 700, margin: 0 }}>{item?.name || t('edit_title')}</h1>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-          {saved && <span style={{ fontSize: 14, color: '#059669' }}>{t('saved')}</span>}
           <button style={btnPrimary} onClick={submit} disabled={saving || loading}>{saving ? '…' : t('save')}</button>
         </div>
       </div>
