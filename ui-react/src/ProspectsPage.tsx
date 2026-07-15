@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState, type CSSProperties } from 'react'
+import { useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type RefObject } from 'react'
 import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import {
   deleteProspect, fetchProspectById, fetchProspects, fetchProspectStats, fetchSites, fetchTypes, fetchThemes,
@@ -144,17 +144,33 @@ function loadCols(): ColDef[] {
 function saveCols(c: ColDef[]) { try { localStorage.setItem(COL_KEY, JSON.stringify(c)) } catch { /* */ } }
 const visibleCols = (c: ColDef[]) => c.filter((x) => x.visible)
 
-const panelCss: CSSProperties = { display: 'flex', flexDirection: 'column', gap: 2, minHeight: 130, borderRadius: 8, border: '1px dashed var(--color-border)', padding: 6 }
+const panelCss: CSSProperties = { display: 'flex', flexDirection: 'column', gap: 2, minHeight: 130, maxHeight: 'min(48vh, 320px)', overflowY: 'auto', minWidth: 0, borderRadius: 8, border: '1px dashed var(--color-border)', padding: 6 }
 const panelTitle: CSSProperties = { padding: '0 6px 4px', fontSize: 10, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '.06em', color: 'var(--color-muted-foreground)' }
 
-function ColManager({ cols, labelFor, onChange, onClose }: {
-  cols: ColDef[]; labelFor: (id: string) => string; onChange: (c: ColDef[]) => void; onClose: () => void
+function ColManager({ anchorRef, cols, labelFor, onChange, onClose }: {
+  anchorRef: RefObject<HTMLElement | null>; cols: ColDef[]; labelFor: (id: string) => string; onChange: (c: ColDef[]) => void; onClose: () => void
 }) {
   const t = useT()
   const [dragId, setDragId] = useState<string | null>(null)
   const [over, setOver] = useState<{ id: string; panel: 'visible' | 'hidden' } | null>(null)
+  const [pos, setPos] = useState<{ top?: number; bottom?: number; right: number; maxHeight: number } | null>(null)
   const shown = cols.filter((c) => c.visible)
   const hidden = cols.filter((c) => !c.visible)
+
+  useLayoutEffect(() => {
+    const anchor = anchorRef.current
+    if (!anchor) return
+    const rect = anchor.getBoundingClientRect()
+    const margin = 8
+    const spaceBelow = window.innerHeight - rect.bottom - margin
+    const spaceAbove = rect.top - margin
+    const right = Math.max(margin, window.innerWidth - rect.right)
+    if (spaceBelow >= 200 || spaceBelow >= spaceAbove) {
+      setPos({ top: rect.bottom + 6, right, maxHeight: Math.max(160, spaceBelow - 6) })
+    } else {
+      setPos({ bottom: window.innerHeight - rect.top + 6, right, maxHeight: Math.max(160, spaceAbove - 6) })
+    }
+  }, [anchorRef])
 
   function drop(panel: 'visible' | 'hidden') {
     if (!dragId) return
@@ -190,8 +206,13 @@ function ColManager({ cols, labelFor, onChange, onClose }: {
     )
   }
 
+  if (!pos) return null
   return (
-    <div style={{ ...card, position: 'absolute', right: 0, top: '100%', marginTop: 6, zIndex: 50, width: 380, maxWidth: 'calc(100vw - 1rem)' }}>
+    <div style={{
+      ...card, position: 'fixed', right: pos.right, zIndex: 50, width: 380, maxWidth: 'calc(100vw - 1rem)',
+      maxHeight: pos.maxHeight, overflowY: 'auto', display: 'flex', flexDirection: 'column',
+      ...(pos.top != null ? { top: pos.top } : { bottom: pos.bottom }),
+    }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 12px', borderBottom: '1px solid var(--color-border)' }}>
         <span style={{ fontSize: 14, fontWeight: 600 }}>{t('columns')}</span>
         <button style={{ ...iconBtn, width: 22, height: 22 }} onClick={onClose}>✕</button>
@@ -344,6 +365,7 @@ function ProspectList({ base }: { base: string }) {
   const [tick, setTick] = useState(0)
   const [refreshing, setRefreshing] = useState(false)
   const [cols, setCols] = useState<ColDef[]>(loadCols)
+  const colsAnchorRef = useRef<HTMLDivElement>(null)
   const [showCols, setShowCols] = useState(false)
   const [showExport, setShowExport] = useState(false)
   const [mode, setMode] = useState<ViewMode>('react')
@@ -442,9 +464,9 @@ function ProspectList({ base }: { base: string }) {
           <button style={{ ...btnGhost, height: 36 }} onClick={resetFilters} disabled={refreshing} title={t('reset_filters')}>
             <RotateCcwIcon spinning={refreshing} />{t('reset_filters')}
           </button>
-          <div style={{ position: 'relative' }}>
+          <div ref={colsAnchorRef} style={{ position: 'relative' }}>
             <button style={{ ...btnGhost, height: 36 }} onClick={() => setShowCols((v) => !v)}><Columns3Icon />{t('columns')}</button>
-            {showCols && <ColManager cols={cols} labelFor={(id) => t(COL_LABEL[id])} onChange={setCols} onClose={() => setShowCols(false)} />}
+            {showCols && <ColManager anchorRef={colsAnchorRef} cols={cols} labelFor={(id) => t(COL_LABEL[id])} onChange={setCols} onClose={() => setShowCols(false)} />}
           </div>
           {can('export') && <button style={{ ...btnGhost, height: 36 }} onClick={() => setShowExport(true)}><DownloadIcon />{t('export')}</button>}
         </div>
