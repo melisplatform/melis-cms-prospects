@@ -336,7 +336,10 @@ export default function ProspectsPage() {
   // modules natifs persistants (ex. Languages) : évite de la démonter/refetch à chaque aller-retour.
   return (
     <>
-      <div style={{ display: id ? 'none' : 'block' }}>
+      {/* height:100% : propage la hauteur bornée de l'hôte (BrickHost `h-full`) jusqu'à la liste,
+          sinon ce wrapper (hauteur auto) casse la chaîne de `height:100%` et l'iframe de la vue
+          « Old » reste coincée à son minHeight (contenu coupé, pas de scroll). */}
+      <div style={{ display: id ? 'none' : 'block', height: '100%' }}>
         <ProspectList base={base} />
       </div>
       {id && <ProspectForm id={id} base={base} />}

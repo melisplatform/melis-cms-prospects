@@ -1563,7 +1563,10 @@
 		const location = (0, react_router_dom.useLocation)();
 		const base = id ? location.pathname.slice(0, location.pathname.length - id.length - 1) : location.pathname;
 		return /* @__PURE__ */ (0, react_jsx_runtime.jsxs)(react_jsx_runtime.Fragment, { children: [/* @__PURE__ */ (0, react_jsx_runtime.jsx)("div", {
-			style: { display: id ? "none" : "block" },
+			style: {
+				display: id ? "none" : "block",
+				height: "100%"
+			},
 			children: /* @__PURE__ */ (0, react_jsx_runtime.jsx)(ProspectList, { base })
 		}), id && /* @__PURE__ */ (0, react_jsx_runtime.jsx)(ProspectForm, {
 			id,
