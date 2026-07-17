@@ -340,6 +340,12 @@ class MelisReactApiProspectController extends MelisAbstractActionController
                 [$siteId, $name, $email, $telephone, $message, $company ?: null, $country ?: null, $theme, $id]
             );
 
+            $this->getEventManager()->trigger('meliscmsprospects_toolprospects_save_end', $this, [
+                'success' => true, 'textTitle' => 'tr_melistoolprospects_tool_prospects',
+                'textMessage' => 'tr_prospect_manager_fm_update_data_content',
+                'typeCode' => 'CMS_PROSPECTS_UPDATE', 'itemId' => $id,
+            ]);
+
             return $this->jsonResponse(['success' => true, 'data' => ['id' => $id]]);
         } catch (\Throwable $e) {
             return $this->errorResponse($e);
@@ -364,6 +370,13 @@ class MelisReactApiProspectController extends MelisAbstractActionController
                 return $this->jsonResponse(['success' => false, 'error' => 'Not found'], 404);
             }
             $db->query('DELETE FROM melis_cms_prospects WHERE pros_id = ?', [$id]);
+
+            $this->getEventManager()->trigger('meliscmsprospects_toolprospects_delete_end', $this, [
+                'success' => true, 'textTitle' => 'tr_melistoolprospects_tool_prospects',
+                'textMessage' => 'tr_prospect_manager_fm_delete_data_content',
+                'typeCode' => 'CMS_PROSPECTS_DELETE', 'itemId' => $id,
+            ]);
+
             return $this->jsonResponse(['success' => true, 'data' => null]);
         } catch (\Throwable $e) {
             return $this->errorResponse($e);
