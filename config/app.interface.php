@@ -15,18 +15,52 @@ return [
                                         'name' => 'tr_melistoolprospects_tool_prospects',
                                         'icon' => 'fa-user-plus',
                                         'rights_checkbox_disable' => true,
+                                        // Wrapper melisKey = its own array key. The legacy nav gates this
+                                        // node with canAccess(ARRAY KEY) (TreeToolsController:73) and the
+                                        // allow-set holds melisKeys only, so a wrapper without one is never
+                                        // in it → the whole Prospects subtree was dropped for a NON-admin.
+                                        // With it, isAccessible infers the wrapper via configIsParentOf as a
+                                        // SEGMENT of a granted tool's path — which only works because the
+                                        // rights-bearing children below now live on THIS left-menu path.
+                                        'melisKey' => 'melisprospects_tools_section',
                                     ],
                                     'interface' => [
-                                        'MelisCmsProspects_tool_prospects' => [
+                                        // Rights-bearing nodes, shaped like MelisCmsSlider / MelisCmsNews /
+                                        // MelisCmsCategory2 / MelisCmsSiteRobot.
+                                        //
+                                        // These used to carry ONLY the `conf.type` link, so the keys they
+                                        // resolved to (MelisCmsProspects_tool_prospects / _tool_themes) were
+                                        // declared on the targets, in the `MelisCmsProspects` plugin root.
+                                        // configIsParentOf matches a wrapper against SEGMENTS OF THE GRANTED
+                                        // TOOL'S CONFIG PATH, and those target paths
+                                        // (/MelisCmsProspects/interface/MelisCmsProspects_toolstree/…) never
+                                        // run through `melisprospects_tools_section` → wrapper denied →
+                                        // Prospects invisible in the legacy menu even when granted, while
+                                        // React (which gates on the leaf) showed it. Admin bypass hides this.
+                                        //
+                                        // Declaring melisKeys HERE puts the rights keys back on the left-menu
+                                        // path. Array keys match their melisKeys so getSectionParent resolves
+                                        // them (else a legacy save files the grant under <noparent>).
+                                        // The `conf.type` links still pull in the targets' forwards, and the
+                                        // targets keep their own melisKeys as the renderable ZONE keys.
+                                        'melisprospects_tool_prospects_section' => [
                                             'conf' => [
+                                                'id' => 'id_melisprospects_tool_prospects_section',
+                                                'name' => 'tr_melistoolprospects_tool_prospects',
+                                                'icon' => 'fa-user-plus',
+                                                'rights_checkbox_disable' => false,
+                                                'melisKey' => 'melisprospects_tool_prospects_section',
                                                 'type' => '/MelisCmsProspects/interface/MelisCmsProspects_toolstree/interface/MelisCmsProspects_tool_conf',
                                             ],
                                         ],
-                                        'MelisCmsProspects_tool_prospects_themes' => [
+                                        'melisprospects_tool_themes_section' => [
                                             'conf' => [
+                                                'id' => 'id_melisprospects_tool_themes_section',
+                                                'rights_checkbox_disable' => false,
+                                                'melisKey' => 'melisprospects_tool_themes_section',
                                                 'type' => '/MelisCmsProspects/interface/MelisCmsProspects_toolstree/interface/MelisCmsProspectsThemes_tool_conf',
                                             ],
-                                        ], 
+                                        ],
         			    			],
 								],
         			    	],

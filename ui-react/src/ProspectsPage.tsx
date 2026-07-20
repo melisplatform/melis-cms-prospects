@@ -9,7 +9,13 @@ import { ExportModal, DownloadIcon } from './ExportModal'
 import { ViewToggle, type ViewMode } from './ViewToggle'
 
 // Outil Prospects legacy (vue « Old » en iframe). Voir brick.manifest.json (prospects).
+// Renderable ZONE key — the `conf.type` target's melisKey. Rights do NOT hang on this.
 const MELIS_KEY = 'MelisCmsProspects_tool_prospects'
+
+// Capability key — must match config/react.capabilities.php, i.e. the melisKey of the
+// rights-bearing menu node. Distinct from the zone key above: using MELIS_KEY here would look up
+// capabilities that are declared under a different key and silently default-allow everything.
+const CAPS_KEY = 'melisprospects_tool_prospects_section'
 
 declare global {
   interface Window {
@@ -23,7 +29,7 @@ declare global {
 // Capacités (droits avancés) : la brique ne peut PAS importer le hook hôte → lit le global window.MelisCan.
 // Default-allow (true) tant que non chargé / pour un admin ; l'API reste gardée côté serveur (403).
 function can(cap: string): boolean {
-  return window.MelisCan?.(MELIS_KEY, cap) ?? true
+  return window.MelisCan?.(CAPS_KEY, cap) ?? true
 }
 
 /* ──────────────────────────────────────────────────────────────────────────

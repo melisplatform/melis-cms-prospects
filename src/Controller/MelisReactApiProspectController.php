@@ -36,8 +36,13 @@ class MelisReactApiProspectController extends MelisAbstractActionController
 {
     use CapabilityGuardTrait;
 
-    /** melisKey de l'outil — utilisé par le garde de droits (cf. denyUnlessAccess). */
-    private const MELIS_KEY = 'MelisCmsProspects_tool_prospects';
+    /** melisKey of the RIGHTS-BEARING menu node — the access guard AND the capability key.
+     *  MUST stay in sync with config/react.capabilities.php: denyUnlessCan() resolves capabilities
+     *  through this constant, so a mismatch makes every server-side capability check silently
+     *  default-allow. NOT `MelisCmsProspects_tool_prospects` — that is the `conf.type` target, kept
+     *  as the renderable ZONE key (iframe); it is not granted on its own, so guarding on it would
+     *  403 every request. */
+    private const MELIS_KEY = 'melisprospects_tool_prospects_section';
 
     // ─── GET /prospects ────────────────────────────────────────────────────────
 

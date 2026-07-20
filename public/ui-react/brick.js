@@ -633,8 +633,9 @@
 	//#endregion
 	//#region src/ProspectsPage.tsx
 	var MELIS_KEY = "MelisCmsProspects_tool_prospects";
+	var CAPS_KEY = "melisprospects_tool_prospects_section";
 	function can(cap) {
-		return window.MelisCan?.(MELIS_KEY, cap) ?? true;
+		return window.MelisCan?.(CAPS_KEY, cap) ?? true;
 	}
 	function currentLang() {
 		return (document.documentElement.lang || "en").toLowerCase().startsWith("fr") ? "fr" : "en";
