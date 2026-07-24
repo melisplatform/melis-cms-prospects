@@ -58,7 +58,15 @@ return [
                                                 'id' => 'id_melisprospects_tool_themes_section',
                                                 'rights_checkbox_disable' => false,
                                                 'melisKey' => 'melisprospects_tool_themes_section',
-                                                'type' => '/MelisCmsProspects/interface/MelisCmsProspects_toolstree/interface/MelisCmsProspectsThemes_tool_conf',
+                                                // Pointe DIRECTEMENT sur l'outil (…/MelisCmsProspects_tool_themes),
+                                                // pas sur le conteneur (…Themes_tool_conf) qui enveloppe 2 outils
+                                                // (Themes + Theme Items). Comme le frère "Prospect" (→ …_tool_conf =
+                                                // un outil), ce nœud se résout alors en UN SEUL outil : forward
+                                                // adopté, sa propre melisKey (rights key) conservée. Corrige le
+                                                // doublon "Themes > Themes" dans les droits React ET la divergence
+                                                // de coche (React cochait la zone-key MelisCmsProspects_tool_themes,
+                                                // le legacy la rights-key melisprospects_tool_themes_section).
+                                                'type' => '/MelisCmsProspects/interface/MelisCmsProspects_toolstree/interface/MelisCmsProspectsThemes_tool_conf/interface/MelisCmsProspects_tool_themes',
                                             ],
                                         ],
         			    			],
@@ -278,6 +286,14 @@ return [
                                         'id' => 'id_MelisCmsProspects_tool_themes',
                                         'name' => 'tr_melis_cms_prospects_theme',
                                         'melisKey' => 'MelisCmsProspects_tool_themes',
+                                        // Icône requise pour rendre l'outil navigable : buildLevel3 (menu
+                                        // React) et TreeToolsController (menu legacy) n'affichent un
+                                        // sous-outil imbriqué que s'il porte une icône. Sans elle, "Themes"
+                                        // (melisprospects_tool_themes_section, résolu via conf.type vers
+                                        // ce nœud) était élagué du menu → et donc de l'arbre des droits
+                                        // React (qui EST le menu). Le frère "Prospect" en a une, d'où
+                                        // l'asymétrie. Ajoutée pour l'exposer dans le menu ET les droits.
+                                        'icon' => 'fa-paint-brush',
                                     ],
                                     'forward' => [
                                         'module' => 'MelisCmsProspects',

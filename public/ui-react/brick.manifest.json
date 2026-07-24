@@ -1,10 +1,24 @@
 {
-  "id": "prospects",
-  "route": "/prospects",
-  "label": "Prospects",
-  "forwardKey": "MelisCmsProspects/ToolProspects",
-  "melisKey": "MelisCmsProspects_tool_prospects",
-  "entry": "brick.js",
-  "subTabs": true,
-  "persistent": true
+  "bricks": [
+    {
+      "id": "prospects",
+      "route": "/prospects",
+      "label": "Prospects",
+      "forwardKey": "MelisCmsProspects/ToolProspects",
+      "melisKey": "MelisCmsProspects_tool_prospects",
+      "entry": "brick.js",
+      "subTabs": true,
+      "persistent": true
+    },
+    {
+      "id": "prospect-themes",
+      "route": "/prospect-themes",
+      "label": "Themes",
+      "forwardKey": "MelisCmsProspects/ProspectThemes",
+      "melisKey": "MelisCmsProspects_tool_themes",
+      "entry": "brick.js",
+      "subTabs": true,
+      "persistent": true
+    }
+  ]
 }
