@@ -38,7 +38,19 @@ export interface ProspectItem {
 export interface ProspectStats { total: number; thisMonth: number; avgPerMonth: number; anonymized: number }
 export interface SiteOption { id: number; name: string }
 export interface ThemeOption { id: number; name: string; themeName: string }
-export interface ProspectListResult { items: ProspectItem[]; total: number; page: number; limit: number }
+export interface ProspectListResult { items: ProspectItem[]; total: number; nextCursor: string | null }
+export type ProspectSortKey = 'id' | 'site' | 'name' | 'email' | 'type' | 'phone' | 'date' | 'theme'
+export interface ProspectListParams {
+  limit?: number
+  search?: string
+  site?: number | null
+  type?: string
+  dateFrom?: string
+  dateTo?: string
+  sort?: ProspectSortKey
+  dir?: 'asc' | 'desc'
+  after?: string | null
+}
 export interface ProspectSavePayload {
   id: number
   siteId: number | null
@@ -70,14 +82,17 @@ async function apiFetch<T>(url: string, opts?: RequestInit): Promise<T> {
   return data.data as T
 }
 
-export async function fetchProspects(params: { search?: string; site?: number | null; type?: string; dateFrom?: string; dateTo?: string } = {}): Promise<ProspectListResult> {
+export async function fetchProspects(params: ProspectListParams = {}): Promise<ProspectListResult> {
   const qs = new URLSearchParams()
-  qs.set('limit', '9999')
+  if (params.limit) qs.set('limit', String(params.limit))
   if (params.search) qs.set('search', params.search)
   if (params.site) qs.set('site', String(params.site))
   if (params.type) qs.set('type', params.type)
   if (params.dateFrom) qs.set('dateFrom', params.dateFrom)
   if (params.dateTo) qs.set('dateTo', params.dateTo)
+  if (params.sort) qs.set('sort', params.sort)
+  if (params.dir) qs.set('dir', params.dir)
+  if (params.after) qs.set('after', params.after)
   return apiFetch<ProspectListResult>(`/melis/react-api/prospects?${qs}`)
 }
 

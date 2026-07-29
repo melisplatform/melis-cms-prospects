@@ -1,11 +1,12 @@
-import { useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type RefObject } from 'react'
+import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties, type RefObject } from 'react'
 import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import {
   deleteTheme, fetchThemeById, fetchThemes, fetchThemeStats, saveTheme,
   markThemesListStale, consumeThemesListStale,
   fetchThemeItems, fetchThemeItemById, fetchCmsLanguages, saveThemeItem, deleteThemeItem,
-  type ThemeItem, type ThemeStats, type ThemeItemRow, type CmsLang,
+  type ThemeItem, type ThemeStats, type ThemeItemRow, type CmsLang, type ThemeSortKey,
 } from './prospect-themes-api'
+import { useKeysetList } from './use-keyset-list'
 import { ExportModal, DownloadIcon } from './ExportModal'
 import { ViewToggle, type ViewMode } from './ViewToggle'
 
@@ -153,6 +154,18 @@ const RotateCcwIcon = ({ spinning }: { spinning?: boolean }) => (
   </svg>
 )
 
+// Icône de tri (neutre quand la colonne n'est pas la colonne active).
+function SortIcon({ dir }: { dir: 'asc' | 'desc' | null }) {
+  const p = { width: 12, height: 12, viewBox: '0 0 24 24', fill: 'none' as const, stroke: 'currentColor', strokeWidth: 2, strokeLinecap: 'round' as const, strokeLinejoin: 'round' as const, style: { flexShrink: 0, opacity: dir ? 1 : 0.3 } }
+  if (dir === 'asc') return <svg {...p}><path d="m5 12 7-7 7 7" /><path d="M12 19V5" /></svg>
+  if (dir === 'desc') return <svg {...p}><path d="M12 5v14" /><path d="m19 12-7 7-7-7" /></svg>
+  return <svg {...p}><path d="m21 16-4 4-4-4" /><path d="M17 20V4" /><path d="m3 8 4-4 4 4" /><path d="M7 4v16" /></svg>
+}
+const Spinner = () => <svg style={{ width: 14, height: 14, animation: 'melis-themes-spin 0.8s linear infinite' }} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><style>{'@keyframes melis-themes-spin { to { transform: rotate(360deg) } }'}</style><path d="M21 12a9 9 0 1 1-6.219-8.56" /></svg>
+
+// Colonnes triables (toutes). Doit matcher le sortMap backend.
+const SORTABLE = new Set<ThemeSortKey>(['id', 'name', 'items'])
+
 // ── Colonnes (masquer + réordonner par glisser-déposer, persisté) ──
 type ColDef = { id: string; visible: boolean }
 const COL_ORDER = ['id', 'name', 'items'] as const
@@ -299,15 +312,12 @@ function ThemeList({ base }: { base: string }) {
   const t = useT()
   const navigate = useNavigate()
   const location = useLocation()
-  const [items, setItems] = useState<ThemeItem[]>([])
   const [stats, setStats] = useState<ThemeStats | null>(null)
-  const [loading, setLoading] = useState(false)
   const [searchInput, setSearchInput] = useState('')
   const [search, setSearch] = useState('')
-  const [sortAsc, setSortAsc] = useState(false)
   const [toDelete, setToDelete] = useState<ThemeItem | null>(null)
   const [editingTheme, setEditingTheme] = useState<ThemeItem | 'new' | null>(null)
-  const [tick, setTick] = useState(0)
+  const [refreshKey, setRefreshKey] = useState(0)
   const [refreshing, setRefreshing] = useState(false)
   const [cols, setCols] = useState<ColDef[]>(loadCols)
   const colsAnchorRef = useRef<HTMLDivElement>(null)
@@ -316,28 +326,32 @@ function ThemeList({ base }: { base: string }) {
   const [mode, setMode] = useState<ViewMode>('react')
   const [frameLoaded, setFrameLoaded] = useState(false)
 
+  const {
+    items, total, loading, hasMore, sentinelRef, sortCol, sortDir, toggleSort, reload, removeLocal,
+  } = useKeysetList<ThemeItem>({
+    fetcher: (a) => fetchThemes({ ...a, sort: a.sort as ThemeSortKey, search }),
+    deps: [search, refreshKey],
+    defaultSort: 'id',
+    defaultDir: 'desc',
+  })
+
+  useEffect(() => { if (!loading) setRefreshing(false) }, [loading])
+
   // Publier la vue courante à l'hôte : en vue React, la ToolTabBar masque les onglets legacy
   // que l'iframe « Old » (restée montée en display:none) continue de publier → plus d'onglet
   // fantôme non-cliquable après un retour en « New ».
   useEffect(() => { window.__melisSetToolView?.(MELIS_KEY, mode) }, [mode])
 
   useEffect(() => {
-    if (location.pathname === base && consumeThemesListStale()) setTick((x) => x + 1)
+    if (location.pathname === base && consumeThemesListStale()) setRefreshKey((x) => x + 1)
   }, [location.pathname, base])
 
-  useEffect(() => { fetchThemeStats().then(setStats).catch(() => null) }, [tick])
-  useEffect(() => {
-    setLoading(true)
-    fetchThemes({ search })
-      .then((r) => setItems(r.items)).catch(() => null).finally(() => { setLoading(false); setRefreshing(false) })
-  }, [search, tick])
+  useEffect(() => { fetchThemeStats().then(setStats).catch(() => null) }, [refreshKey])
 
-  const sorted = useMemo(() => [...items].sort((a, b) => sortAsc ? a.id - b.id : b.id - a.id), [items, sortAsc])
-
-  function handleRefresh() { setItems([]); setRefreshing(true); setTick((x) => x + 1) }
+  function handleRefresh() { setRefreshing(true); setRefreshKey((x) => x + 1) }
   function resetFilters() {
-    setSearchInput(''); setSearch(''); setSortAsc(false)
-    setItems([]); setRefreshing(true); setTick((x) => x + 1)
+    setSearchInput(''); setSearch('')
+    setRefreshing(true); setRefreshKey((x) => x + 1)
   }
 
   async function confirmDelete() {
@@ -345,7 +359,8 @@ function ThemeList({ base }: { base: string }) {
     try {
       await deleteTheme(toDelete.id)
       window.__melisCloseSubTab?.(base, `${base}/${toDelete.id}`)
-      setToDelete(null); setTick((x) => x + 1)
+      removeLocal((r) => r.id === toDelete.id)
+      setToDelete(null); reload()
     } catch { setToDelete(null) }
   }
 
@@ -414,19 +429,25 @@ function ThemeList({ base }: { base: string }) {
         <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: 640 }}>
           <thead style={{ background: 'var(--color-muted,rgba(0,0,0,.03))' }}>
             <tr>
-              {visibleCols(cols).map(({ id }) => (
-                <th key={id} style={{ ...th, ...(id === 'id' ? { cursor: 'pointer', width: 70 } : {}), ...(id === 'items' ? { width: 100 } : {}) }}
-                  onClick={id === 'id' ? () => setSortAsc((v) => !v) : undefined}>
-                  {t(COL_LABEL[id])}{id === 'id' ? ` ${sortAsc ? '↑' : '↓'}` : ''}
-                </th>
-              ))}
+              {visibleCols(cols).map(({ id }) => {
+                const sortable = SORTABLE.has(id as ThemeSortKey)
+                return (
+                  <th key={id} style={{ ...th, ...(id === 'id' ? { width: 70 } : {}), ...(id === 'items' ? { width: 100 } : {}), ...(sortable ? { cursor: 'pointer' } : {}) }}
+                    onClick={sortable ? () => toggleSort(id) : undefined}>
+                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+                      {t(COL_LABEL[id])}
+                      {sortable && <SortIcon dir={sortCol === id ? sortDir : null} />}
+                    </span>
+                  </th>
+                )
+              })}
               <th style={{ ...th, width: 120 }} />
             </tr>
           </thead>
           <tbody>
-            {sorted.length === 0 && !loading ? (
+            {items.length === 0 && !loading ? (
               <tr><td style={{ ...td, textAlign: 'center', color: 'var(--color-muted-foreground)', padding: '40px 16px' }} colSpan={visibleCols(cols).length + 1}>{t('empty')}</td></tr>
-            ) : sorted.map((r) => (
+            ) : items.map((r) => (
               <tr key={r.id}>
                 {visibleCols(cols).map(({ id }) => (
                   <td key={id} style={{
@@ -454,9 +475,17 @@ function ThemeList({ base }: { base: string }) {
             ))}
           </tbody>
         </table>
-        <div style={{ padding: '10px 16px', textAlign: 'center', fontSize: 12, color: 'var(--color-muted-foreground)' }}>
-          {loading ? t('loading') : t('count', { n: items.length })}
-        </div>
+        <div ref={sentinelRef} style={{ height: 1 }} />
+        {loading && (
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, padding: '14px 16px', fontSize: 12, color: 'var(--color-muted-foreground)' }}>
+            <Spinner />{t('loading')}
+          </div>
+        )}
+        {!hasMore && items.length > 0 && (
+          <div style={{ padding: '10px 16px', textAlign: 'center', fontSize: 12, color: 'var(--color-muted-foreground)' }}>
+            {t('count', { n: total })}
+          </div>
+        )}
       </div>
       </>)}
       </div>
@@ -466,7 +495,7 @@ function ThemeList({ base }: { base: string }) {
         <ThemeModal
           theme={editingTheme}
           onClose={() => setEditingTheme(null)}
-          onSaved={() => { setEditingTheme(null); setTick((x) => x + 1) }}
+          onSaved={() => { setEditingTheme(null); setRefreshKey((x) => x + 1) }}
         />
       )}
 
@@ -488,11 +517,21 @@ function ThemeList({ base }: { base: string }) {
         <ExportModal<ThemeItem>
           cols={cols}
           labelFor={(id) => t(COL_LABEL[id])}
-          fetchAll={async () => (await fetchThemes({ search })).items}
+          fetchAll={async () => {
+            const all: ThemeItem[] = []
+            let after: string | null = null
+            do {
+              const r: { items: ThemeItem[]; nextCursor: string | null } =
+                await fetchThemes({ search, sort: sortCol as ThemeSortKey, dir: sortDir, limit: 100, after })
+              all.push(...r.items)
+              after = r.nextCursor
+            } while (after)
+            return all
+          }}
           getCell={(r, id) => cellText(r, id)}
           filename="prospect-themes"
           sheetName={t('title')}
-          total={items.length}
+          total={total}
           onClose={() => setShowExport(false)}
         />
       )}

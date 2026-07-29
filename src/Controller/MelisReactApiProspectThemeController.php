@@ -3,6 +3,7 @@
 namespace MelisCmsProspects\Controller;
 
 use MelisReactApi\Controller\CapabilityGuardTrait;
+use MelisCore\Controller\MelisReactKeysetListTrait;
 
 use Laminas\Http\PhpEnvironment\Response as HttpResponse;
 use MelisCore\Controller\MelisAbstractActionController;
@@ -30,6 +31,7 @@ use MelisCore\Controller\MelisAbstractActionController;
 class MelisReactApiProspectThemeController extends MelisAbstractActionController
 {
     use CapabilityGuardTrait;
+    use MelisReactKeysetListTrait;
 
     /** melisKey of the RIGHTS-BEARING menu node — the access guard AND the capability key.
      *  MUST stay in sync with config/react.capabilities.php. NOT `MelisCmsProspects_tool_themes`
@@ -53,10 +55,11 @@ class MelisReactApiProspectThemeController extends MelisAbstractActionController
         if ($denyCap = $this->denyUnlessCan('list')) { return $denyCap; }
 
         try {
-            $page   = max(1, (int) $this->params()->fromQuery('page', 1));
             $limit  = min(9999, max(1, (int) $this->params()->fromQuery('limit', 25)));
             $search = trim((string) ($this->params()->fromQuery('search', '') ?? ''));
-            $offset = ($page - 1) * $limit;
+            $sort   = (string) $this->params()->fromQuery('sort', 'id');
+            $dir    = (string) $this->params()->fromQuery('dir', 'desc');
+            $after  = (string) $this->params()->fromQuery('after', '');
 
             $db = $this->getServiceManager()->get('Laminas\Db\Adapter\AdapterInterface');
 
@@ -67,25 +70,33 @@ class MelisReactApiProspectThemeController extends MelisAbstractActionController
                 $where[] = '(t.pros_theme_name LIKE ? OR t.pros_theme_code LIKE ?)';
                 $params  = array_merge($params, [$like, $like]);
             }
-            $whereClause = $where ? 'WHERE ' . implode(' AND ', $where) : '';
 
-            $countRow = iterator_to_array($db->query(
-                "SELECT COUNT(*) AS total FROM melis_cms_prospects_themes t $whereClause",
-                $params
-            ));
-            $total = (int) ($countRow[0]['total'] ?? 0);
+            // item_count via sous-requête corrélée (au lieu de JOIN + GROUP BY) → une seule ligne
+            // par thème, pour que le COUNT(*) du trait reste juste et que le keyset fonctionne.
+            $itemCountExpr = '(SELECT COUNT(*) FROM melis_cms_prospects_theme_items i WHERE i.pros_theme_id = t.pros_theme_id)';
 
-            $rows = $db->query(
-                "SELECT t.pros_theme_id, t.pros_theme_name, t.pros_theme_code,
-                        COUNT(i.pros_theme_item_id) AS item_count
-                 FROM melis_cms_prospects_themes t
-                 LEFT JOIN melis_cms_prospects_theme_items i ON i.pros_theme_id = t.pros_theme_id
-                 $whereClause
-                 GROUP BY t.pros_theme_id, t.pros_theme_name, t.pros_theme_code
-                 ORDER BY t.pros_theme_id DESC
-                 LIMIT ? OFFSET ?",
-                array_merge($params, [$limit, $offset])
-            );
+            // Whitelist des colonnes triables (expr SQL NON-NULL).
+            $sortMap = [
+                'id'    => 't.pros_theme_id',
+                'name'  => "COALESCE(t.pros_theme_name,'')",
+                'items' => 'COALESCE(' . $itemCountExpr . ', 0)',
+            ];
+
+            [$rows, $total, $next] = $this->keysetList([
+                'db'           => $db,
+                'from'         => 'melis_cms_prospects_themes t',
+                'joins'        => '',
+                'selectCols'   => "t.pros_theme_id, t.pros_theme_name, t.pros_theme_code, $itemCountExpr AS item_count",
+                'filterWhere'  => $where,
+                'filterParams' => $params,
+                'sortMap'      => $sortMap,
+                'idCol'        => 't.pros_theme_id',
+                'idAlias'      => 'pros_theme_id',
+                'sortKey'      => $sort,
+                'dir'          => $dir,
+                'after'        => $after,
+                'limit'        => $limit,
+            ]);
 
             $items = [];
             foreach ($rows as $row) {
@@ -94,7 +105,7 @@ class MelisReactApiProspectThemeController extends MelisAbstractActionController
 
             return $this->jsonResponse([
                 'success' => true,
-                'data'    => ['items' => $items, 'total' => $total, 'page' => $page, 'limit' => $limit],
+                'data'    => ['items' => $items, 'total' => $total, 'nextCursor' => $next],
             ]);
         } catch (\Throwable $e) {
             return $this->errorResponse($e);

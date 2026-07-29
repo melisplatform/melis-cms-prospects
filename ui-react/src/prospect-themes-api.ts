@@ -26,7 +26,15 @@ export interface ThemeItem {
   itemCount: number
 }
 export interface ThemeStats { total: number; withCode: number; items: number }
-export interface ThemeListResult { items: ThemeItem[]; total: number; page: number; limit: number }
+export interface ThemeListResult { items: ThemeItem[]; total: number; nextCursor: string | null }
+export type ThemeSortKey = 'id' | 'name' | 'items'
+export interface ThemeListParams {
+  limit?: number
+  search?: string
+  sort?: ThemeSortKey
+  dir?: 'asc' | 'desc'
+  after?: string | null
+}
 export interface ThemeSavePayload {
   id: number
   name: string
@@ -54,10 +62,13 @@ async function apiFetch<T>(url: string, opts?: RequestInit): Promise<T> {
   return data.data as T
 }
 
-export async function fetchThemes(params: { search?: string } = {}): Promise<ThemeListResult> {
+export async function fetchThemes(params: ThemeListParams = {}): Promise<ThemeListResult> {
   const qs = new URLSearchParams()
-  qs.set('limit', '9999')
+  if (params.limit) qs.set('limit', String(params.limit))
   if (params.search) qs.set('search', params.search)
+  if (params.sort) qs.set('sort', params.sort)
+  if (params.dir) qs.set('dir', params.dir)
+  if (params.after) qs.set('after', params.after)
   return apiFetch<ThemeListResult>(`/melis/react-api/prospect-themes?${qs}`)
 }
 
