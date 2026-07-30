@@ -1,6 +1,6 @@
 <?php 
 	return array(
-	    'tr_melistoolprospects_tool_prospects' => 'Prospect',
+	    'tr_melistoolprospects_tool_prospects' => 'Prospects',
 	    'tr_melistoolprospects_tool_prospects_description' => 'This tool allows to manage prospects from the contact forms.',
 	    'tr_melistoolprospects_tool_prospects_modal_description' => 'This form allows to update the information of existing prospects.',
 	    'tr_melistoolprospects_prospects_pros_id' => 'ID',
