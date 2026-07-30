@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties, type RefObject } from 'react'
+import { Fragment, useEffect, useLayoutEffect, useRef, useState, type CSSProperties, type RefObject } from 'react'
 import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import {
   deleteProspect, fetchProspectById, fetchProspects, fetchProspectStats, fetchSites, fetchTypes, fetchThemes,
@@ -8,6 +8,8 @@ import {
 import { useKeysetList } from './use-keyset-list'
 import { ExportModal, DownloadIcon } from './ExportModal'
 import { ViewToggle, type ViewMode } from './ViewToggle'
+import { useIsNarrow } from './shared/useIsNarrow'
+import { ExpandToggle, HiddenColsRow } from './shared/ExpandableRow'
 
 // Outil Prospects legacy (vue « Old » en iframe). Voir brick.manifest.json (prospects).
 // Renderable ZONE key — the `conf.type` target's melisKey. Rights do NOT hang on this.
@@ -172,10 +174,14 @@ function ColManager({ anchorRef, cols, labelFor, onChange, onClose }: {
   const t = useT()
   const [dragId, setDragId] = useState<string | null>(null)
   const [over, setOver] = useState<{ id: string; panel: 'visible' | 'hidden' } | null>(null)
-  const [pos, setPos] = useState<{ top?: number; bottom?: number; right: number; maxHeight: number } | null>(null)
+  const [pos, setPos] = useState<{ top?: number; bottom?: number; left: number; width: number; maxHeight: number } | null>(null)
   const shown = cols.filter((c) => c.visible)
   const hidden = cols.filter((c) => !c.visible)
 
+  // `left` explicite et borné (pas `right` + maxWidth) : l'ancre n'est pas forcément flush avec
+  // le vrai bord de l'écran (padding de page, bouton sur une ligne wrapée en mobile) — un panneau
+  // ancré seulement par sa droite peut voir son bord GAUCHE passer négatif et couper son propre
+  // header. cf. skill melis-react-mobile-responsive, piège « Anchored popovers ».
   useLayoutEffect(() => {
     const anchor = anchorRef.current
     if (!anchor) return
@@ -183,11 +189,12 @@ function ColManager({ anchorRef, cols, labelFor, onChange, onClose }: {
     const margin = 8
     const spaceBelow = window.innerHeight - rect.bottom - margin
     const spaceAbove = rect.top - margin
-    const right = Math.max(margin, window.innerWidth - rect.right)
+    const width = Math.min(380, window.innerWidth - margin * 2)
+    const left = Math.min(Math.max(margin, rect.right - width), window.innerWidth - width - margin)
     if (spaceBelow >= 200 || spaceBelow >= spaceAbove) {
-      setPos({ top: rect.bottom + 6, right, maxHeight: Math.max(160, spaceBelow - 6) })
+      setPos({ top: rect.bottom + 6, left, width, maxHeight: Math.max(160, spaceBelow - 6) })
     } else {
-      setPos({ bottom: window.innerHeight - rect.top + 6, right, maxHeight: Math.max(160, spaceAbove - 6) })
+      setPos({ bottom: window.innerHeight - rect.top + 6, left, width, maxHeight: Math.max(160, spaceAbove - 6) })
     }
   }, [anchorRef])
 
@@ -228,7 +235,7 @@ function ColManager({ anchorRef, cols, labelFor, onChange, onClose }: {
   if (!pos) return null
   return (
     <div style={{
-      ...card, position: 'fixed', right: pos.right, zIndex: 50, width: 380, maxWidth: 'calc(100vw - 1rem)',
+      ...card, position: 'fixed', left: pos.left, width: pos.width, zIndex: 50,
       maxHeight: pos.maxHeight, overflowY: 'auto', display: 'flex', flexDirection: 'column',
       ...(pos.top != null ? { top: pos.top } : { bottom: pos.bottom }),
     }}>
@@ -276,7 +283,7 @@ function fmtYmd(d: Date): string {
 // ── Filtre de date à présets (Aujourd'hui / Hier / 7 derniers jours / … / Plage personnalisée),
 // calqué sur le daterangepicker legacy du back-office (port de melis-commerce/shared/DateRangeFilter —
 // la brique ne peut pas importer le module hôte, voir la note en tête de fichier).
-function DateRangeFilter({ from, to, onChange }: { from: string; to: string; onChange: (from: string, to: string) => void }) {
+function DateRangeFilter({ from, to, onChange, fullWidth }: { from: string; to: string; onChange: (from: string, to: string) => void; fullWidth?: boolean }) {
   const t = useT()
   const [open, setOpen] = useState(false)
   const [custom, setCustom] = useState(false)
@@ -317,9 +324,9 @@ function DateRangeFilter({ from, to, onChange }: { from: string; to: string; onC
   })
 
   return (
-    <div ref={ref} style={{ position: 'relative', display: 'inline-flex' }}>
-      <button style={{ ...btnGhost, height: 36, gap: 8 }} onClick={() => setOpen((o) => !o)}>
-        <CalendarIcon /><span style={{ maxWidth: 160, overflow: 'hidden', textOverflow: 'ellipsis' }}>{buttonLabel}</span><ChevronDownIcon />
+    <div ref={ref} style={{ position: 'relative', display: fullWidth ? 'flex' : 'inline-flex', width: fullWidth ? '100%' : undefined }}>
+      <button style={{ ...btnGhost, height: 36, gap: 8, ...(fullWidth ? { width: '100%' } : {}) }} onClick={() => setOpen((o) => !o)}>
+        <CalendarIcon /><span style={{ maxWidth: fullWidth ? undefined : 160, flex: fullWidth ? 1 : undefined, textAlign: fullWidth ? 'left' : undefined, overflow: 'hidden', textOverflow: 'ellipsis' }}>{buttonLabel}</span><ChevronDownIcon />
       </button>
       {open && (
         <div style={{ ...card, position: 'absolute', top: '100%', left: 0, marginTop: 6, zIndex: 60, padding: 6, minWidth: 200 }}>
@@ -369,6 +376,7 @@ export default function ProspectsPage() {
 // ── Liste ───────────────────────────────────────────────────────────────────
 function ProspectList({ base }: { base: string }) {
   const t = useT()
+  const narrow = useIsNarrow()
   const navigate = useNavigate()
   const location = useLocation()
   const [stats, setStats] = useState<ProspectStats | null>(null)
@@ -389,6 +397,10 @@ function ProspectList({ base }: { base: string }) {
   const [showExport, setShowExport] = useState(false)
   const [mode, setMode] = useState<ViewMode>('react')
   const [frameLoaded, setFrameLoaded] = useState(false)
+  const [expandedIds, setExpandedIds] = useState<Set<number>>(new Set())
+  function toggleExpand(id: number) {
+    setExpandedIds((prev) => { const next = new Set(prev); next.has(id) ? next.delete(id) : next.add(id); return next })
+  }
 
   const {
     items, total, loading, hasMore, sentinelRef, sortCol, sortDir, toggleSort, reload, removeLocal,
@@ -432,16 +444,36 @@ function ProspectList({ base }: { base: string }) {
     catch { return v }
   }
 
+  function cellValue(r: ProspectItem, id: string) {
+    if (id === 'id') return r.id
+    if (id === 'name') return r.name
+    if (id === 'email') return r.email
+    if (id === 'phone') return r.telephone
+    if (id === 'site') return r.siteName ?? t('none')
+    if (id === 'type') return r.type ?? t('none')
+    if (id === 'theme') return r.themeName ?? t('none')
+    if (id === 'date') return fmtDate(r.contactDate)
+    if (id === 'message') return r.message
+    return ''
+  }
+
+  // Sur mobile, la table s'effondre à une seule colonne essentielle (+ un « + » pour déplier le
+  // reste) quelle que soit la préférence de colonnes de l'utilisateur (desktop) — cf. skill
+  // melis-react-mobile-responsive. `hasHidden` ne dépend QUE de `narrow`, jamais des colonnes
+  // masquées manuellement par l'utilisateur.
+  const displayCols = narrow ? cols.map((c) => ({ ...c, visible: c.id === 'name' })) : cols
+  const hasHidden = narrow
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 20, padding: 24, height: '100%', boxSizing: 'border-box', overflow: 'auto' }}>
       {/* Header */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16 }}>
-        <div>
-          <h1 style={{ fontSize: 20, fontWeight: 700, margin: 0 }}>{t('title')}</h1>
-          <p style={{ fontSize: 14, color: 'var(--color-muted-foreground)', margin: '2px 0 0' }}>{t('subtitle')}</p>
+        <div style={{ minWidth: 0 }}>
+          <h1 style={{ fontSize: 20, fontWeight: 700, margin: 0, ...(narrow ? { overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' } : {}) }}>{t('title')}</h1>
+          <p style={{ fontSize: 14, color: 'var(--color-muted-foreground)', margin: '2px 0 0', ...(narrow ? { overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' } : {}) }}>{t('subtitle')}</p>
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <ViewToggle mode={mode} onChange={(m) => { setMode(m); if (m === 'iframe') setFrameLoaded(true) }} />
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
+          <ViewToggle mode={mode} onChange={(m) => { setMode(m); if (m === 'iframe') setFrameLoaded(true) }} compact={narrow} />
           <button style={btnGhost} onClick={handleRefresh} disabled={refreshing} title={t('refresh')}><RotateCcwIcon spinning={refreshing} /></button>
         </div>
       </div>
@@ -470,37 +502,42 @@ function ProspectList({ base }: { base: string }) {
 
       {/* Filtres */}
       <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
-        <input style={{ ...inputCss, height: 36, flex: 1, minWidth: 220 }} value={searchInput}
+        <input style={{ ...inputCss, height: 36, ...(narrow ? { width: '100%' } : { flex: 1, minWidth: 220 }) }} value={searchInput}
           onChange={(e) => setSearchInput(e.target.value)}
           onKeyDown={(e) => e.key === 'Enter' && setSearch(searchInput.trim())}
           placeholder={t('search')} />
-        <select style={{ ...inputCss, height: 36, width: 'auto' }} value={site ?? ''} onChange={(e) => setSite(e.target.value ? Number(e.target.value) : null)}>
+        <select style={{ ...inputCss, height: 36, width: narrow ? '100%' : 'auto' }} value={site ?? ''} onChange={(e) => setSite(e.target.value ? Number(e.target.value) : null)}>
           <option value="">{t('all_sites')}</option>
           {sites.map((s) => <option key={s.id} value={s.id}>{s.name}</option>)}
         </select>
-        <select style={{ ...inputCss, height: 36, width: 'auto' }} value={type} onChange={(e) => setType(e.target.value)}>
+        <select style={{ ...inputCss, height: 36, width: narrow ? '100%' : 'auto' }} value={type} onChange={(e) => setType(e.target.value)}>
           <option value="">{t('all_types')}</option>
           {types.map((tp) => <option key={tp} value={tp}>{tp}</option>)}
         </select>
-        <DateRangeFilter from={dateFrom} to={dateTo} onChange={(f, tt) => { setDateFrom(f); setDateTo(tt) }} />
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginLeft: 'auto' }}>
-          <button style={{ ...btnGhost, height: 36 }} onClick={resetFilters} disabled={refreshing} title={t('reset_filters')}>
+        <DateRangeFilter from={dateFrom} to={dateTo} onChange={(f, tt) => { setDateFrom(f); setDateTo(tt) }} fullWidth={narrow} />
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, ...(narrow ? { width: '100%', flexWrap: 'wrap' } : { marginLeft: 'auto' }) }}>
+          <button style={{ ...btnGhost, height: 36, ...(narrow ? { flex: '1 1 100%', justifyContent: 'center' } : {}) }} onClick={resetFilters} disabled={refreshing} title={t('reset_filters')}>
             <RotateCcwIcon spinning={refreshing} />{t('reset_filters')}
           </button>
-          <div ref={colsAnchorRef} style={{ position: 'relative' }}>
-            <button style={{ ...btnGhost, height: 36 }} onClick={() => setShowCols((v) => !v)}><Columns3Icon />{t('columns')}</button>
+          <div ref={colsAnchorRef} style={{ position: 'relative', ...(narrow ? { flex: '1 1 calc(50% - 4px)' } : {}) }}>
+            <button style={{ ...btnGhost, height: 36, ...(narrow ? { width: '100%', justifyContent: 'center' } : {}) }} onClick={() => setShowCols((v) => !v)}><Columns3Icon />{t('columns')}</button>
             {showCols && <ColManager anchorRef={colsAnchorRef} cols={cols} labelFor={(id) => t(COL_LABEL[id])} onChange={setCols} onClose={() => setShowCols(false)} />}
           </div>
-          {can('export') && <button style={{ ...btnGhost, height: 36 }} onClick={() => setShowExport(true)}><DownloadIcon />{t('export')}</button>}
+          {can('export') && (
+            <button style={{ ...btnGhost, height: 36, ...(narrow ? { flex: '1 1 calc(50% - 4px)', justifyContent: 'center' } : {}) }} onClick={() => setShowExport(true)}>
+              <DownloadIcon />{t('export')}
+            </button>
+          )}
         </div>
       </div>
 
       {/* Table */}
       <div style={{ ...card, overflow: 'auto' }}>
-        <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: 1040 }}>
+        <table style={{ width: '100%', borderCollapse: 'collapse', ...(!narrow ? { minWidth: 1040 } : {}) }}>
           <thead style={{ background: 'var(--color-muted,rgba(0,0,0,.03))' }}>
             <tr>
-              {visibleCols(cols).map(({ id }) => {
+              {hasHidden && <th style={{ ...th, width: 36 }} />}
+              {visibleCols(displayCols).map(({ id }) => {
                 const sortable = SORTABLE.has(id as ProspectSortKey)
                 return (
                   <th key={id} style={{ ...th, ...(id === 'id' ? { width: 70 } : {}), ...(sortable ? { cursor: 'pointer' } : {}) }}
@@ -517,34 +554,38 @@ function ProspectList({ base }: { base: string }) {
           </thead>
           <tbody>
             {items.length === 0 && !loading ? (
-              <tr><td style={{ ...td, textAlign: 'center', color: 'var(--color-muted-foreground)', padding: '40px 16px' }} colSpan={visibleCols(cols).length + 1}>{t('empty')}</td></tr>
-            ) : items.map((r) => (
-              <tr key={r.id}>
-                {visibleCols(cols).map(({ id }) => (
-                  <td key={id} style={{
-                    ...td,
-                    ...(id === 'id' ? { color: 'var(--color-muted-foreground)', fontVariantNumeric: 'tabular-nums' } : {}),
-                    ...(id === 'message' ? { maxWidth: 240, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' } : {}),
-                  }} title={id === 'message' ? r.message : undefined}>
-                    {id === 'id' && r.id}
-                    {id === 'name' && r.name}
-                    {id === 'email' && r.email}
-                    {id === 'phone' && r.telephone}
-                    {id === 'site' && (r.siteName ?? t('none'))}
-                    {id === 'type' && (r.type ?? t('none'))}
-                    {id === 'theme' && (r.themeName ?? t('none'))}
-                    {id === 'date' && fmtDate(r.contactDate)}
-                    {id === 'message' && r.message}
+              <tr><td style={{ ...td, textAlign: 'center', color: 'var(--color-muted-foreground)', padding: '40px 16px' }} colSpan={visibleCols(displayCols).length + 1 + (hasHidden ? 1 : 0)}>{t('empty')}</td></tr>
+            ) : items.map((r) => {
+              const expanded = expandedIds.has(r.id)
+              return (
+                <Fragment key={r.id}>
+                <tr>
+                  {hasHidden && <td style={td}><ExpandToggle expanded={expanded} onClick={() => toggleExpand(r.id)} /></td>}
+                  {visibleCols(displayCols).map(({ id }) => (
+                    <td key={id} style={{
+                      ...td,
+                      ...(id === 'id' ? { color: 'var(--color-muted-foreground)', fontVariantNumeric: 'tabular-nums' } : {}),
+                      ...(id === 'message' ? { maxWidth: 240, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' } : {}),
+                    }} title={id === 'message' ? r.message : undefined}>
+                      {cellValue(r, id)}
+                    </td>
+                  ))}
+                  <td style={td}>
+                    <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 4 }}>
+                      {can('edit') && <button style={iconBtn} title={t('edit')} onClick={() => navigate(`${base}/${r.id}`)}><PencilIcon /></button>}
+                      {can('delete') && <button style={{ ...iconBtn, color: 'var(--color-destructive,#ef4444)' }} title={t('del')} onClick={() => setToDelete(r)}><TrashIcon /></button>}
+                    </div>
                   </td>
-                ))}
-                <td style={td}>
-                  <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 4 }}>
-                    {can('edit') && <button style={iconBtn} title={t('edit')} onClick={() => navigate(`${base}/${r.id}`)}><PencilIcon /></button>}
-                    {can('delete') && <button style={{ ...iconBtn, color: 'var(--color-destructive,#ef4444)' }} title={t('del')} onClick={() => setToDelete(r)}><TrashIcon /></button>}
-                  </div>
-                </td>
-              </tr>
-            ))}
+                </tr>
+                {hasHidden && expanded && (
+                  <HiddenColsRow
+                    colSpan={visibleCols(displayCols).length + 2}
+                    cols={COL_ORDER.filter((id) => id !== 'name').map((id) => ({ label: t(COL_LABEL[id]), value: cellValue(r, id) }))}
+                  />
+                )}
+                </Fragment>
+              )
+            })}
           </tbody>
         </table>
         <div ref={sentinelRef} style={{ height: 1 }} />
@@ -564,7 +605,7 @@ function ProspectList({ base }: { base: string }) {
 
       {/* Suppression */}
       {toDelete && (
-        <div style={{ position: 'fixed', inset: 0, zIndex: 50, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(0,0,0,.5)' }}>
+        <div style={{ position: 'fixed', inset: 0, zIndex: 50, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(0,0,0,.5)', padding: 16 }}>
           <div style={{ ...card, padding: 24, width: '100%', maxWidth: 360 }}>
             <h3 style={{ fontSize: 16, fontWeight: 600, margin: 0 }}>{t('del_title')}</h3>
             <p style={{ fontSize: 14, color: 'var(--color-muted-foreground)', marginTop: 8 }}>{t('del_confirm', { u: toDelete.name })}</p>
@@ -616,6 +657,7 @@ function ProspectList({ base }: { base: string }) {
 // ── Formulaire ────────────────────────────────────────────────────────────────
 function ProspectForm({ id, base }: { id: string; base: string }) {
   const t = useT()
+  const narrow = useIsNarrow()
   const navigate = useNavigate()
   const prospectId = parseInt(id)
   const path = `${base}/${id}`
@@ -693,11 +735,11 @@ function ProspectForm({ id, base }: { id: string; base: string }) {
     <div style={{ display: 'flex', flexDirection: 'column', gap: 20, padding: 24, height: '100%', boxSizing: 'border-box', overflow: 'auto' }}>
       {/* Header */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16 }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-          <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 32, height: 32, borderRadius: 8, background: 'color-mix(in srgb, var(--color-primary) 10%, transparent)', color: 'var(--color-primary)' }}><UserIcon /></span>
-          <h1 style={{ fontSize: 20, fontWeight: 700, margin: 0 }}>{item?.name || t('edit_title')}</h1>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10, minWidth: 0 }}>
+          <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 32, height: 32, borderRadius: 8, background: 'color-mix(in srgb, var(--color-primary) 10%, transparent)', color: 'var(--color-primary)', flexShrink: 0 }}><UserIcon /></span>
+          <h1 style={{ fontSize: 20, fontWeight: 700, margin: 0, ...(narrow ? { overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' } : {}) }}>{item?.name || t('edit_title')}</h1>
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0 }}>
           <button style={btnPrimary} onClick={submit} disabled={saving || loading}>{saving ? '…' : t('save')}</button>
         </div>
       </div>
@@ -707,12 +749,12 @@ function ProspectForm({ id, base }: { id: string; base: string }) {
       {loading ? (
         <div style={{ padding: 48, textAlign: 'center', color: 'var(--color-muted-foreground)' }}>{t('loading')}</div>
       ) : (
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr minmax(240px,280px)', gap: 20, alignItems: 'start' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: narrow ? '1fr' : '1fr minmax(240px,280px)', gap: 20, alignItems: 'start' }}>
           {/* Colonne principale */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
             <div style={{ ...card, padding: 20 }}>
               <h3 style={secTitle}>{t('sec_contact')}</h3>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+              <div style={{ display: 'grid', gridTemplateColumns: narrow ? '1fr' : '1fr 1fr', gap: 16 }}>
                 <div>
                   <label style={label}>{t('f_name')}</label>
                   <input style={inputCss} value={name} onChange={(e) => setName(e.target.value)} maxLength={255} autoComplete="off" />

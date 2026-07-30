@@ -532,7 +532,8 @@
 				display: "flex",
 				alignItems: "center",
 				justifyContent: "center",
-				background: "rgba(0,0,0,.5)"
+				background: "rgba(0,0,0,.5)",
+				padding: 16
 			},
 			onClick: (e) => {
 				if (e.target === e.currentTarget) onClose();
@@ -677,13 +678,13 @@
 	}
 	//#endregion
 	//#region src/ViewToggle.tsx
-	var sIcon$2 = {
+	var sIcon$3 = {
 		width: 15,
 		height: 15,
 		flexShrink: 0
 	};
 	var SparkIcon = () => /* @__PURE__ */ (0, react_jsx_runtime.jsx)("svg", {
-		style: sIcon$2,
+		style: sIcon$3,
 		viewBox: "0 0 24 24",
 		fill: "none",
 		stroke: "currentColor",
@@ -693,7 +694,7 @@
 		children: /* @__PURE__ */ (0, react_jsx_runtime.jsx)("path", { d: "m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z" })
 	});
 	var LayoutIcon = () => /* @__PURE__ */ (0, react_jsx_runtime.jsxs)("svg", {
-		style: sIcon$2,
+		style: sIcon$3,
 		viewBox: "0 0 24 24",
 		fill: "none",
 		stroke: "currentColor",
@@ -708,13 +709,13 @@
 			rx: "2"
 		}), /* @__PURE__ */ (0, react_jsx_runtime.jsx)("path", { d: "M3 9h18M9 21V9" })]
 	});
-	function ViewToggle({ mode, onChange }) {
+	function ViewToggle({ mode, onChange, compact = false }) {
 		const tab = (active) => ({
 			display: "inline-flex",
 			alignItems: "center",
-			gap: 6,
+			gap: compact ? 0 : 6,
 			height: 30,
-			padding: "0 12px",
+			padding: compact ? "0 8px" : "0 12px",
 			borderRadius: 6,
 			border: 0,
 			fontSize: 12,
@@ -736,13 +737,114 @@
 			children: [/* @__PURE__ */ (0, react_jsx_runtime.jsxs)("button", {
 				style: tab(mode === "react"),
 				onClick: () => onChange("react"),
-				children: [/* @__PURE__ */ (0, react_jsx_runtime.jsx)(SparkIcon, {}), "New"]
+				title: compact ? "New (React)" : void 0,
+				children: [/* @__PURE__ */ (0, react_jsx_runtime.jsx)(SparkIcon, {}), !compact && "New"]
 			}), /* @__PURE__ */ (0, react_jsx_runtime.jsxs)("button", {
 				style: tab(mode === "iframe"),
 				onClick: () => onChange("iframe"),
-				children: [/* @__PURE__ */ (0, react_jsx_runtime.jsx)(LayoutIcon, {}), "Old"]
+				title: compact ? "Old" : void 0,
+				children: [/* @__PURE__ */ (0, react_jsx_runtime.jsx)(LayoutIcon, {}), !compact && "Old"]
 			})]
 		});
+	}
+	//#endregion
+	//#region src/shared/useIsNarrow.ts
+	function useIsNarrow(breakpoint = 640) {
+		const [narrow, setNarrow] = (0, react.useState)(() => window.innerWidth < breakpoint);
+		(0, react.useEffect)(() => {
+			const onResize = () => setNarrow(window.innerWidth < breakpoint);
+			window.addEventListener("resize", onResize);
+			return () => window.removeEventListener("resize", onResize);
+		}, [breakpoint]);
+		return narrow;
+	}
+	//#endregion
+	//#region src/shared/ExpandableRow.tsx
+	var sIcon$2 = {
+		width: 13,
+		height: 13,
+		flexShrink: 0
+	};
+	var PlusIcon$1 = () => /* @__PURE__ */ (0, react_jsx_runtime.jsx)("svg", {
+		style: sIcon$2,
+		viewBox: "0 0 24 24",
+		fill: "none",
+		stroke: "currentColor",
+		strokeWidth: "2.2",
+		strokeLinecap: "round",
+		strokeLinejoin: "round",
+		children: /* @__PURE__ */ (0, react_jsx_runtime.jsx)("path", { d: "M12 5v14M5 12h14" })
+	});
+	var MinusIcon = () => /* @__PURE__ */ (0, react_jsx_runtime.jsx)("svg", {
+		style: sIcon$2,
+		viewBox: "0 0 24 24",
+		fill: "none",
+		stroke: "currentColor",
+		strokeWidth: "2.2",
+		strokeLinecap: "round",
+		strokeLinejoin: "round",
+		children: /* @__PURE__ */ (0, react_jsx_runtime.jsx)("path", { d: "M5 12h14" })
+	});
+	var toggleBtn = {
+		display: "inline-flex",
+		alignItems: "center",
+		justifyContent: "center",
+		width: 24,
+		height: 24,
+		borderRadius: 6,
+		border: "1px solid var(--color-border)",
+		background: "var(--color-card)",
+		color: "var(--color-muted-foreground)",
+		cursor: "pointer",
+		padding: 0
+	};
+	function ExpandToggle({ expanded, onClick }) {
+		return /* @__PURE__ */ (0, react_jsx_runtime.jsx)("button", {
+			type: "button",
+			style: toggleBtn,
+			onClick,
+			title: expanded ? "−" : "+",
+			children: expanded ? /* @__PURE__ */ (0, react_jsx_runtime.jsx)(MinusIcon, {}) : /* @__PURE__ */ (0, react_jsx_runtime.jsx)(PlusIcon$1, {})
+		});
+	}
+	function HiddenColsRow({ colSpan, cols }) {
+		return /* @__PURE__ */ (0, react_jsx_runtime.jsx)("tr", { children: /* @__PURE__ */ (0, react_jsx_runtime.jsx)("td", {
+			colSpan,
+			style: {
+				padding: "4px 16px 12px",
+				borderTop: "1px solid var(--color-border)",
+				background: "var(--color-muted,rgba(0,0,0,.02))"
+			},
+			children: /* @__PURE__ */ (0, react_jsx_runtime.jsx)("div", {
+				style: {
+					display: "flex",
+					flexDirection: "column",
+					gap: 6
+				},
+				children: cols.map((c) => /* @__PURE__ */ (0, react_jsx_runtime.jsxs)("div", {
+					style: {
+						display: "flex",
+						justifyContent: "space-between",
+						gap: 12,
+						fontSize: 13
+					},
+					children: [/* @__PURE__ */ (0, react_jsx_runtime.jsx)("span", {
+						style: {
+							color: "var(--color-muted-foreground)",
+							flexShrink: 0
+						},
+						children: c.label
+					}), /* @__PURE__ */ (0, react_jsx_runtime.jsx)("span", {
+						style: {
+							textAlign: "right",
+							color: "var(--color-foreground)",
+							overflowWrap: "anywhere"
+						},
+						children: c.value
+					})]
+				}, c.label))
+			})
+		}) });
 	}
 	//#endregion
 	//#region src/ProspectsPage.tsx
@@ -1280,15 +1382,18 @@
 			const margin = 8;
 			const spaceBelow = window.innerHeight - rect.bottom - margin;
 			const spaceAbove = rect.top - margin;
-			const right = Math.max(margin, window.innerWidth - rect.right);
+			const width = Math.min(380, window.innerWidth - margin * 2);
+			const left = Math.min(Math.max(margin, rect.right - width), window.innerWidth - width - margin);
 			if (spaceBelow >= 200 || spaceBelow >= spaceAbove) setPos({
 				top: rect.bottom + 6,
-				right,
+				left,
+				width,
 				maxHeight: Math.max(160, spaceBelow - 6)
 			});
 			else setPos({
 				bottom: window.innerHeight - rect.top + 6,
-				right,
+				left,
+				width,
 				maxHeight: Math.max(160, spaceAbove - 6)
 			});
 		}, [anchorRef]);
@@ -1376,10 +1481,9 @@
 			style: {
 				...card$1,
 				position: "fixed",
-				right: pos.right,
+				left: pos.left,
+				width: pos.width,
 				zIndex: 50,
-				width: 380,
-				maxWidth: "calc(100vw - 1rem)",
 				maxHeight: pos.maxHeight,
 				overflowY: "auto",
 				display: "flex",
@@ -1532,7 +1636,7 @@
 	function fmtYmd(d) {
 		return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
 	}
-	function DateRangeFilter({ from, to, onChange }) {
+	function DateRangeFilter({ from, to, onChange, fullWidth }) {
 		const t = useT$1();
 		const [open, setOpen] = (0, react.useState)(false);
 		const [custom, setCustom] = (0, react.useState)(false);
@@ -1621,20 +1725,24 @@
 			ref,
 			style: {
 				position: "relative",
-				display: "inline-flex"
+				display: fullWidth ? "flex" : "inline-flex",
+				width: fullWidth ? "100%" : void 0
 			},
 			children: [/* @__PURE__ */ (0, react_jsx_runtime.jsxs)("button", {
 				style: {
 					...btnGhost$1,
 					height: 36,
-					gap: 8
+					gap: 8,
+					...fullWidth ? { width: "100%" } : {}
 				},
 				onClick: () => setOpen((o) => !o),
 				children: [
 					/* @__PURE__ */ (0, react_jsx_runtime.jsx)(CalendarIcon, {}),
 					/* @__PURE__ */ (0, react_jsx_runtime.jsx)("span", {
 						style: {
-							maxWidth: 160,
+							maxWidth: fullWidth ? void 0 : 160,
+							flex: fullWidth ? 1 : void 0,
+							textAlign: fullWidth ? "left" : void 0,
 							overflow: "hidden",
 							textOverflow: "ellipsis"
 						},
@@ -1746,6 +1854,7 @@
 	}
 	function ProspectList({ base }) {
 		const t = useT$1();
+		const narrow = useIsNarrow();
 		const navigate = (0, react_router_dom.useNavigate)();
 		const location = (0, react_router_dom.useLocation)();
 		const [stats, setStats] = (0, react.useState)(null);
@@ -1766,6 +1875,14 @@
 		const [showExport, setShowExport] = (0, react.useState)(false);
 		const [mode, setMode] = (0, react.useState)("react");
 		const [frameLoaded, setFrameLoaded] = (0, react.useState)(false);
+		const [expandedIds, setExpandedIds] = (0, react.useState)(/* @__PURE__ */ new Set());
+		function toggleExpand(id) {
+			setExpandedIds((prev) => {
+				const next = new Set(prev);
+				next.has(id) ? next.delete(id) : next.add(id);
+				return next;
+			});
+		}
 		const { items, total, loading, hasMore, sentinelRef, sortCol, sortDir, toggleSort, reload, removeLocal } = useKeysetList({
 			fetcher: (a) => fetchProspects({
 				...a,
@@ -1839,6 +1956,23 @@
 				return v;
 			}
 		}
+		function cellValue(r, id) {
+			if (id === "id") return r.id;
+			if (id === "name") return r.name;
+			if (id === "email") return r.email;
+			if (id === "phone") return r.telephone;
+			if (id === "site") return r.siteName ?? t("none");
+			if (id === "type") return r.type ?? t("none");
+			if (id === "theme") return r.themeName ?? t("none");
+			if (id === "date") return fmtDate(r.contactDate);
+			if (id === "message") return r.message;
+			return "";
+		}
+		const displayCols = narrow ? cols.map((c) => ({
+			...c,
+			visible: c.id === "name"
+		})) : cols;
+		const hasHidden = narrow;
 		return /* @__PURE__ */ (0, react_jsx_runtime.jsxs)("div", {
 			style: {
 				display: "flex",
@@ -1857,32 +1991,47 @@
 						justifyContent: "space-between",
 						gap: 16
 					},
-					children: [/* @__PURE__ */ (0, react_jsx_runtime.jsxs)("div", { children: [/* @__PURE__ */ (0, react_jsx_runtime.jsx)("h1", {
-						style: {
-							fontSize: 20,
-							fontWeight: 700,
-							margin: 0
-						},
-						children: t("title")
-					}), /* @__PURE__ */ (0, react_jsx_runtime.jsx)("p", {
-						style: {
-							fontSize: 14,
-							color: "var(--color-muted-foreground)",
-							margin: "2px 0 0"
-						},
-						children: t("subtitle")
-					})] }), /* @__PURE__ */ (0, react_jsx_runtime.jsxs)("div", {
+					children: [/* @__PURE__ */ (0, react_jsx_runtime.jsxs)("div", {
+						style: { minWidth: 0 },
+						children: [/* @__PURE__ */ (0, react_jsx_runtime.jsx)("h1", {
+							style: {
+								fontSize: 20,
+								fontWeight: 700,
+								margin: 0,
+								...narrow ? {
+									overflow: "hidden",
+									textOverflow: "ellipsis",
+									whiteSpace: "nowrap"
+								} : {}
+							},
+							children: t("title")
+						}), /* @__PURE__ */ (0, react_jsx_runtime.jsx)("p", {
+							style: {
+								fontSize: 14,
+								color: "var(--color-muted-foreground)",
+								margin: "2px 0 0",
+								...narrow ? {
+									overflow: "hidden",
+									textOverflow: "ellipsis",
+									whiteSpace: "nowrap"
+								} : {}
+							},
+							children: t("subtitle")
+						})]
+					}), /* @__PURE__ */ (0, react_jsx_runtime.jsxs)("div", {
 						style: {
 							display: "flex",
 							alignItems: "center",
-							gap: 8
+							gap: 8,
+							flexShrink: 0
 						},
 						children: [/* @__PURE__ */ (0, react_jsx_runtime.jsx)(ViewToggle, {
 							mode,
 							onChange: (m) => {
 								setMode(m);
 								if (m === "iframe") setFrameLoaded(true);
-							}
+							},
+							compact: narrow
 						}), /* @__PURE__ */ (0, react_jsx_runtime.jsx)("button", {
 							style: btnGhost$1,
 							onClick: handleRefresh,
@@ -1964,8 +2113,10 @@
 									style: {
 										...inputCss$1,
 										height: 36,
-										flex: 1,
-										minWidth: 220
+										...narrow ? { width: "100%" } : {
+											flex: 1,
+											minWidth: 220
+										}
 									},
 									value: searchInput,
 									onChange: (e) => setSearchInput(e.target.value),
@@ -1976,7 +2127,7 @@
 									style: {
 										...inputCss$1,
 										height: 36,
-										width: "auto"
+										width: narrow ? "100%" : "auto"
 									},
 									value: site ?? "",
 									onChange: (e) => setSite(e.target.value ? Number(e.target.value) : null),
@@ -1992,7 +2143,7 @@
 									style: {
 										...inputCss$1,
 										height: 36,
-										width: "auto"
+										width: narrow ? "100%" : "auto"
 									},
 									value: type,
 									onChange: (e) => setType(e.target.value),
@@ -2010,20 +2161,28 @@
 									onChange: (f, tt) => {
 										setDateFrom(f);
 										setDateTo(tt);
-									}
+									},
+									fullWidth: narrow
 								}),
 								/* @__PURE__ */ (0, react_jsx_runtime.jsxs)("div", {
 									style: {
 										display: "flex",
 										alignItems: "center",
 										gap: 8,
-										marginLeft: "auto"
+										...narrow ? {
+											width: "100%",
+											flexWrap: "wrap"
+										} : { marginLeft: "auto" }
 									},
 									children: [
 										/* @__PURE__ */ (0, react_jsx_runtime.jsxs)("button", {
 											style: {
 												...btnGhost$1,
-												height: 36
+												height: 36,
+												...narrow ? {
+													flex: "1 1 100%",
+													justifyContent: "center"
+												} : {}
 											},
 											onClick: resetFilters,
 											disabled: refreshing,
@@ -2032,11 +2191,18 @@
 										}),
 										/* @__PURE__ */ (0, react_jsx_runtime.jsxs)("div", {
 											ref: colsAnchorRef,
-											style: { position: "relative" },
+											style: {
+												position: "relative",
+												...narrow ? { flex: "1 1 calc(50% - 4px)" } : {}
+											},
 											children: [/* @__PURE__ */ (0, react_jsx_runtime.jsxs)("button", {
 												style: {
 													...btnGhost$1,
-													height: 36
+													height: 36,
+													...narrow ? {
+														width: "100%",
+														justifyContent: "center"
+													} : {}
 												},
 												onClick: () => setShowCols((v) => !v),
 												children: [/* @__PURE__ */ (0, react_jsx_runtime.jsx)(Columns3Icon$1, {}), t("columns")]
@@ -2051,7 +2217,11 @@
 										can$1("export") && /* @__PURE__ */ (0, react_jsx_runtime.jsxs)("button", {
 											style: {
 												...btnGhost$1,
-												height: 36
+												height: 36,
+												...narrow ? {
+													flex: "1 1 calc(50% - 4px)",
+													justifyContent: "center"
+												} : {}
 											},
 											onClick: () => setShowExport(true),
 											children: [/* @__PURE__ */ (0, react_jsx_runtime.jsx)(DownloadIcon, {}), t("export")]
@@ -2070,32 +2240,39 @@
 									style: {
 										width: "100%",
 										borderCollapse: "collapse",
-										minWidth: 1040
+										...!narrow ? { minWidth: 1040 } : {}
 									},
 									children: [/* @__PURE__ */ (0, react_jsx_runtime.jsx)("thead", {
 										style: { background: "var(--color-muted,rgba(0,0,0,.03))" },
-										children: /* @__PURE__ */ (0, react_jsx_runtime.jsxs)("tr", { children: [visibleCols$1(cols).map(({ id }) => {
-											const sortable = SORTABLE$1.has(id);
-											return /* @__PURE__ */ (0, react_jsx_runtime.jsx)("th", {
-												style: {
-													...th$1,
-													...id === "id" ? { width: 70 } : {},
-													...sortable ? { cursor: "pointer" } : {}
-												},
-												onClick: sortable ? () => toggleSort(id) : void 0,
-												children: /* @__PURE__ */ (0, react_jsx_runtime.jsxs)("span", {
+										children: /* @__PURE__ */ (0, react_jsx_runtime.jsxs)("tr", { children: [
+											hasHidden && /* @__PURE__ */ (0, react_jsx_runtime.jsx)("th", { style: {
+												...th$1,
+												width: 36
+											} }),
+											visibleCols$1(displayCols).map(({ id }) => {
+												const sortable = SORTABLE$1.has(id);
+												return /* @__PURE__ */ (0, react_jsx_runtime.jsx)("th", {
 													style: {
-														display: "inline-flex",
-														alignItems: "center",
-														gap: 4
+														...th$1,
+														...id === "id" ? { width: 70 } : {},
+														...sortable ? { cursor: "pointer" } : {}
 													},
-													children: [t(COL_LABEL$1[id]), sortable && /* @__PURE__ */ (0, react_jsx_runtime.jsx)(SortIcon$1, { dir: sortCol === id ? sortDir : null })]
-												})
-											}, id);
-										}), /* @__PURE__ */ (0, react_jsx_runtime.jsx)("th", { style: {
-											...th$1,
-											width: 80
-										} })] })
+													onClick: sortable ? () => toggleSort(id) : void 0,
+													children: /* @__PURE__ */ (0, react_jsx_runtime.jsxs)("span", {
+														style: {
+															display: "inline-flex",
+															alignItems: "center",
+															gap: 4
+														},
+														children: [t(COL_LABEL$1[id]), sortable && /* @__PURE__ */ (0, react_jsx_runtime.jsx)(SortIcon$1, { dir: sortCol === id ? sortDir : null })]
+													})
+												}, id);
+											}),
+											/* @__PURE__ */ (0, react_jsx_runtime.jsx)("th", { style: {
+												...th$1,
+												width: 80
+											} })
+										] })
 									}), /* @__PURE__ */ (0, react_jsx_runtime.jsx)("tbody", { children: items.length === 0 && !loading ? /* @__PURE__ */ (0, react_jsx_runtime.jsx)("tr", { children: /* @__PURE__ */ (0, react_jsx_runtime.jsx)("td", {
 										style: {
 											...td$1,
@@ -2103,58 +2280,67 @@
 											color: "var(--color-muted-foreground)",
 											padding: "40px 16px"
 										},
-										colSpan: visibleCols$1(cols).length + 1,
+										colSpan: visibleCols$1(displayCols).length + 1 + (hasHidden ? 1 : 0),
 										children: t("empty")
-									}) }) : items.map((r) => /* @__PURE__ */ (0, react_jsx_runtime.jsxs)("tr", { children: [visibleCols$1(cols).map(({ id }) => /* @__PURE__ */ (0, react_jsx_runtime.jsxs)("td", {
-										style: {
-											...td$1,
-											...id === "id" ? {
-												color: "var(--color-muted-foreground)",
-												fontVariantNumeric: "tabular-nums"
-											} : {},
-											...id === "message" ? {
-												maxWidth: 240,
-												whiteSpace: "nowrap",
-												overflow: "hidden",
-												textOverflow: "ellipsis"
-											} : {}
-										},
-										title: id === "message" ? r.message : void 0,
-										children: [
-											id === "id" && r.id,
-											id === "name" && r.name,
-											id === "email" && r.email,
-											id === "phone" && r.telephone,
-											id === "site" && (r.siteName ?? t("none")),
-											id === "type" && (r.type ?? t("none")),
-											id === "theme" && (r.themeName ?? t("none")),
-											id === "date" && fmtDate(r.contactDate),
-											id === "message" && r.message
-										]
-									}, id)), /* @__PURE__ */ (0, react_jsx_runtime.jsx)("td", {
-										style: td$1,
-										children: /* @__PURE__ */ (0, react_jsx_runtime.jsxs)("div", {
-											style: {
-												display: "flex",
-												justifyContent: "flex-end",
-												gap: 4
-											},
-											children: [can$1("edit") && /* @__PURE__ */ (0, react_jsx_runtime.jsx)("button", {
-												style: iconBtn$1,
-												title: t("edit"),
-												onClick: () => navigate(`${base}/${r.id}`),
-												children: /* @__PURE__ */ (0, react_jsx_runtime.jsx)(PencilIcon$1, {})
-											}), can$1("delete") && /* @__PURE__ */ (0, react_jsx_runtime.jsx)("button", {
+									}) }) : items.map((r) => {
+										const expanded = expandedIds.has(r.id);
+										return /* @__PURE__ */ (0, react_jsx_runtime.jsxs)(react.Fragment, { children: [/* @__PURE__ */ (0, react_jsx_runtime.jsxs)("tr", { children: [
+											hasHidden && /* @__PURE__ */ (0, react_jsx_runtime.jsx)("td", {
+												style: td$1,
+												children: /* @__PURE__ */ (0, react_jsx_runtime.jsx)(ExpandToggle, {
+													expanded,
+													onClick: () => toggleExpand(r.id)
+												})
+											}),
+											visibleCols$1(displayCols).map(({ id }) => /* @__PURE__ */ (0, react_jsx_runtime.jsx)("td", {
 												style: {
-													...iconBtn$1,
-													color: "var(--color-destructive,#ef4444)"
+													...td$1,
+													...id === "id" ? {
+														color: "var(--color-muted-foreground)",
+														fontVariantNumeric: "tabular-nums"
+													} : {},
+													...id === "message" ? {
+														maxWidth: 240,
+														whiteSpace: "nowrap",
+														overflow: "hidden",
+														textOverflow: "ellipsis"
+													} : {}
 												},
-												title: t("del"),
-												onClick: () => setToDelete(r),
-												children: /* @__PURE__ */ (0, react_jsx_runtime.jsx)(TrashIcon$1, {})
-											})]
-										})
-									})] }, r.id)) })]
+												title: id === "message" ? r.message : void 0,
+												children: cellValue(r, id)
+											}, id)),
+											/* @__PURE__ */ (0, react_jsx_runtime.jsx)("td", {
+												style: td$1,
+												children: /* @__PURE__ */ (0, react_jsx_runtime.jsxs)("div", {
+													style: {
+														display: "flex",
+														justifyContent: "flex-end",
+														gap: 4
+													},
+													children: [can$1("edit") && /* @__PURE__ */ (0, react_jsx_runtime.jsx)("button", {
+														style: iconBtn$1,
+														title: t("edit"),
+														onClick: () => navigate(`${base}/${r.id}`),
+														children: /* @__PURE__ */ (0, react_jsx_runtime.jsx)(PencilIcon$1, {})
+													}), can$1("delete") && /* @__PURE__ */ (0, react_jsx_runtime.jsx)("button", {
+														style: {
+															...iconBtn$1,
+															color: "var(--color-destructive,#ef4444)"
+														},
+														title: t("del"),
+														onClick: () => setToDelete(r),
+														children: /* @__PURE__ */ (0, react_jsx_runtime.jsx)(TrashIcon$1, {})
+													})]
+												})
+											})
+										] }), hasHidden && expanded && /* @__PURE__ */ (0, react_jsx_runtime.jsx)(HiddenColsRow, {
+											colSpan: visibleCols$1(displayCols).length + 2,
+											cols: COL_ORDER$1.filter((id) => id !== "name").map((id) => ({
+												label: t(COL_LABEL$1[id]),
+												value: cellValue(r, id)
+											}))
+										})] }, r.id);
+									}) })]
 								}),
 								/* @__PURE__ */ (0, react_jsx_runtime.jsx)("div", {
 									ref: sentinelRef,
@@ -2193,7 +2379,8 @@
 						display: "flex",
 						alignItems: "center",
 						justifyContent: "center",
-						background: "rgba(0,0,0,.5)"
+						background: "rgba(0,0,0,.5)",
+						padding: 16
 					},
 					children: /* @__PURE__ */ (0, react_jsx_runtime.jsxs)("div", {
 						style: {
@@ -2288,6 +2475,7 @@
 	}
 	function ProspectForm({ id, base }) {
 		const t = useT$1();
+		const narrow = useIsNarrow();
 		const navigate = (0, react_router_dom.useNavigate)();
 		const prospectId = parseInt(id);
 		const path = `${base}/${id}`;
@@ -2405,7 +2593,8 @@
 						style: {
 							display: "flex",
 							alignItems: "center",
-							gap: 10
+							gap: 10,
+							minWidth: 0
 						},
 						children: [/* @__PURE__ */ (0, react_jsx_runtime.jsx)("span", {
 							style: {
@@ -2416,14 +2605,20 @@
 								height: 32,
 								borderRadius: 8,
 								background: "color-mix(in srgb, var(--color-primary) 10%, transparent)",
-								color: "var(--color-primary)"
+								color: "var(--color-primary)",
+								flexShrink: 0
 							},
 							children: /* @__PURE__ */ (0, react_jsx_runtime.jsx)(UserIcon, {})
 						}), /* @__PURE__ */ (0, react_jsx_runtime.jsx)("h1", {
 							style: {
 								fontSize: 20,
 								fontWeight: 700,
-								margin: 0
+								margin: 0,
+								...narrow ? {
+									overflow: "hidden",
+									textOverflow: "ellipsis",
+									whiteSpace: "nowrap"
+								} : {}
 							},
 							children: item?.name || t("edit_title")
 						})]
@@ -2431,7 +2626,8 @@
 						style: {
 							display: "flex",
 							alignItems: "center",
-							gap: 10
+							gap: 10,
+							flexShrink: 0
 						},
 						children: /* @__PURE__ */ (0, react_jsx_runtime.jsx)("button", {
 							style: btnPrimary$1,
@@ -2462,7 +2658,7 @@
 				}) : /* @__PURE__ */ (0, react_jsx_runtime.jsxs)("div", {
 					style: {
 						display: "grid",
-						gridTemplateColumns: "1fr minmax(240px,280px)",
+						gridTemplateColumns: narrow ? "1fr" : "1fr minmax(240px,280px)",
 						gap: 20,
 						alignItems: "start"
 					},
@@ -2483,7 +2679,7 @@
 							}), /* @__PURE__ */ (0, react_jsx_runtime.jsxs)("div", {
 								style: {
 									display: "grid",
-									gridTemplateColumns: "1fr 1fr",
+									gridTemplateColumns: narrow ? "1fr" : "1fr 1fr",
 									gap: 16
 								},
 								children: [
@@ -3270,15 +3466,18 @@
 			const margin = 8;
 			const spaceBelow = window.innerHeight - rect.bottom - margin;
 			const spaceAbove = rect.top - margin;
-			const right = Math.max(margin, window.innerWidth - rect.right);
+			const width = Math.min(380, window.innerWidth - margin * 2);
+			const left = Math.min(Math.max(margin, rect.right - width), window.innerWidth - width - margin);
 			if (spaceBelow >= 200 || spaceBelow >= spaceAbove) setPos({
 				top: rect.bottom + 6,
-				right,
+				left,
+				width,
 				maxHeight: Math.max(160, spaceBelow - 6)
 			});
 			else setPos({
 				bottom: window.innerHeight - rect.top + 6,
-				right,
+				left,
+				width,
 				maxHeight: Math.max(160, spaceAbove - 6)
 			});
 		}, [anchorRef]);
@@ -3366,10 +3565,9 @@
 			style: {
 				...card,
 				position: "fixed",
-				right: pos.right,
+				left: pos.left,
+				width: pos.width,
 				zIndex: 50,
-				width: 380,
-				maxWidth: "calc(100vw - 1rem)",
 				maxHeight: pos.maxHeight,
 				overflowY: "auto",
 				display: "flex",
@@ -3535,6 +3733,7 @@
 	}
 	function ThemeList({ base }) {
 		const t = useT();
+		const narrow = useIsNarrow();
 		const navigate = (0, react_router_dom.useNavigate)();
 		const location = (0, react_router_dom.useLocation)();
 		const [stats, setStats] = (0, react.useState)(null);
@@ -3550,6 +3749,14 @@
 		const [showExport, setShowExport] = (0, react.useState)(false);
 		const [mode, setMode] = (0, react.useState)("react");
 		const [frameLoaded, setFrameLoaded] = (0, react.useState)(false);
+		const [expandedIds, setExpandedIds] = (0, react.useState)(/* @__PURE__ */ new Set());
+		function toggleExpand(id) {
+			setExpandedIds((prev) => {
+				const next = new Set(prev);
+				next.has(id) ? next.delete(id) : next.add(id);
+				return next;
+			});
+		}
 		const { items, total, loading, hasMore, sentinelRef, sortCol, sortDir, toggleSort, reload, removeLocal } = useKeysetList({
 			fetcher: (a) => fetchThemes({
 				...a,
@@ -3600,6 +3807,11 @@
 			if (id === "items") return r.itemCount;
 			return "";
 		}
+		const displayCols = narrow ? cols.map((c) => ({
+			...c,
+			visible: c.id === "name"
+		})) : cols;
+		const hasHidden = narrow;
 		return /* @__PURE__ */ (0, react_jsx_runtime.jsxs)("div", {
 			style: {
 				display: "flex",
@@ -3614,51 +3826,81 @@
 				/* @__PURE__ */ (0, react_jsx_runtime.jsxs)("div", {
 					style: {
 						display: "flex",
-						alignItems: "center",
+						alignItems: narrow ? "flex-start" : "center",
 						justifyContent: "space-between",
 						gap: 16
 					},
-					children: [/* @__PURE__ */ (0, react_jsx_runtime.jsxs)("div", { children: [/* @__PURE__ */ (0, react_jsx_runtime.jsx)("h1", {
-						style: {
-							fontSize: 20,
-							fontWeight: 700,
-							margin: 0
-						},
-						children: t("title")
-					}), /* @__PURE__ */ (0, react_jsx_runtime.jsx)("p", {
-						style: {
-							fontSize: 14,
-							color: "var(--color-muted-foreground)",
-							margin: "2px 0 0"
-						},
-						children: t("subtitle")
-					})] }), /* @__PURE__ */ (0, react_jsx_runtime.jsxs)("div", {
-						style: {
+					children: [/* @__PURE__ */ (0, react_jsx_runtime.jsxs)("div", {
+						style: { minWidth: 0 },
+						children: [/* @__PURE__ */ (0, react_jsx_runtime.jsx)("h1", {
+							style: {
+								fontSize: 20,
+								fontWeight: 700,
+								margin: 0,
+								...narrow ? {
+									overflow: "hidden",
+									textOverflow: "ellipsis",
+									whiteSpace: "nowrap"
+								} : {}
+							},
+							children: t("title")
+						}), /* @__PURE__ */ (0, react_jsx_runtime.jsx)("p", {
+							style: {
+								fontSize: 14,
+								color: "var(--color-muted-foreground)",
+								margin: "2px 0 0",
+								...narrow ? {
+									overflow: "hidden",
+									textOverflow: "ellipsis",
+									whiteSpace: "nowrap"
+								} : {}
+							},
+							children: t("subtitle")
+						})]
+					}), /* @__PURE__ */ (0, react_jsx_runtime.jsxs)("div", {
+						style: narrow ? {
+							display: "flex",
+							flexDirection: "column",
+							gap: 8,
+							flexShrink: 0
+						} : {
 							display: "flex",
 							alignItems: "center",
-							gap: 8
+							gap: 8,
+							flexShrink: 0
 						},
-						children: [
-							/* @__PURE__ */ (0, react_jsx_runtime.jsx)(ViewToggle, {
+						children: [/* @__PURE__ */ (0, react_jsx_runtime.jsxs)("div", {
+							style: {
+								display: "flex",
+								alignItems: "center",
+								gap: 8,
+								justifyContent: narrow ? "flex-end" : void 0
+							},
+							children: [/* @__PURE__ */ (0, react_jsx_runtime.jsx)(ViewToggle, {
 								mode,
 								onChange: (m) => {
 									setMode(m);
 									if (m === "iframe") setFrameLoaded(true);
-								}
-							}),
-							/* @__PURE__ */ (0, react_jsx_runtime.jsx)("button", {
+								},
+								compact: narrow
+							}), /* @__PURE__ */ (0, react_jsx_runtime.jsx)("button", {
 								style: btnGhost,
 								onClick: handleRefresh,
 								disabled: refreshing,
 								title: t("refresh"),
 								children: /* @__PURE__ */ (0, react_jsx_runtime.jsx)(RotateCcwIcon, { spinning: refreshing })
-							}),
-							can("create") && /* @__PURE__ */ (0, react_jsx_runtime.jsxs)("button", {
-								style: btnPrimary,
-								onClick: () => setEditingTheme("new"),
-								children: [/* @__PURE__ */ (0, react_jsx_runtime.jsx)(PlusIcon, {}), t("add")]
-							})
-						]
+							})]
+						}), can("create") && /* @__PURE__ */ (0, react_jsx_runtime.jsxs)("button", {
+							style: {
+								...btnPrimary,
+								...narrow ? {
+									width: "100%",
+									justifyContent: "center"
+								} : {}
+							},
+							onClick: () => setEditingTheme("new"),
+							children: [/* @__PURE__ */ (0, react_jsx_runtime.jsx)(PlusIcon, {}), t("add")]
+						})]
 					})]
 				}),
 				frameLoaded && /* @__PURE__ */ (0, react_jsx_runtime.jsx)("div", {
@@ -3723,8 +3965,10 @@
 								style: {
 									...inputCss,
 									height: 36,
-									flex: 1,
-									minWidth: 220
+									...narrow ? { width: "100%" } : {
+										flex: 1,
+										minWidth: 220
+									}
 								},
 								value: searchInput,
 								onChange: (e) => setSearchInput(e.target.value),
@@ -3735,13 +3979,20 @@
 									display: "flex",
 									alignItems: "center",
 									gap: 8,
-									marginLeft: "auto"
+									...narrow ? {
+										width: "100%",
+										flexWrap: "wrap"
+									} : { marginLeft: "auto" }
 								},
 								children: [
 									/* @__PURE__ */ (0, react_jsx_runtime.jsxs)("button", {
 										style: {
 											...btnGhost,
-											height: 36
+											height: 36,
+											...narrow ? {
+												flex: "1 1 100%",
+												justifyContent: "center"
+											} : {}
 										},
 										onClick: resetFilters,
 										disabled: refreshing,
@@ -3750,11 +4001,18 @@
 									}),
 									/* @__PURE__ */ (0, react_jsx_runtime.jsxs)("div", {
 										ref: colsAnchorRef,
-										style: { position: "relative" },
+										style: {
+											position: "relative",
+											...narrow ? { flex: "1 1 calc(50% - 4px)" } : {}
+										},
 										children: [/* @__PURE__ */ (0, react_jsx_runtime.jsxs)("button", {
 											style: {
 												...btnGhost,
-												height: 36
+												height: 36,
+												...narrow ? {
+													width: "100%",
+													justifyContent: "center"
+												} : {}
 											},
 											onClick: () => setShowCols((v) => !v),
 											children: [/* @__PURE__ */ (0, react_jsx_runtime.jsx)(Columns3Icon, {}), t("columns")]
@@ -3769,7 +4027,11 @@
 									can("export") && /* @__PURE__ */ (0, react_jsx_runtime.jsxs)("button", {
 										style: {
 											...btnGhost,
-											height: 36
+											height: 36,
+											...narrow ? {
+												flex: "1 1 calc(50% - 4px)",
+												justifyContent: "center"
+											} : {}
 										},
 										onClick: () => setShowExport(true),
 										children: [/* @__PURE__ */ (0, react_jsx_runtime.jsx)(DownloadIcon, {}), t("export")]
@@ -3787,33 +4049,40 @@
 									style: {
 										width: "100%",
 										borderCollapse: "collapse",
-										minWidth: 640
+										...!narrow ? { minWidth: 640 } : {}
 									},
 									children: [/* @__PURE__ */ (0, react_jsx_runtime.jsx)("thead", {
 										style: { background: "var(--color-muted,rgba(0,0,0,.03))" },
-										children: /* @__PURE__ */ (0, react_jsx_runtime.jsxs)("tr", { children: [visibleCols(cols).map(({ id }) => {
-											const sortable = SORTABLE.has(id);
-											return /* @__PURE__ */ (0, react_jsx_runtime.jsx)("th", {
-												style: {
-													...th,
-													...id === "id" ? { width: 70 } : {},
-													...id === "items" ? { width: 100 } : {},
-													...sortable ? { cursor: "pointer" } : {}
-												},
-												onClick: sortable ? () => toggleSort(id) : void 0,
-												children: /* @__PURE__ */ (0, react_jsx_runtime.jsxs)("span", {
+										children: /* @__PURE__ */ (0, react_jsx_runtime.jsxs)("tr", { children: [
+											hasHidden && /* @__PURE__ */ (0, react_jsx_runtime.jsx)("th", { style: {
+												...th,
+												width: 36
+											} }),
+											visibleCols(displayCols).map(({ id }) => {
+												const sortable = SORTABLE.has(id);
+												return /* @__PURE__ */ (0, react_jsx_runtime.jsx)("th", {
 													style: {
-														display: "inline-flex",
-														alignItems: "center",
-														gap: 4
+														...th,
+														...id === "id" ? { width: 70 } : {},
+														...id === "items" ? { width: 100 } : {},
+														...sortable ? { cursor: "pointer" } : {}
 													},
-													children: [t(COL_LABEL[id]), sortable && /* @__PURE__ */ (0, react_jsx_runtime.jsx)(SortIcon, { dir: sortCol === id ? sortDir : null })]
-												})
-											}, id);
-										}), /* @__PURE__ */ (0, react_jsx_runtime.jsx)("th", { style: {
-											...th,
-											width: 120
-										} })] })
+													onClick: sortable ? () => toggleSort(id) : void 0,
+													children: /* @__PURE__ */ (0, react_jsx_runtime.jsxs)("span", {
+														style: {
+															display: "inline-flex",
+															alignItems: "center",
+															gap: 4
+														},
+														children: [t(COL_LABEL[id]), sortable && /* @__PURE__ */ (0, react_jsx_runtime.jsx)(SortIcon, { dir: sortCol === id ? sortDir : null })]
+													})
+												}, id);
+											}),
+											/* @__PURE__ */ (0, react_jsx_runtime.jsx)("th", { style: {
+												...th,
+												width: 120
+											} })
+										] })
 									}), /* @__PURE__ */ (0, react_jsx_runtime.jsx)("tbody", { children: items.length === 0 && !loading ? /* @__PURE__ */ (0, react_jsx_runtime.jsx)("tr", { children: /* @__PURE__ */ (0, react_jsx_runtime.jsx)("td", {
 										style: {
 											...td,
@@ -3821,55 +4090,74 @@
 											color: "var(--color-muted-foreground)",
 											padding: "40px 16px"
 										},
-										colSpan: visibleCols(cols).length + 1,
+										colSpan: visibleCols(displayCols).length + 1 + (hasHidden ? 1 : 0),
 										children: t("empty")
-									}) }) : items.map((r) => /* @__PURE__ */ (0, react_jsx_runtime.jsxs)("tr", { children: [visibleCols(cols).map(({ id }) => /* @__PURE__ */ (0, react_jsx_runtime.jsxs)("td", {
-										style: {
-											...td,
-											...id === "id" ? {
-												color: "var(--color-muted-foreground)",
-												fontVariantNumeric: "tabular-nums"
-											} : {},
-											...id === "name" ? { fontWeight: 500 } : {}
-										},
-										children: [
-											id === "id" && r.id,
-											id === "name" && r.name,
-											id === "items" && r.itemCount
-										]
-									}, id)), /* @__PURE__ */ (0, react_jsx_runtime.jsx)("td", {
-										style: td,
-										children: /* @__PURE__ */ (0, react_jsx_runtime.jsxs)("div", {
-											style: {
-												display: "flex",
-												justifyContent: "flex-end",
-												gap: 4
-											},
-											children: [
-												can("edit") && /* @__PURE__ */ (0, react_jsx_runtime.jsx)("button", {
-													style: iconBtn,
-													title: t("rename"),
-													onClick: () => setEditingTheme(r),
-													children: /* @__PURE__ */ (0, react_jsx_runtime.jsx)(RenameIcon, {})
-												}),
-												can("items") && /* @__PURE__ */ (0, react_jsx_runtime.jsx)("button", {
-													style: iconBtn,
-													title: t("edit"),
-													onClick: () => navigate(`${base}/${r.id}`),
-													children: /* @__PURE__ */ (0, react_jsx_runtime.jsx)(PencilIcon, {})
-												}),
-												can("delete") && /* @__PURE__ */ (0, react_jsx_runtime.jsx)("button", {
-													style: {
-														...iconBtn,
-														color: "var(--color-destructive,#ef4444)"
-													},
-													title: t("del"),
-													onClick: () => setToDelete(r),
-													children: /* @__PURE__ */ (0, react_jsx_runtime.jsx)(TrashIcon, {})
+									}) }) : items.map((r) => {
+										const expanded = expandedIds.has(r.id);
+										return /* @__PURE__ */ (0, react_jsx_runtime.jsxs)(react.Fragment, { children: [/* @__PURE__ */ (0, react_jsx_runtime.jsxs)("tr", { children: [
+											hasHidden && /* @__PURE__ */ (0, react_jsx_runtime.jsx)("td", {
+												style: td,
+												children: /* @__PURE__ */ (0, react_jsx_runtime.jsx)(ExpandToggle, {
+													expanded,
+													onClick: () => toggleExpand(r.id)
 												})
-											]
-										})
-									})] }, r.id)) })]
+											}),
+											visibleCols(displayCols).map(({ id }) => /* @__PURE__ */ (0, react_jsx_runtime.jsxs)("td", {
+												style: {
+													...td,
+													...id === "id" ? {
+														color: "var(--color-muted-foreground)",
+														fontVariantNumeric: "tabular-nums"
+													} : {},
+													...id === "name" ? { fontWeight: 500 } : {}
+												},
+												children: [
+													id === "id" && r.id,
+													id === "name" && r.name,
+													id === "items" && r.itemCount
+												]
+											}, id)),
+											/* @__PURE__ */ (0, react_jsx_runtime.jsx)("td", {
+												style: td,
+												children: /* @__PURE__ */ (0, react_jsx_runtime.jsxs)("div", {
+													style: {
+														display: "flex",
+														justifyContent: "flex-end",
+														gap: 4
+													},
+													children: [
+														can("edit") && /* @__PURE__ */ (0, react_jsx_runtime.jsx)("button", {
+															style: iconBtn,
+															title: t("rename"),
+															onClick: () => setEditingTheme(r),
+															children: /* @__PURE__ */ (0, react_jsx_runtime.jsx)(RenameIcon, {})
+														}),
+														can("items") && /* @__PURE__ */ (0, react_jsx_runtime.jsx)("button", {
+															style: iconBtn,
+															title: t("edit"),
+															onClick: () => navigate(`${base}/${r.id}`),
+															children: /* @__PURE__ */ (0, react_jsx_runtime.jsx)(PencilIcon, {})
+														}),
+														can("delete") && /* @__PURE__ */ (0, react_jsx_runtime.jsx)("button", {
+															style: {
+																...iconBtn,
+																color: "var(--color-destructive,#ef4444)"
+															},
+															title: t("del"),
+															onClick: () => setToDelete(r),
+															children: /* @__PURE__ */ (0, react_jsx_runtime.jsx)(TrashIcon, {})
+														})
+													]
+												})
+											})
+										] }), hasHidden && expanded && /* @__PURE__ */ (0, react_jsx_runtime.jsx)(HiddenColsRow, {
+											colSpan: visibleCols(displayCols).length + 2,
+											cols: COL_ORDER.filter((id) => id !== "name").map((id) => ({
+												label: t(COL_LABEL[id]),
+												value: cellText(r, id)
+											}))
+										})] }, r.id);
+									}) })]
 								}),
 								/* @__PURE__ */ (0, react_jsx_runtime.jsx)("div", {
 									ref: sentinelRef,
@@ -3916,7 +4204,8 @@
 						display: "flex",
 						alignItems: "center",
 						justifyContent: "center",
-						background: "rgba(0,0,0,.5)"
+						background: "rgba(0,0,0,.5)",
+						padding: 16
 					},
 					children: /* @__PURE__ */ (0, react_jsx_runtime.jsxs)("div", {
 						style: {
@@ -4147,7 +4436,8 @@
 				style: {
 					display: "flex",
 					alignItems: "center",
-					gap: 10
+					gap: 10,
+					minWidth: 0
 				},
 				children: [/* @__PURE__ */ (0, react_jsx_runtime.jsx)("span", {
 					style: {
@@ -4158,24 +4448,31 @@
 						height: 32,
 						borderRadius: 8,
 						background: "color-mix(in srgb, var(--color-primary) 10%, transparent)",
-						color: "var(--color-primary)"
+						color: "var(--color-primary)",
+						flexShrink: 0
 					},
 					children: /* @__PURE__ */ (0, react_jsx_runtime.jsx)(TagIcon, {})
-				}), /* @__PURE__ */ (0, react_jsx_runtime.jsxs)("div", { children: [/* @__PURE__ */ (0, react_jsx_runtime.jsx)("h1", {
-					style: {
-						fontSize: 20,
-						fontWeight: 700,
-						margin: 0
-					},
-					children: item?.name || t("edit_title")
-				}), /* @__PURE__ */ (0, react_jsx_runtime.jsx)("p", {
-					style: {
-						fontSize: 13,
-						color: "var(--color-muted-foreground)",
-						margin: "2px 0 0"
-					},
-					children: t("tab_items")
-				})] })]
+				}), /* @__PURE__ */ (0, react_jsx_runtime.jsxs)("div", {
+					style: { minWidth: 0 },
+					children: [/* @__PURE__ */ (0, react_jsx_runtime.jsx)("h1", {
+						style: {
+							fontSize: 20,
+							fontWeight: 700,
+							margin: 0,
+							overflow: "hidden",
+							textOverflow: "ellipsis",
+							whiteSpace: "nowrap"
+						},
+						children: item?.name || t("edit_title")
+					}), /* @__PURE__ */ (0, react_jsx_runtime.jsx)("p", {
+						style: {
+							fontSize: 13,
+							color: "var(--color-muted-foreground)",
+							margin: "2px 0 0"
+						},
+						children: t("tab_items")
+					})]
+				})]
 			}), loading ? /* @__PURE__ */ (0, react_jsx_runtime.jsx)("div", {
 				style: {
 					padding: 48,
@@ -4188,6 +4485,7 @@
 	}
 	function ThemeItemsPanel({ theme }) {
 		const t = useT();
+		const narrow = useIsNarrow();
 		const [rows, setRows] = (0, react.useState)([]);
 		const [langs, setLangs] = (0, react.useState)([]);
 		const [loading, setLoading] = (0, react.useState)(false);
@@ -4247,8 +4545,10 @@
 						/* @__PURE__ */ (0, react_jsx_runtime.jsxs)("div", {
 							style: {
 								position: "relative",
-								flex: 1,
-								minWidth: 220
+								...narrow ? { flex: "1 1 100%" } : {
+									flex: 1,
+									minWidth: 220
+								}
 							},
 							children: [/* @__PURE__ */ (0, react_jsx_runtime.jsx)("span", {
 								style: {
@@ -4276,14 +4576,24 @@
 						/* @__PURE__ */ (0, react_jsx_runtime.jsxs)("button", {
 							style: {
 								...btnGhost,
-								height: 36
+								height: 36,
+								...narrow ? {
+									flex: "1 1 100%",
+									justifyContent: "center"
+								} : {}
 							},
 							onClick: resetFilters,
 							title: t("reset_filters"),
 							children: [/* @__PURE__ */ (0, react_jsx_runtime.jsx)(RotateCcwIcon, {}), t("reset_filters")]
 						}),
 						can("items.create") && /* @__PURE__ */ (0, react_jsx_runtime.jsxs)("button", {
-							style: btnPrimary,
+							style: {
+								...btnPrimary,
+								...narrow ? {
+									flex: "1 1 100%",
+									justifyContent: "center"
+								} : {}
+							},
 							onClick: () => setEditing("new"),
 							children: [/* @__PURE__ */ (0, react_jsx_runtime.jsx)(PlusIcon, {}), t("items_add")]
 						})
@@ -4298,7 +4608,7 @@
 						style: {
 							width: "100%",
 							borderCollapse: "collapse",
-							minWidth: 480
+							...!narrow ? { minWidth: 480 } : {}
 						},
 						children: [/* @__PURE__ */ (0, react_jsx_runtime.jsx)("thead", {
 							style: { background: "var(--color-muted,rgba(0,0,0,.03))" },
@@ -4398,7 +4708,8 @@
 						display: "flex",
 						alignItems: "center",
 						justifyContent: "center",
-						background: "rgba(0,0,0,.5)"
+						background: "rgba(0,0,0,.5)",
+						padding: 16
 					},
 					children: /* @__PURE__ */ (0, react_jsx_runtime.jsxs)("div", {
 						style: {

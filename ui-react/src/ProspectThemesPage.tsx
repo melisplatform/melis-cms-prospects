@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties, type RefObject } from 'react'
+import { Fragment, useEffect, useLayoutEffect, useRef, useState, type CSSProperties, type RefObject } from 'react'
 import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import {
   deleteTheme, fetchThemeById, fetchThemes, fetchThemeStats, saveTheme,
@@ -9,6 +9,8 @@ import {
 import { useKeysetList } from './use-keyset-list'
 import { ExportModal, DownloadIcon } from './ExportModal'
 import { ViewToggle, type ViewMode } from './ViewToggle'
+import { useIsNarrow } from './shared/useIsNarrow'
+import { ExpandToggle, HiddenColsRow } from './shared/ExpandableRow'
 
 // Outil Thèmes legacy (vue « Old » en iframe). Renderable ZONE key — le `conf.type` target.
 // Les droits ne s'accrochent PAS dessus (cf. brick.manifest.json → melisKey).
@@ -194,10 +196,13 @@ function ColManager({ anchorRef, cols, labelFor, onChange, onClose }: {
   const t = useT()
   const [dragId, setDragId] = useState<string | null>(null)
   const [over, setOver] = useState<{ id: string; panel: 'visible' | 'hidden' } | null>(null)
-  const [pos, setPos] = useState<{ top?: number; bottom?: number; right: number; maxHeight: number } | null>(null)
+  const [pos, setPos] = useState<{ top?: number; bottom?: number; left: number; width: number; maxHeight: number } | null>(null)
   const shown = cols.filter((c) => c.visible)
   const hidden = cols.filter((c) => !c.visible)
 
+  // `left` explicite et borné (pas `right` + maxWidth) : l'ancre n'est pas forcément flush avec
+  // le vrai bord de l'écran — un panneau ancré seulement par sa droite peut voir son bord GAUCHE
+  // passer négatif et couper son propre header. cf. skill melis-react-mobile-responsive.
   useLayoutEffect(() => {
     const anchor = anchorRef.current
     if (!anchor) return
@@ -205,11 +210,12 @@ function ColManager({ anchorRef, cols, labelFor, onChange, onClose }: {
     const margin = 8
     const spaceBelow = window.innerHeight - rect.bottom - margin
     const spaceAbove = rect.top - margin
-    const right = Math.max(margin, window.innerWidth - rect.right)
+    const width = Math.min(380, window.innerWidth - margin * 2)
+    const left = Math.min(Math.max(margin, rect.right - width), window.innerWidth - width - margin)
     if (spaceBelow >= 200 || spaceBelow >= spaceAbove) {
-      setPos({ top: rect.bottom + 6, right, maxHeight: Math.max(160, spaceBelow - 6) })
+      setPos({ top: rect.bottom + 6, left, width, maxHeight: Math.max(160, spaceBelow - 6) })
     } else {
-      setPos({ bottom: window.innerHeight - rect.top + 6, right, maxHeight: Math.max(160, spaceAbove - 6) })
+      setPos({ bottom: window.innerHeight - rect.top + 6, left, width, maxHeight: Math.max(160, spaceAbove - 6) })
     }
   }, [anchorRef])
 
@@ -250,7 +256,7 @@ function ColManager({ anchorRef, cols, labelFor, onChange, onClose }: {
   if (!pos) return null
   return (
     <div style={{
-      ...card, position: 'fixed', right: pos.right, zIndex: 50, width: 380, maxWidth: 'calc(100vw - 1rem)',
+      ...card, position: 'fixed', left: pos.left, width: pos.width, zIndex: 50,
       maxHeight: pos.maxHeight, overflowY: 'auto', display: 'flex', flexDirection: 'column',
       ...(pos.top != null ? { top: pos.top } : { bottom: pos.bottom }),
     }}>
@@ -310,6 +316,7 @@ export default function ProspectThemesPage() {
 // ── Liste ───────────────────────────────────────────────────────────────────
 function ThemeList({ base }: { base: string }) {
   const t = useT()
+  const narrow = useIsNarrow()
   const navigate = useNavigate()
   const location = useLocation()
   const [stats, setStats] = useState<ThemeStats | null>(null)
@@ -325,6 +332,10 @@ function ThemeList({ base }: { base: string }) {
   const [showExport, setShowExport] = useState(false)
   const [mode, setMode] = useState<ViewMode>('react')
   const [frameLoaded, setFrameLoaded] = useState(false)
+  const [expandedIds, setExpandedIds] = useState<Set<number>>(new Set())
+  function toggleExpand(id: number) {
+    setExpandedIds((prev) => { const next = new Set(prev); next.has(id) ? next.delete(id) : next.add(id); return next })
+  }
 
   const {
     items, total, loading, hasMore, sentinelRef, sortCol, sortDir, toggleSort, reload, removeLocal,
@@ -371,18 +382,31 @@ function ThemeList({ base }: { base: string }) {
     return ''
   }
 
+  // cf. skill melis-react-mobile-responsive : essential-column-collapse — `hasHidden` ne dépend
+  // QUE de `narrow`, jamais des colonnes masquées manuellement par l'utilisateur.
+  const displayCols = narrow ? cols.map((c) => ({ ...c, visible: c.id === 'name' })) : cols
+  const hasHidden = narrow
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 20, padding: 24, height: '100%', boxSizing: 'border-box', overflow: 'auto' }}>
       {/* Header */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16 }}>
-        <div>
-          <h1 style={{ fontSize: 20, fontWeight: 700, margin: 0 }}>{t('title')}</h1>
-          <p style={{ fontSize: 14, color: 'var(--color-muted-foreground)', margin: '2px 0 0' }}>{t('subtitle')}</p>
+      <div style={{ display: 'flex', alignItems: narrow ? 'flex-start' : 'center', justifyContent: 'space-between', gap: 16 }}>
+        <div style={{ minWidth: 0 }}>
+          <h1 style={{ fontSize: 20, fontWeight: 700, margin: 0, ...(narrow ? { overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' } : {}) }}>{t('title')}</h1>
+          <p style={{ fontSize: 14, color: 'var(--color-muted-foreground)', margin: '2px 0 0', ...(narrow ? { overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' } : {}) }}>{t('subtitle')}</p>
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <ViewToggle mode={mode} onChange={(m) => { setMode(m); if (m === 'iframe') setFrameLoaded(true) }} />
-          <button style={btnGhost} onClick={handleRefresh} disabled={refreshing} title={t('refresh')}><RotateCcwIcon spinning={refreshing} /></button>
-          {can('create') && <button style={btnPrimary} onClick={() => setEditingTheme('new')}><PlusIcon />{t('add')}</button>}
+        {/* Sur mobile : icon-row (toggle+refresh) + bouton « + Nouveau thème » pleine largeur en
+            dessous, largeur alignée via ce wrapper flex-col (pas de largeur explicite) — voir skill. */}
+        <div style={narrow ? { display: 'flex', flexDirection: 'column', gap: 8, flexShrink: 0 } : { display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, justifyContent: narrow ? 'flex-end' : undefined }}>
+            <ViewToggle mode={mode} onChange={(m) => { setMode(m); if (m === 'iframe') setFrameLoaded(true) }} compact={narrow} />
+            <button style={btnGhost} onClick={handleRefresh} disabled={refreshing} title={t('refresh')}><RotateCcwIcon spinning={refreshing} /></button>
+          </div>
+          {can('create') && (
+            <button style={{ ...btnPrimary, ...(narrow ? { width: '100%', justifyContent: 'center' } : {}) }} onClick={() => setEditingTheme('new')}>
+              <PlusIcon />{t('add')}
+            </button>
+          )}
         </div>
       </div>
 
@@ -408,28 +432,33 @@ function ThemeList({ base }: { base: string }) {
 
       {/* Filtres */}
       <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
-        <input style={{ ...inputCss, height: 36, flex: 1, minWidth: 220 }} value={searchInput}
+        <input style={{ ...inputCss, height: 36, ...(narrow ? { width: '100%' } : { flex: 1, minWidth: 220 }) }} value={searchInput}
           onChange={(e) => setSearchInput(e.target.value)}
           onKeyDown={(e) => e.key === 'Enter' && setSearch(searchInput.trim())}
           placeholder={t('search')} />
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginLeft: 'auto' }}>
-          <button style={{ ...btnGhost, height: 36 }} onClick={resetFilters} disabled={refreshing} title={t('reset_filters')}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, ...(narrow ? { width: '100%', flexWrap: 'wrap' } : { marginLeft: 'auto' }) }}>
+          <button style={{ ...btnGhost, height: 36, ...(narrow ? { flex: '1 1 100%', justifyContent: 'center' } : {}) }} onClick={resetFilters} disabled={refreshing} title={t('reset_filters')}>
             <RotateCcwIcon spinning={refreshing} />{t('reset_filters')}
           </button>
-          <div ref={colsAnchorRef} style={{ position: 'relative' }}>
-            <button style={{ ...btnGhost, height: 36 }} onClick={() => setShowCols((v) => !v)}><Columns3Icon />{t('columns')}</button>
+          <div ref={colsAnchorRef} style={{ position: 'relative', ...(narrow ? { flex: '1 1 calc(50% - 4px)' } : {}) }}>
+            <button style={{ ...btnGhost, height: 36, ...(narrow ? { width: '100%', justifyContent: 'center' } : {}) }} onClick={() => setShowCols((v) => !v)}><Columns3Icon />{t('columns')}</button>
             {showCols && <ColManager anchorRef={colsAnchorRef} cols={cols} labelFor={(id) => t(COL_LABEL[id])} onChange={setCols} onClose={() => setShowCols(false)} />}
           </div>
-          {can('export') && <button style={{ ...btnGhost, height: 36 }} onClick={() => setShowExport(true)}><DownloadIcon />{t('export')}</button>}
+          {can('export') && (
+            <button style={{ ...btnGhost, height: 36, ...(narrow ? { flex: '1 1 calc(50% - 4px)', justifyContent: 'center' } : {}) }} onClick={() => setShowExport(true)}>
+              <DownloadIcon />{t('export')}
+            </button>
+          )}
         </div>
       </div>
 
       {/* Table */}
       <div style={{ ...card, overflow: 'auto' }}>
-        <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: 640 }}>
+        <table style={{ width: '100%', borderCollapse: 'collapse', ...(!narrow ? { minWidth: 640 } : {}) }}>
           <thead style={{ background: 'var(--color-muted,rgba(0,0,0,.03))' }}>
             <tr>
-              {visibleCols(cols).map(({ id }) => {
+              {hasHidden && <th style={{ ...th, width: 36 }} />}
+              {visibleCols(displayCols).map(({ id }) => {
                 const sortable = SORTABLE.has(id as ThemeSortKey)
                 return (
                   <th key={id} style={{ ...th, ...(id === 'id' ? { width: 70 } : {}), ...(id === 'items' ? { width: 100 } : {}), ...(sortable ? { cursor: 'pointer' } : {}) }}
@@ -446,33 +475,45 @@ function ThemeList({ base }: { base: string }) {
           </thead>
           <tbody>
             {items.length === 0 && !loading ? (
-              <tr><td style={{ ...td, textAlign: 'center', color: 'var(--color-muted-foreground)', padding: '40px 16px' }} colSpan={visibleCols(cols).length + 1}>{t('empty')}</td></tr>
-            ) : items.map((r) => (
-              <tr key={r.id}>
-                {visibleCols(cols).map(({ id }) => (
-                  <td key={id} style={{
-                    ...td,
-                    ...(id === 'id' ? { color: 'var(--color-muted-foreground)', fontVariantNumeric: 'tabular-nums' } : {}),
-                    ...(id === 'name' ? { fontWeight: 500 } : {}),
-                  }}>
-                    {id === 'id' && r.id}
-                    {id === 'name' && r.name}
-                    {id === 'items' && r.itemCount}
+              <tr><td style={{ ...td, textAlign: 'center', color: 'var(--color-muted-foreground)', padding: '40px 16px' }} colSpan={visibleCols(displayCols).length + 1 + (hasHidden ? 1 : 0)}>{t('empty')}</td></tr>
+            ) : items.map((r) => {
+              const expanded = expandedIds.has(r.id)
+              return (
+                <Fragment key={r.id}>
+                <tr>
+                  {hasHidden && <td style={td}><ExpandToggle expanded={expanded} onClick={() => toggleExpand(r.id)} /></td>}
+                  {visibleCols(displayCols).map(({ id }) => (
+                    <td key={id} style={{
+                      ...td,
+                      ...(id === 'id' ? { color: 'var(--color-muted-foreground)', fontVariantNumeric: 'tabular-nums' } : {}),
+                      ...(id === 'name' ? { fontWeight: 500 } : {}),
+                    }}>
+                      {id === 'id' && r.id}
+                      {id === 'name' && r.name}
+                      {id === 'items' && r.itemCount}
+                    </td>
+                  ))}
+                  <td style={td}>
+                    <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 4 }}>
+                      {/* Renommer : le thème n'a qu'un champ → modale (legacy btn_prospects_theme_edit, tooltip « Rename »). */}
+                      {can('edit') && <button style={iconBtn} title={t('rename')} onClick={() => setEditingTheme(r)}><RenameIcon /></button>}
+                      {/* Éditer : ouvre le thème en SOUS-ONGLET pour gérer ses éléments (legacy btn_prospects_theme_items).
+                          Gaté par la capacité `items`. */}
+                      {can('items') && <button style={iconBtn} title={t('edit')} onClick={() => navigate(`${base}/${r.id}`)}><PencilIcon /></button>}
+                      {/* Supprimer (legacy btn_prospects_theme_delete) */}
+                      {can('delete') && <button style={{ ...iconBtn, color: 'var(--color-destructive,#ef4444)' }} title={t('del')} onClick={() => setToDelete(r)}><TrashIcon /></button>}
+                    </div>
                   </td>
-                ))}
-                <td style={td}>
-                  <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 4 }}>
-                    {/* Renommer : le thème n'a qu'un champ → modale (legacy btn_prospects_theme_edit, tooltip « Rename »). */}
-                    {can('edit') && <button style={iconBtn} title={t('rename')} onClick={() => setEditingTheme(r)}><RenameIcon /></button>}
-                    {/* Éditer : ouvre le thème en SOUS-ONGLET pour gérer ses éléments (legacy btn_prospects_theme_items).
-                        Gaté par la capacité `items`. */}
-                    {can('items') && <button style={iconBtn} title={t('edit')} onClick={() => navigate(`${base}/${r.id}`)}><PencilIcon /></button>}
-                    {/* Supprimer (legacy btn_prospects_theme_delete) */}
-                    {can('delete') && <button style={{ ...iconBtn, color: 'var(--color-destructive,#ef4444)' }} title={t('del')} onClick={() => setToDelete(r)}><TrashIcon /></button>}
-                  </div>
-                </td>
-              </tr>
-            ))}
+                </tr>
+                {hasHidden && expanded && (
+                  <HiddenColsRow
+                    colSpan={visibleCols(displayCols).length + 2}
+                    cols={COL_ORDER.filter((id) => id !== 'name').map((id) => ({ label: t(COL_LABEL[id]), value: cellText(r, id) }))}
+                  />
+                )}
+                </Fragment>
+              )
+            })}
           </tbody>
         </table>
         <div ref={sentinelRef} style={{ height: 1 }} />
@@ -501,7 +542,7 @@ function ThemeList({ base }: { base: string }) {
 
       {/* Suppression */}
       {toDelete && (
-        <div style={{ position: 'fixed', inset: 0, zIndex: 50, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(0,0,0,.5)' }}>
+        <div style={{ position: 'fixed', inset: 0, zIndex: 50, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(0,0,0,.5)', padding: 16 }}>
           <div style={{ ...card, padding: 24, width: '100%', maxWidth: 380 }}>
             <h3 style={{ fontSize: 16, fontWeight: 600, margin: 0 }}>{t('del_title')}</h3>
             <p style={{ fontSize: 14, color: 'var(--color-muted-foreground)', marginTop: 8 }}>{t('del_confirm', { u: toDelete.name })}</p>
@@ -616,10 +657,10 @@ function ThemeForm({ id, base }: { id: string; base: string }) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 20, padding: 24, height: '100%', boxSizing: 'border-box', overflow: 'auto' }}>
       {/* Header : nom du thème (le Retour est fourni par le sous-onglet hôte) */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-        <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 32, height: 32, borderRadius: 8, background: 'color-mix(in srgb, var(--color-primary) 10%, transparent)', color: 'var(--color-primary)' }}><TagIcon /></span>
-        <div>
-          <h1 style={{ fontSize: 20, fontWeight: 700, margin: 0 }}>{item?.name || t('edit_title')}</h1>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 10, minWidth: 0 }}>
+        <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 32, height: 32, borderRadius: 8, background: 'color-mix(in srgb, var(--color-primary) 10%, transparent)', color: 'var(--color-primary)', flexShrink: 0 }}><TagIcon /></span>
+        <div style={{ minWidth: 0 }}>
+          <h1 style={{ fontSize: 20, fontWeight: 700, margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{item?.name || t('edit_title')}</h1>
           <p style={{ fontSize: 13, color: 'var(--color-muted-foreground)', margin: '2px 0 0' }}>{t('tab_items')}</p>
         </div>
       </div>
@@ -638,6 +679,7 @@ function ThemeForm({ id, base }: { id: string; base: string }) {
 // (un nom par langue CMS) + suppression, 100% React (remplace l'iframe legacy).
 function ThemeItemsPanel({ theme }: { theme: ThemeItem }) {
   const t = useT()
+  const narrow = useIsNarrow()
   const [rows, setRows] = useState<ThemeItemRow[]>([])
   const [langs, setLangs] = useState<CmsLang[]>([])
   const [loading, setLoading] = useState(false)
@@ -672,21 +714,26 @@ function ThemeItemsPanel({ theme }: { theme: ThemeItem }) {
       {/* Barre : recherche (icône dans le champ, live) + Réinitialiser + « Nouvel élément »
           (le sous-onglet hôte fournit déjà Retour + titre) */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
-        <div style={{ position: 'relative', flex: 1, minWidth: 220 }}>
+        <div style={{ position: 'relative', ...(narrow ? { flex: '1 1 100%' } : { flex: 1, minWidth: 220 }) }}>
           <span style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none', color: 'var(--color-muted-foreground)', display: 'inline-flex' }}><SearchIcon /></span>
           <input style={{ ...inputCss, height: 36, width: '100%', paddingLeft: 34 }} value={searchInput}
             onChange={(e) => setSearchInput(e.target.value)}
             placeholder={t('items_search')} />
         </div>
-        <button style={{ ...btnGhost, height: 36 }} onClick={resetFilters} title={t('reset_filters')}>
+        {/* reset_filters : toujours sa propre ligne pleine largeur sur mobile (FR plus long que EN) — jamais un pairing 50/50. */}
+        <button style={{ ...btnGhost, height: 36, ...(narrow ? { flex: '1 1 100%', justifyContent: 'center' } : {}) }} onClick={resetFilters} title={t('reset_filters')}>
           <RotateCcwIcon />{t('reset_filters')}
         </button>
-        {can('items.create') && <button style={btnPrimary} onClick={() => setEditing('new')}><PlusIcon />{t('items_add')}</button>}
+        {can('items.create') && (
+          <button style={{ ...btnPrimary, ...(narrow ? { flex: '1 1 100%', justifyContent: 'center' } : {}) }} onClick={() => setEditing('new')}>
+            <PlusIcon />{t('items_add')}
+          </button>
+        )}
       </div>
 
       {/* Table */}
       <div style={{ ...card, overflow: 'auto' }}>
-        <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: 480 }}>
+        <table style={{ width: '100%', borderCollapse: 'collapse', ...(!narrow ? { minWidth: 480 } : {}) }}>
           <thead style={{ background: 'var(--color-muted,rgba(0,0,0,.03))' }}>
             <tr>
               <th style={{ ...th, width: 70 }}>{t('col_id')}</th>
@@ -727,7 +774,7 @@ function ThemeItemsPanel({ theme }: { theme: ThemeItem }) {
       )}
 
       {toDelete && (
-        <div style={{ position: 'fixed', inset: 0, zIndex: 50, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(0,0,0,.5)' }}>
+        <div style={{ position: 'fixed', inset: 0, zIndex: 50, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(0,0,0,.5)', padding: 16 }}>
           <div style={{ ...card, padding: 24, width: '100%', maxWidth: 380 }}>
             <h3 style={{ fontSize: 16, fontWeight: 600, margin: 0 }}>{t('items_del_title')}</h3>
             <p style={{ fontSize: 14, color: 'var(--color-muted-foreground)', marginTop: 8 }}>{t('items_del_confirm', { u: toDelete.name })}</p>
