@@ -7,6 +7,7 @@ return [
 			'MelisCmsProspects' => [ 
 				//MelisCmsSliderService.php
 				'MelisCmsProspectsService' => [
+				    '_description' => 'tr_meliscmsprospects_ws_desc',
 					/**
 					 *  method getProspectsDataForWidgets
 					 * 	@param widgetId
