@@ -910,7 +910,7 @@
 			f_date: "Date de contact",
 			f_theme: "Thème",
 			err_save: "Erreur lors de la sauvegarde",
-			err_required: "Le nom, l’email, le téléphone et le message sont obligatoires.",
+			err_email: "L’adresse email n’est pas valide.",
 			no_access: "Vous n’avez pas les droits pour consulter cette liste.",
 			none: "—",
 			dr_label: "Date",
@@ -979,7 +979,7 @@
 			f_date: "Contact date",
 			f_theme: "Theme",
 			err_save: "Error while saving",
-			err_required: "Name, email, phone and message are required.",
+			err_email: "The email address is not valid.",
 			no_access: "You do not have permission to view this list.",
 			none: "—",
 			dr_label: "Date",
@@ -2534,8 +2534,8 @@
 		}, [prospectId]);
 		async function submit() {
 			setError(null);
-			if (!name.trim() || !email.trim() || !telephone.trim() || !message.trim()) {
-				setError(t("err_required"));
+			if (email.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
+				setError(t("err_email"));
 				return;
 			}
 			setSaving(true);

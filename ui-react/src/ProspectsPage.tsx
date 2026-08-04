@@ -66,7 +66,7 @@ const DICT: Record<Lang, Record<string, string>> = {
     edit_title: 'Prospect', sec_contact: 'Coordonnées', sec_message: 'Message', sec_details: 'Détails',
     f_name: 'Nom', f_email: 'Email', f_phone: 'Téléphone', f_company: 'Société', f_country: 'Pays',
     f_site: 'Site', f_site_ph: '— Aucun site —', f_type: 'Type', f_date: 'Date de contact', f_theme: 'Thème',
-    err_save: 'Erreur lors de la sauvegarde', err_required: 'Le nom, l’email, le téléphone et le message sont obligatoires.',
+    err_save: 'Erreur lors de la sauvegarde', err_email: 'L’adresse email n’est pas valide.',
     no_access: 'Vous n’avez pas les droits pour consulter cette liste.', none: '—',
     dr_label: 'Date', dr_all: 'Toutes les dates', dr_today: "Aujourd'hui", dr_yesterday: 'Hier',
     dr_last7: '7 derniers jours', dr_last30: '30 derniers jours', dr_thismonth: 'Ce mois-ci', dr_lastmonth: 'Le mois dernier',
@@ -87,7 +87,7 @@ const DICT: Record<Lang, Record<string, string>> = {
     edit_title: 'Prospect', sec_contact: 'Contact information', sec_message: 'Message', sec_details: 'Details',
     f_name: 'Name', f_email: 'Email', f_phone: 'Phone', f_company: 'Company', f_country: 'Country',
     f_site: 'Site', f_site_ph: '— No site —', f_type: 'Type', f_date: 'Contact date', f_theme: 'Theme',
-    err_save: 'Error while saving', err_required: 'Name, email, phone and message are required.',
+    err_save: 'Error while saving', err_email: 'The email address is not valid.',
     no_access: 'You do not have permission to view this list.', none: '—',
     dr_label: 'Date', dr_all: 'All dates', dr_today: 'Today', dr_yesterday: 'Yesterday',
     dr_last7: 'Last 7 days', dr_last30: 'Last 30 days', dr_thismonth: 'This month', dr_lastmonth: 'Last month',
@@ -708,7 +708,8 @@ function ProspectForm({ id, base }: { id: string; base: string }) {
 
   async function submit() {
     setError(null)
-    if (!name.trim() || !email.trim() || !telephone.trim() || !message.trim()) { setError(t('err_required')); return }
+    // Aucun champ n'est obligatoire (parité legacy) ; on valide seulement le format email s'il est renseigné.
+    if (email.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) { setError(t('err_email')); return }
     setSaving(true)
     try {
       await saveProspect({
