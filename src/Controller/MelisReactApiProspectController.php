@@ -334,11 +334,9 @@ class MelisReactApiProspectController extends MelisAbstractActionController
             $siteId    = isset($body['siteId']) && $body['siteId'] ? (int) $body['siteId'] : null;
             $theme     = isset($body['theme']) && $body['theme'] ? (int) $body['theme'] : null;
 
-            // Validations (parité legacy — ToolProspectsController::updateProspectDataAction).
-            if ($name === '' || $email === '' || $telephone === '' || $message === '') {
-                return $this->jsonResponse(['success' => false, 'error' => 'Le nom, l\'email, le téléphone et le message sont obligatoires.'], 400);
-            }
-            if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            // Validations (parité legacy) : aucun champ n'est obligatoire (formulaire legacy
+            // `required => false`) ; on ne valide le format que si une valeur est renseignée.
+            if ($email !== '' && !filter_var($email, FILTER_VALIDATE_EMAIL)) {
                 return $this->jsonResponse(['success' => false, 'error' => 'L\'adresse email n\'est pas valide.'], 400);
             }
             if (!preg_match('/^[0-9()\/+ -]*$/', $telephone)) {
