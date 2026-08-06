@@ -41,6 +41,7 @@ class MelisCmsProspectsThemeTable extends MelisGenericTable
         }
 
         if(!empty($orderBy)) {
+            $orderDirection = strtoupper($orderDirection) === 'DESC' ? 'DESC' : 'ASC';
             $select->order($orderBy . ' ' . $orderDirection);
         }
 

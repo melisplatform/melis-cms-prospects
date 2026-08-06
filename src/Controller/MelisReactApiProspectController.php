@@ -3,6 +3,7 @@
 namespace MelisCmsProspects\Controller;
 
 use MelisReactApi\Controller\CapabilityGuardTrait;
+use MelisCore\Controller\MelisReactKeysetListTrait;
 
 use Laminas\Http\PhpEnvironment\Response as HttpResponse;
 use MelisCore\Controller\MelisAbstractActionController;
@@ -35,9 +36,15 @@ use MelisCore\Controller\MelisAbstractActionController;
 class MelisReactApiProspectController extends MelisAbstractActionController
 {
     use CapabilityGuardTrait;
+    use MelisReactKeysetListTrait;
 
-    /** melisKey de l'outil — utilisé par le garde de droits (cf. denyUnlessAccess). */
-    private const MELIS_KEY = 'MelisCmsProspects_tool_prospects';
+    /** melisKey of the RIGHTS-BEARING menu node — the access guard AND the capability key.
+     *  MUST stay in sync with config/react.capabilities.php: denyUnlessCan() resolves capabilities
+     *  through this constant, so a mismatch makes every server-side capability check silently
+     *  default-allow. NOT `MelisCmsProspects_tool_prospects` — that is the `conf.type` target, kept
+     *  as the renderable ZONE key (iframe); it is not granted on its own, so guarding on it would
+     *  403 every request. */
+    private const MELIS_KEY = 'melisprospects_tool_prospects_section';
 
     // ─── GET /prospects ────────────────────────────────────────────────────────
 
@@ -47,14 +54,15 @@ class MelisReactApiProspectController extends MelisAbstractActionController
         if ($denyCap = $this->denyUnlessCan('list')) { return $denyCap; }
 
         try {
-            $page   = max(1, (int) $this->params()->fromQuery('page', 1));
             $limit  = min(9999, max(1, (int) $this->params()->fromQuery('limit', 25)));
             $search = trim((string) ($this->params()->fromQuery('search', '') ?? ''));
             $siteId = (int) $this->params()->fromQuery('site', 0) ?: null;
             $type   = trim((string) ($this->params()->fromQuery('type', '') ?? ''));
             $dateFrom = trim((string) ($this->params()->fromQuery('dateFrom', '') ?? ''));
             $dateTo   = trim((string) ($this->params()->fromQuery('dateTo', '') ?? ''));
-            $offset = ($page - 1) * $limit;
+            $sort   = (string) $this->params()->fromQuery('sort', 'date');
+            $dir    = (string) $this->params()->fromQuery('dir', 'desc');
+            $after  = (string) $this->params()->fromQuery('after', '');
 
             $db = $this->getServiceManager()->get('Laminas\Db\Adapter\AdapterInterface');
 
@@ -81,31 +89,41 @@ class MelisReactApiProspectController extends MelisAbstractActionController
                 $where[] = 'p.pros_contact_date <= ?';
                 $params[] = $dateTo . ' 23:59:59';
             }
-            $whereClause = $where ? 'WHERE ' . implode(' AND ', $where) : '';
 
-            $countRow = iterator_to_array($db->query(
-                "SELECT COUNT(*) AS total
-                 FROM melis_cms_prospects p
-                 LEFT JOIN melis_cms_site s ON s.site_id = p.pros_site_id
-                 $whereClause",
-                $params
-            ));
-            $total = (int) ($countRow[0]['total'] ?? 0);
+            // Whitelist des colonnes triables (expr SQL NON-NULL). Le tri sur « site »/« theme »
+            // porte sur le libellé affiché (site_label/site_name, texte du thème). « message » n'est
+            // pas triable (texte long, tronqué à l'affichage).
+            $sortMap = [
+                'id'    => 'p.pros_id',
+                'site'  => "COALESCE(NULLIF(s.site_label,''), s.site_name, '')",
+                'name'  => "COALESCE(p.pros_name,'')",
+                'email' => "COALESCE(p.pros_email,'')",
+                'type'  => "COALESCE(p.pros_type,'')",
+                'phone' => "COALESCE(p.pros_telephone,'')",
+                'date'  => "COALESCE(p.pros_contact_date,'1000-01-01 00:00:00')",
+                'theme' => "COALESCE(it.item_trans_text,'')",
+            ];
 
-            $rows = $db->query(
-                "SELECT p.pros_id, p.pros_site_id, p.pros_type, p.pros_theme, p.pros_name, p.pros_email,
-                        p.pros_telephone, p.pros_message, p.pros_company, p.pros_country,
-                        p.pros_contact_date, p.pros_anonymized,
-                        s.site_name, s.site_label,
-                        it.item_trans_text AS theme_name
-                 FROM melis_cms_prospects p
-                 LEFT JOIN melis_cms_site s ON s.site_id = p.pros_site_id
-                 LEFT JOIN melis_cms_prospects_theme_items_trans it ON it.item_trans_theme_item_id = p.pros_theme
-                 $whereClause
-                 ORDER BY p.pros_contact_date DESC
-                 LIMIT ? OFFSET ?",
-                array_merge($params, [$limit, $offset])
-            );
+            [$rows, $total, $next] = $this->keysetList([
+                'db'           => $db,
+                'from'         => 'melis_cms_prospects p',
+                'joins'        => 'LEFT JOIN melis_cms_site s ON s.site_id = p.pros_site_id
+                                   LEFT JOIN melis_cms_prospects_theme_items_trans it ON it.item_trans_theme_item_id = p.pros_theme',
+                'selectCols'   => 'p.pros_id, p.pros_site_id, p.pros_type, p.pros_theme, p.pros_name, p.pros_email,
+                                   p.pros_telephone, p.pros_message, p.pros_company, p.pros_country,
+                                   p.pros_contact_date, p.pros_anonymized,
+                                   s.site_name, s.site_label,
+                                   it.item_trans_text AS theme_name',
+                'filterWhere'  => $where,
+                'filterParams' => $params,
+                'sortMap'      => $sortMap,
+                'idCol'        => 'p.pros_id',
+                'idAlias'      => 'pros_id',
+                'sortKey'      => $sort,
+                'dir'          => $dir,
+                'after'        => $after,
+                'limit'        => $limit,
+            ]);
 
             $items = [];
             foreach ($rows as $row) {
@@ -114,7 +132,7 @@ class MelisReactApiProspectController extends MelisAbstractActionController
 
             return $this->jsonResponse([
                 'success' => true,
-                'data'    => ['items' => $items, 'total' => $total, 'page' => $page, 'limit' => $limit],
+                'data'    => ['items' => $items, 'total' => $total, 'nextCursor' => $next],
             ]);
         } catch (\Throwable $e) {
             return $this->errorResponse($e);

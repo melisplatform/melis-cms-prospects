@@ -131,6 +131,7 @@ class MelisProspectTable extends MelisGenericTable
 //        }
 
         if(!empty($orderBy)) {
+            $orderDirection = strtoupper($orderDirection) === 'DESC' ? 'DESC' : 'ASC';
             $select->order($orderBy . ' ' . $orderDirection);
         }
 
@@ -181,16 +182,16 @@ class MelisProspectTable extends MelisGenericTable
         if (!empty($searchInputs)) {
             if (!empty($searchInputs['user_name'])) {
                 if ($isSpecificSearch)
-                    $select->where->literal('LOWER(' . 'pros_name' . ') = ' . "'" . strtolower($searchInputs['user_name']) . "'");
+                    $select->where->expression('LOWER(pros_name) = ?', strtolower($searchInputs['user_name']));
                 else
-                    $select->where->literal('LOWER(' . 'pros_name' . ') LIKE ' . "'%" . strtolower($searchInputs['user_name']) . "%'");
+                    $select->where->expression('LOWER(pros_name) LIKE ?', '%' . strtolower($searchInputs['user_name']) . '%');
             }
 
             if (!empty($searchInputs['user_email']))
-                $select->where->literal('LOWER(' . 'pros_email' . ') = ' . "'" . strtolower($searchInputs['user_email']) . "'");
+                $select->where->expression('LOWER(pros_email) = ?', strtolower($searchInputs['user_email']));
 
             if (!empty($searchInputs['site_id']))
-                $select->where->literal('LOWER(' . 'pros_site_id' . ') = ' . "'" . strtolower($searchInputs['site_id']) . "'");
+                $select->where->expression('LOWER(pros_site_id) = ?', strtolower($searchInputs['site_id']));
         }
 
         $resultSet = $this->tableGateway->selectWith($select);

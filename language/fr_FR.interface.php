@@ -1,6 +1,7 @@
 <?php 
 	return array( 
-	    'tr_melistoolprospects_tool_prospects' => 'Prospect',
+    'tr_meliscmsprospects_ws_desc' => 'Prospects issus des formulaires : données agrégées pour widgets et par date.',
+	    'tr_melistoolprospects_tool_prospects' => 'Prospects',
 	    'tr_melistoolprospects_tool_prospects_description' => 'Cet outil permet de gérer les prospects issus des formulaires de contact.',
 	    'tr_melistoolprospects_tool_prospects_modal_description' => 'Ce formulaire permet d&#39;actualiser les informations de prospect existant.',
 	    'tr_melistoolprospects_prospects_pros_id' => 'ID',

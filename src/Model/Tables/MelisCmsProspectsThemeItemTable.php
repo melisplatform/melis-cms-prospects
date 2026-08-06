@@ -119,6 +119,7 @@ class MelisCmsProspectsThemeItemTable extends MelisGenericTable
         
         $order = !empty($options['order']['key']) ? $options['order']['key'] : '';
         $orderDir = !empty($options['order']['dir']) ? $options['order']['dir'] : 'ASC';
+        $orderDir = strtoupper($orderDir) === 'DESC' ? 'DESC' : 'ASC';
         
         $start = (int) $options['start'];
         $limit = (int) $options['limit'] === -1 ? $this->getTotalData() : (int) $options['limit'];
