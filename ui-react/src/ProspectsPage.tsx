@@ -10,7 +10,6 @@ import { ExportModal, DownloadIcon } from './ExportModal'
 import { ViewToggle, type ViewMode } from './ViewToggle'
 import { useIsNarrow } from './shared/useIsNarrow'
 import { ExpandToggle, HiddenColsRow } from './shared/ExpandableRow'
-import { FormErrorBanner, okNotify, koNotify, type FormIssue } from './shared/melis-form-errors'
 import { useDragReorder } from './shared/use-drag-reorder'
 
 // Outil Prospects legacy (vue « Old » en iframe). Voir brick.manifest.json (prospects).
@@ -69,7 +68,6 @@ const DICT: Record<Lang, Record<string, string>> = {
     f_name: 'Nom', f_email: 'Email', f_phone: 'Téléphone', f_company: 'Société', f_country: 'Pays',
     f_site: 'Site', f_site_ph: '— Aucun site —', f_type: 'Type', f_date: 'Date de contact', f_theme: 'Thème',
     err_save: 'Erreur lors de la sauvegarde', err_email: 'L’adresse email n’est pas valide.',
-    err_check: 'Veuillez vérifier les champs obligatoires.',
     no_access: 'Vous n’avez pas les droits pour consulter cette liste.', none: '—',
     dr_label: 'Date', dr_all: 'Toutes les dates', dr_today: "Aujourd'hui", dr_yesterday: 'Hier',
     dr_last7: '7 derniers jours', dr_last30: '30 derniers jours', dr_thismonth: 'Ce mois-ci', dr_lastmonth: 'Le mois dernier',
@@ -92,7 +90,6 @@ const DICT: Record<Lang, Record<string, string>> = {
     f_name: 'Name', f_email: 'Email', f_phone: 'Phone', f_company: 'Company', f_country: 'Country',
     f_site: 'Site', f_site_ph: '— No site —', f_type: 'Type', f_date: 'Contact date', f_theme: 'Theme',
     err_save: 'Error while saving', err_email: 'The email address is not valid.',
-    err_check: 'Please check the required fields.',
     no_access: 'You do not have permission to view this list.', none: '—',
     dr_label: 'Date', dr_all: 'All dates', dr_today: 'Today', dr_yesterday: 'Yesterday',
     dr_last7: 'Last 7 days', dr_last30: 'Last 30 days', dr_thismonth: 'This month', dr_lastmonth: 'Last month',
@@ -108,6 +105,10 @@ function useT() {
     return s
   }
 }
+function notify(kind: 'ok' | 'ko', title: string, message: string) {
+  window.postMessage({ __melisNotif: true, kind, title, message }, '*')
+}
+
 // ── Styles (variables CSS du thème de l'hôte) ──
 const card: CSSProperties = { border: '1px solid var(--color-border)', background: 'var(--color-card)', borderRadius: 12, boxShadow: '0 1px 2px rgba(0,0,0,.04)' }
 const inputCss: CSSProperties = { height: 40, width: '100%', boxSizing: 'border-box', borderRadius: 8, border: '1px solid var(--color-input,var(--color-border))', background: 'var(--color-card)', color: 'var(--color-foreground)', padding: '0 12px', fontSize: 14, outline: 'none' }
@@ -679,8 +680,7 @@ function ProspectForm({ id, base }: { id: string; base: string }) {
   const [themes, setThemes] = useState<ThemeOption[]>([])
   const [loading, setLoading] = useState(false)
   const [saving, setSaving] = useState(false)
-  // Bannière d'erreur unifiée : un titre + la liste des champs en échec (client) ou le message serveur.
-  const [formError, setFormError] = useState<{ title: string; issues?: FormIssue[] } | null>(null)
+  const [error, setError] = useState<string | null>(null)
   const subTabRegistered = useRef(false)
 
   useEffect(() => { if (!can('edit')) navigate(base) }, [base, navigate])
@@ -712,14 +712,9 @@ function ProspectForm({ id, base }: { id: string; base: string }) {
   }, [prospectId]) // eslint-disable-line react-hooks/exhaustive-deps
 
   async function submit() {
-    setFormError(null)
+    setError(null)
     // Aucun champ n'est obligatoire (parité legacy) ; on valide seulement le format email s'il est renseigné.
-    // On collecte TOUS les champs invalides pour les lister dans la bannière (ici uniquement l'email).
-    const found: FormIssue[] = []
-    if (email.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
-      found.push({ label: t('f_email'), message: t('err_email') })
-    }
-    if (found.length) { setFormError({ title: t('err_check'), issues: found }); return }
+    if (email.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) { setError(t('err_email')); return }
     setSaving(true)
     try {
       await saveProspect({
@@ -729,13 +724,11 @@ function ProspectForm({ id, base }: { id: string; base: string }) {
         theme: theme === '' ? null : Number(theme),
       })
       markProspectsListStale()
-      okNotify(t('title'), t('saved'))
+      notify('ok', t('title'), t('saved'))
       window.__melisUpdateSubTabLabel?.(base, path, name.trim())
       setTimeout(() => navigate(base), 600)
     } catch (e) {
-      const m = e instanceof Error ? e.message : t('err_save')
-      setFormError({ title: t('err_save'), issues: [{ message: m }] })
-      koNotify(t('err_save'), m)
+      setError(e instanceof Error ? e.message : t('err_save'))
     } finally { setSaving(false) }
   }
 
@@ -757,7 +750,7 @@ function ProspectForm({ id, base }: { id: string; base: string }) {
         </div>
       </div>
 
-      {formError && <FormErrorBanner title={formError.title} issues={formError.issues} />}
+      {error && <div style={{ ...card, borderColor: '#fca5a5', background: '#fef2f2', color: '#b91c1c', padding: '8px 14px', fontSize: 14 }}>{error}</div>}
 
       {loading ? (
         <div style={{ padding: 48, textAlign: 'center', color: 'var(--color-muted-foreground)' }}>{t('loading')}</div>

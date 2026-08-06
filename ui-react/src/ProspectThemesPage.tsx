@@ -11,7 +11,6 @@ import { ExportModal, DownloadIcon } from './ExportModal'
 import { ViewToggle, type ViewMode } from './ViewToggle'
 import { useIsNarrow } from './shared/useIsNarrow'
 import { ExpandToggle, HiddenColsRow } from './shared/ExpandableRow'
-import { FormErrorBanner, okNotify, koNotify, type FormIssue } from './shared/melis-form-errors'
 import { useDragReorder } from './shared/use-drag-reorder'
 
 // Outil Thèmes legacy (vue « Old » en iframe). Renderable ZONE key — le `conf.type` target.
@@ -76,7 +75,6 @@ const DICT: Record<Lang, Record<string, string>> = {
     f_name: 'Nom', f_code: 'Code', f_code_ph: 'Optionnel — identifiant technique',
     info_note: 'Le nom identifie le thème dans le back-office (formulaires de prospects).',
     err_save: 'Erreur lors de la sauvegarde', err_required: 'Le nom du thème est obligatoire.',
-    err_check: 'Veuillez vérifier les champs obligatoires.',
     no_access: 'Vous n’avez pas les droits pour consulter cette liste.', none: '—',
     view_new: 'Nouveau', view_old: 'Ancien',
   },
@@ -101,7 +99,6 @@ const DICT: Record<Lang, Record<string, string>> = {
     f_name: 'Name', f_code: 'Code', f_code_ph: 'Optional — technical identifier',
     info_note: 'The name identifies the theme in the back-office (prospect forms).',
     err_save: 'Error while saving', err_required: 'The theme name is required.',
-    err_check: 'Please check the required fields.',
     no_access: 'You do not have permission to view this list.', none: '—',
     view_new: 'New', view_old: 'Old',
   },
@@ -114,6 +111,10 @@ function useT() {
     return s
   }
 }
+function notify(kind: 'ok' | 'ko', title: string, message: string) {
+  window.postMessage({ __melisNotif: true, kind, title, message }, '*')
+}
+
 // ── Styles (variables CSS du thème de l'hôte) ──
 const card: CSSProperties = { border: '1px solid var(--color-border)', background: 'var(--color-card)', borderRadius: 12, boxShadow: '0 1px 2px rgba(0,0,0,.04)' }
 const inputCss: CSSProperties = { height: 40, width: '100%', boxSizing: 'border-box', borderRadius: 8, border: '1px solid var(--color-input,var(--color-border))', background: 'var(--color-card)', color: 'var(--color-foreground)', padding: '0 12px', fontSize: 14, outline: 'none' }
@@ -591,24 +592,19 @@ function ThemeModal({ theme, onClose, onSaved }: { theme: ThemeItem | 'new'; onC
   const isNew = theme === 'new'
   const [name, setName] = useState(isNew ? '' : theme.name)
   const [saving, setSaving] = useState(false)
-  const [formError, setFormError] = useState<{ title: string; issues?: FormIssue[] } | null>(null)
+  const [error, setError] = useState<string | null>(null)
 
   async function submit() {
-    setFormError(null)
-    // Collecte de tous les champs invalides (ici uniquement le Nom).
-    const found: FormIssue[] = []
-    if (!name.trim()) found.push({ label: t('f_name'), message: t('err_required') })
-    if (found.length) { setFormError({ title: t('err_check'), issues: found }); return }
+    setError(null)
+    if (!name.trim()) { setError(t('err_required')); return }
     setSaving(true)
     try {
       // Parité legacy (`prospects_theme_form`) : uniquement ID + Nom (le back préserve le code).
       await saveTheme({ id: isNew ? 0 : theme.id, name: name.trim() })
-      okNotify(t('title'), t('saved'))
+      notify('ok', t('title'), t('saved'))
       onSaved()
     } catch (e) {
-      const m = e instanceof Error ? e.message : t('err_save')
-      setFormError({ title: t('err_save'), issues: [{ message: m }] })
-      koNotify(t('err_save'), m)
+      setError(e instanceof Error ? e.message : t('err_save'))
     } finally { setSaving(false) }
   }
 
@@ -616,7 +612,7 @@ function ThemeModal({ theme, onClose, onSaved }: { theme: ThemeItem | 'new'; onC
     <div style={{ position: 'fixed', inset: 0, zIndex: 50, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(0,0,0,.5)', padding: 16 }}>
       <div style={{ ...card, padding: 24, width: '100%', maxWidth: 420 }}>
         <h3 style={{ fontSize: 16, fontWeight: 600, margin: '0 0 16px' }}>{isNew ? t('new_title') : t('rename')}</h3>
-        {formError && <div style={{ marginBottom: 14 }}><FormErrorBanner title={formError.title} issues={formError.issues} /></div>}
+        {error && <div style={{ ...card, borderColor: '#fca5a5', background: '#fef2f2', color: '#b91c1c', padding: '8px 14px', fontSize: 14, marginBottom: 14 }}>{error}</div>}
         <label style={label}>{t('f_name')}</label>
         <input style={inputCss} value={name} maxLength={45} autoComplete="off" autoFocus
           onChange={(e) => setName(e.target.value)}
@@ -808,7 +804,7 @@ function ThemeItemForm({ theme, itemId, langs, onClose, onSaved }: {
   const [activeLang, setActiveLang] = useState<number>(langs[0]?.id ?? 1)
   const [loading, setLoading] = useState(!isNew)
   const [saving, setSaving] = useState(false)
-  const [formError, setFormError] = useState<{ title: string; issues?: FormIssue[] } | null>(null)
+  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => { if (langs.length && !langs.some((l) => l.id === activeLang)) setActiveLang(langs[0].id) }, [langs]) // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -822,20 +818,16 @@ function ThemeItemForm({ theme, itemId, langs, onClose, onSaved }: {
   }, [itemId]) // eslint-disable-line react-hooks/exhaustive-deps
 
   async function submit() {
-    setFormError(null)
-    const found: FormIssue[] = []
+    setError(null)
     const anyText = Object.values(texts).some((v) => v && v.trim() !== '')
-    if (!anyText) found.push({ label: t('items_content_per_lang'), message: t('items_required') })
-    if (found.length) { setFormError({ title: t('err_check'), issues: found }); return }
+    if (!anyText) { setError(t('items_required')); return }
     setSaving(true)
     try {
       await saveThemeItem({ id: itemId, themeId: theme.id, translations: texts })
-      okNotify(t('items_edit_title'), t('saved'))
+      notify('ok', t('items_edit_title'), t('saved'))
       onSaved()
     } catch (e) {
-      const m = e instanceof Error ? e.message : t('err_save')
-      setFormError({ title: t('err_save'), issues: [{ message: m }] })
-      koNotify(t('err_save'), m)
+      setError(e instanceof Error ? e.message : t('err_save'))
     } finally { setSaving(false) }
   }
 
@@ -843,7 +835,7 @@ function ThemeItemForm({ theme, itemId, langs, onClose, onSaved }: {
     <div style={{ position: 'fixed', inset: 0, zIndex: 50, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(0,0,0,.5)', padding: 16 }}>
       <div style={{ ...card, padding: 24, width: '100%', maxWidth: 460, maxHeight: '90vh', overflow: 'auto' }}>
         <h3 style={{ fontSize: 16, fontWeight: 600, margin: '0 0 16px' }}>{isNew ? t('items_new_title') : t('items_edit_title')}</h3>
-        {formError && <div style={{ marginBottom: 14 }}><FormErrorBanner title={formError.title} issues={formError.issues} /></div>}
+        {error && <div style={{ ...card, borderColor: '#fca5a5', background: '#fef2f2', color: '#b91c1c', padding: '8px 14px', fontSize: 14, marginBottom: 14 }}>{error}</div>}
         {loading ? (
           <div style={{ padding: 32, textAlign: 'center', color: 'var(--color-muted-foreground)' }}>{t('loading')}</div>
         ) : (
