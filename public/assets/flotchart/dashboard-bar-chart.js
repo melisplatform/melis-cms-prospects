@@ -158,7 +158,8 @@ $(function() {
 						);
 
 			}).fail(function(xhr, textStatus, errorThrown){
-				alert("ERROR !! Status = "+ textStatus + "\n Error = "+ errorThrown + "\n xhr = "+ xhr.statusText);
+				// Échec silencieux : pas d'alert bloquante ni de bruit console au chargement de la
+				// plateforme (ticket 0010871). Le graphe reste simplement vide.
 			});
 		}
 		

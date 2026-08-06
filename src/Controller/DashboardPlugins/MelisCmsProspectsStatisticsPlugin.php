@@ -80,39 +80,52 @@ class MelisCmsProspectsStatisticsPlugin extends MelisCoreDashboardTemplatingPlug
         $values = array();
         
         if($this->getController()->getRequest()->isPost()) {
-            
+
             $chartFor = $this->getController()->getRequest()->getPost()->toArray();
             $chartFor = isset($chartFor['chartFor']) ? $chartFor['chartFor'] : 'monthly';
-            
-            $melisProspectsService = $this->getServiceManager()->get('MelisProspectsService');
-            
+
+            // ⚠️ Perf/robustesse (ticket 0010871) : AVANT, on appelait getProspectsDataByDate() 10× dans
+            // la boucle, et CHAQUE appel refaisait un fetch COMPLET de la table prospects + un balayage
+            // → O(10 × N). Sur un gros volume (dev6) ça pouvait dépasser mémoire/temps et renvoyer un 502.
+            // On récupère désormais les prospects UNE SEULE FOIS puis on compte par « bucket » en mémoire.
+            $prospectsTable = $this->getServiceManager()->get('MelisProspects');
+            $rows = $prospectsTable->getProspectsOrderByDate('DESC');
+            $rows = $rows ? $rows->toArray() : array();
+
+            // Clé de regroupement d'une date selon le type de rapport (mêmes règles que l'ancien
+            // getProspectsDataByDate : jour = Y-m-d, mois = Y-m, année = Y).
+            $bucketOf = function ($dateStr) use ($chartFor) {
+                $ts = strtotime((string) $dateStr);
+                if ($ts === false) { return null; }
+                switch ($chartFor) {
+                    case 'daily':  return date('Y-m-d', $ts);
+                    case 'yearly': return date('Y', $ts);
+                    case 'monthly':
+                    default:       return date('Y-m', $ts);
+                }
+            };
+
+            // Nombre de prospects par bucket (un seul balayage de la table).
+            $counts = array();
+            foreach ($rows as $r) {
+                $key = isset($r['pros_contact_date']) ? $bucketOf($r['pros_contact_date']) : null;
+                if ($key !== null) { $counts[$key] = (isset($counts[$key]) ? $counts[$key] : 0) + 1; }
+            }
+
             // Last Date/value of the Graph will be the Current Date
             $curdate = date('Y-m-d');
             for ($ctr = $limit ; $ctr > 0 ;$ctr--)
             {
-                // Retreve Prospects Values from database
-                $nb = $melisProspectsService->getProspectsDataByDate($chartFor,$curdate);
-                
-                // Checking type of report
+                $key = $bucketOf($curdate);
+                $nb = ($key !== null && isset($counts[$key])) ? $counts[$key] : 0;
+                $values[] = array($curdate, $nb);
+
+                // Recule d'un pas selon le type de rapport (jour/mois/année).
                 switch ($chartFor) {
-                    case 'daily':
-                        $values[] = array($curdate, $nb);
-                        // Deduct 1 Day every loop
-                        $curdate = date('Y-m-d',strtotime($curdate.' -1 days'));
-                        break;
+                    case 'daily':  $curdate = date('Y-m-d', strtotime($curdate.' -1 days'));   break;
+                    case 'yearly': $curdate = date('Y-m-d', strtotime($curdate.' -1 years'));  break;
                     case 'monthly':
-                        $values[] = array($curdate, $nb);
-                        // Deduct 1 Month every loop
-                        $curdate = date('Y-m-d',strtotime($curdate.' -1 months'));
-                        break;
-                    case 'yearly':
-                        $values[] = array($curdate, $nb);
-                        // Deduct 1 Year every loop
-                        $curdate = date('Y-m-d',strtotime($curdate.' -1 years'));
-                        break;
-                    default:
-                        # code...
-                        break;
+                    default:       $curdate = date('Y-m-d', strtotime($curdate.' -1 months')); break;
                 }
             }
         }
