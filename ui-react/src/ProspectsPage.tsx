@@ -1,4 +1,4 @@
-import { Fragment, useEffect, useLayoutEffect, useRef, useState, type CSSProperties, type RefObject } from 'react'
+import { Fragment, useEffect, useLayoutEffect, useRef, useState, type CSSProperties, type ReactNode, type RefObject } from 'react'
 import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import {
   deleteProspect, fetchProspectById, fetchProspects, fetchProspectStats, fetchSites, fetchTypes, fetchThemes,
@@ -10,6 +10,8 @@ import { ExportModal, DownloadIcon } from './ExportModal'
 import { ViewToggle, type ViewMode } from './ViewToggle'
 import { useIsNarrow } from './shared/useIsNarrow'
 import { ExpandToggle, HiddenColsRow } from './shared/ExpandableRow'
+import { FormErrorBanner, okNotify, koNotify, type FormIssue } from './shared/melis-form-errors'
+import { useDragReorder } from './shared/use-drag-reorder'
 
 // Outil Prospects legacy (vue « Old » en iframe). Voir brick.manifest.json (prospects).
 // Renderable ZONE key — the `conf.type` target's melisKey. Rights do NOT hang on this.
@@ -67,10 +69,12 @@ const DICT: Record<Lang, Record<string, string>> = {
     f_name: 'Nom', f_email: 'Email', f_phone: 'Téléphone', f_company: 'Société', f_country: 'Pays',
     f_site: 'Site', f_site_ph: '— Aucun site —', f_type: 'Type', f_date: 'Date de contact', f_theme: 'Thème',
     err_save: 'Erreur lors de la sauvegarde', err_email: 'L’adresse email n’est pas valide.',
+    err_check: 'Veuillez vérifier les champs obligatoires.',
     no_access: 'Vous n’avez pas les droits pour consulter cette liste.', none: '—',
     dr_label: 'Date', dr_all: 'Toutes les dates', dr_today: "Aujourd'hui", dr_yesterday: 'Hier',
     dr_last7: '7 derniers jours', dr_last30: '30 derniers jours', dr_thismonth: 'Ce mois-ci', dr_lastmonth: 'Le mois dernier',
     dr_custom: 'Plage personnalisée', dr_from: 'Du', dr_to: 'Au', dr_apply: 'Appliquer',
+    view_new: 'Nouveau', view_old: 'Ancien',
   },
   en: {
     title: 'Prospects', subtitle: 'Contact requests received via the site',
@@ -88,10 +92,12 @@ const DICT: Record<Lang, Record<string, string>> = {
     f_name: 'Name', f_email: 'Email', f_phone: 'Phone', f_company: 'Company', f_country: 'Country',
     f_site: 'Site', f_site_ph: '— No site —', f_type: 'Type', f_date: 'Contact date', f_theme: 'Theme',
     err_save: 'Error while saving', err_email: 'The email address is not valid.',
+    err_check: 'Please check the required fields.',
     no_access: 'You do not have permission to view this list.', none: '—',
     dr_label: 'Date', dr_all: 'All dates', dr_today: 'Today', dr_yesterday: 'Yesterday',
     dr_last7: 'Last 7 days', dr_last30: 'Last 30 days', dr_thismonth: 'This month', dr_lastmonth: 'Last month',
     dr_custom: 'Custom range', dr_from: 'From', dr_to: 'To', dr_apply: 'Apply',
+    view_new: 'New', view_old: 'Old',
   },
 }
 function useT() {
@@ -102,10 +108,6 @@ function useT() {
     return s
   }
 }
-function notify(kind: 'ok' | 'ko', title: string, message: string) {
-  window.postMessage({ __melisNotif: true, kind, title, message }, '*')
-}
-
 // ── Styles (variables CSS du thème de l'hôte) ──
 const card: CSSProperties = { border: '1px solid var(--color-border)', background: 'var(--color-card)', borderRadius: 12, boxShadow: '0 1px 2px rgba(0,0,0,.04)' }
 const inputCss: CSSProperties = { height: 40, width: '100%', boxSizing: 'border-box', borderRadius: 8, border: '1px solid var(--color-input,var(--color-border))', background: 'var(--color-card)', color: 'var(--color-foreground)', padding: '0 12px', fontSize: 14, outline: 'none' }
@@ -142,6 +144,12 @@ function SortIcon({ dir }: { dir: 'asc' | 'desc' | null }) {
 }
 const Spinner = () => <svg style={{ width: 14, height: 14, animation: 'melis-prospects-spin 0.8s linear infinite' }} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><style>{'@keyframes melis-prospects-spin { to { transform: rotate(360deg) } }'}</style><path d="M21 12a9 9 0 1 1-6.219-8.56" /></svg>
 
+// Icônes des cartes KPI (24×24, cf. Kpi ci-dessous).
+const UsersKpiIcon = () => <svg width={20} height={20} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" /><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75" /></svg>
+const CalendarDaysKpiIcon = () => <svg width={20} height={20} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" /><path d="M16 2v4M8 2v4M3 10h18" /><path d="M8 14h.01M12 14h.01M16 14h.01" /></svg>
+const TrendingUpKpiIcon = () => <svg width={20} height={20} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round"><path d="M22 7 13.5 15.5 8.5 10.5 2 17" /><path d="M16 7h6v6" /></svg>
+const EyeOffKpiIcon = () => <svg width={20} height={20} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round"><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 10 8 10 8a13.16 13.16 0 0 1-4.13 5.19M6.61 6.61A13.53 13.53 0 0 0 2 12s3 8 10 8a9.74 9.74 0 0 0 5-1.36" /><path d="M14.12 14.12a3 3 0 1 1-4.24-4.24" /><path d="M2 2l20 20" /></svg>
+
 // Colonnes triables (toutes sauf « message », texte long tronqué). Doit matcher le sortMap backend.
 const SORTABLE = new Set<ProspectSortKey>(['id', 'site', 'name', 'email', 'type', 'phone', 'date', 'theme'])
 
@@ -172,8 +180,11 @@ function ColManager({ anchorRef, cols, labelFor, onChange, onClose }: {
   anchorRef: RefObject<HTMLElement | null>; cols: ColDef[]; labelFor: (id: string) => string; onChange: (c: ColDef[]) => void; onClose: () => void
 }) {
   const t = useT()
-  const [dragId, setDragId] = useState<string | null>(null)
-  const [over, setOver] = useState<{ id: string; panel: 'visible' | 'hidden' } | null>(null)
+  // Touch-compatible drag (mouse + touch events, not native HTML5 draggable — that API never
+  // fires from touch input) — see shared/use-drag-reorder.ts.
+  const { draggingId: dragId, overTarget: over, dragPos, startDragMouse, startDragTouch } = useDragReorder({
+    cols, onChange: (next) => { onChange(next); saveCols(next) },
+  })
   const [pos, setPos] = useState<{ top?: number; bottom?: number; left: number; width: number; maxHeight: number } | null>(null)
   const shown = cols.filter((c) => c.visible)
   const hidden = cols.filter((c) => !c.visible)
@@ -198,31 +209,12 @@ function ColManager({ anchorRef, cols, labelFor, onChange, onClose }: {
     }
   }, [anchorRef])
 
-  function drop(panel: 'visible' | 'hidden') {
-    if (!dragId) return
-    const src = cols.find((c) => c.id === dragId)!
-    const upd = { ...src, visible: panel === 'visible' }
-    let vList = shown.filter((c) => c.id !== dragId)
-    const hList = hidden.filter((c) => c.id !== dragId)
-    if (panel === 'visible') {
-      const dst = over?.id
-      if (!dst || dst === '__panel__') vList = [...vList, upd]
-      else { const i = vList.findIndex((c) => c.id === dst); vList = i === -1 ? [...vList, upd] : [...vList.slice(0, i), upd, ...vList.slice(i)] }
-      const next = [...vList, ...hList]; onChange(next); saveCols(next)
-    } else { const next = [...vList, ...hList, upd]; onChange(next); saveCols(next) }
-    setDragId(null); setOver(null)
-  }
-
   function item(col: ColDef, panel: 'visible' | 'hidden') {
     const isOver = over?.id === col.id && over?.panel === panel
     return (
-      <div key={col.id} draggable
-        onDragStart={() => setDragId(col.id)}
-        onDragEnd={() => { setDragId(null); setOver(null) }}
-        onDragOver={(e) => { e.preventDefault(); e.stopPropagation(); if (over?.id !== col.id || over?.panel !== panel) setOver({ id: col.id, panel }) }}
-        onDrop={(e) => { e.preventDefault(); drop(panel) }}
+      <div key={col.id} data-col-item={col.id} onMouseDown={startDragMouse(col.id)} onTouchStart={startDragTouch(col.id)}
         style={{
-          display: 'flex', alignItems: 'center', gap: 8, borderRadius: 8, padding: '6px 8px', fontSize: 14, cursor: 'grab', userSelect: 'none',
+          display: 'flex', alignItems: 'center', gap: 8, borderRadius: 8, padding: '6px 8px', fontSize: 14, cursor: 'grab', userSelect: 'none', touchAction: 'none',
           opacity: dragId === col.id ? 0.4 : 1,
           background: isOver ? 'color-mix(in srgb, var(--color-primary) 12%, transparent)' : 'transparent',
           boxShadow: isOver ? '0 0 0 1px color-mix(in srgb, var(--color-primary) 35%, transparent)' : 'none',
@@ -234,6 +226,7 @@ function ColManager({ anchorRef, cols, labelFor, onChange, onClose }: {
 
   if (!pos) return null
   return (
+    <>
     <div style={{
       ...card, position: 'fixed', left: pos.left, width: pos.width, zIndex: 50,
       maxHeight: pos.maxHeight, overflowY: 'auto', display: 'flex', flexDirection: 'column',
@@ -244,15 +237,11 @@ function ColManager({ anchorRef, cols, labelFor, onChange, onClose }: {
         <button style={{ ...iconBtn, width: 22, height: 22 }} onClick={onClose}>✕</button>
       </div>
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, padding: 12 }}>
-        <div style={panelCss}
-          onDragOver={(e) => { e.preventDefault(); if (over?.id !== '__panel__' || over?.panel !== 'hidden') setOver({ id: '__panel__', panel: 'hidden' }) }}
-          onDrop={(e) => { e.preventDefault(); drop('hidden') }}>
+        <div data-col-panel="hidden" style={{ ...panelCss, ...(over?.id === '__panel__' && over.panel === 'hidden' ? { borderColor: 'color-mix(in srgb, var(--color-primary) 40%, transparent)', background: 'color-mix(in srgb, var(--color-primary) 5%, transparent)' } : {}) }}>
           <p style={panelTitle}>{t('cols_hidden')}</p>
           {hidden.length === 0 ? <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, color: 'var(--color-muted-foreground)', opacity: 0.5, padding: '16px 0' }}>{t('drag_here')}</div> : hidden.map((c) => item(c, 'hidden'))}
         </div>
-        <div style={panelCss}
-          onDragOver={(e) => { e.preventDefault(); if (over?.id !== '__panel__' || over?.panel !== 'visible') setOver({ id: '__panel__', panel: 'visible' }) }}
-          onDrop={(e) => { e.preventDefault(); drop('visible') }}>
+        <div data-col-panel="visible" style={{ ...panelCss, ...(over?.id === '__panel__' && over.panel === 'visible' ? { borderColor: 'color-mix(in srgb, var(--color-primary) 40%, transparent)', background: 'color-mix(in srgb, var(--color-primary) 5%, transparent)' } : {}) }}>
           <p style={panelTitle}>{t('cols_visible')}</p>
           {shown.length === 0 ? <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, color: 'var(--color-muted-foreground)', opacity: 0.5, padding: '16px 0' }}>{t('drag_here')}</div> : shown.map((c) => item(c, 'visible'))}
         </div>
@@ -262,15 +251,29 @@ function ColManager({ anchorRef, cols, labelFor, onChange, onClose }: {
           onClick={() => { onChange(DEFAULT_COLS); saveCols(DEFAULT_COLS) }}>{t('reset')}</button>
       </div>
     </div>
+    {dragId && dragPos && (
+      <div style={{ position: 'fixed', zIndex: 60, left: dragPos.x, top: dragPos.y, transform: 'translate(-50%, -50%)', pointerEvents: 'none', display: 'flex', alignItems: 'center', gap: 8, borderRadius: 8, padding: '6px 10px', fontSize: 14, fontWeight: 500, background: 'var(--color-card)', border: '1px solid color-mix(in srgb, var(--color-primary) 40%, transparent)', boxShadow: '0 4px 16px rgba(0,0,0,.25)' }}>
+        <GripIcon />{labelFor(dragId)}
+      </div>
+    )}
+    </>
   )
 }
 
 // ── KPI ──
-function Kpi({ label: lbl, value }: { label: string; value: number | string | null }) {
+function Kpi({ label: lbl, value, icon, tint }: { label: string; value: number | string | null; icon?: ReactNode; tint?: string }) {
+  const color = tint ?? 'var(--color-primary)'
   return (
-    <div style={{ ...card, display: 'flex', flexDirection: 'column', gap: 2, padding: 16, flex: 1, minWidth: 140 }}>
-      <span style={{ fontSize: 12, color: 'var(--color-muted-foreground)' }}>{lbl}</span>
-      <span style={{ fontSize: 22, fontWeight: 700 }}>{value == null ? '…' : value}</span>
+    <div style={{ ...card, display: 'flex', alignItems: 'center', gap: 12, padding: 16, flex: 1, minWidth: 120 }}>
+      {icon && (
+        <div style={{ width: 38, height: 38, borderRadius: 10, display: 'grid', placeItems: 'center', flexShrink: 0, color, background: `color-mix(in srgb, ${color} 14%, transparent)` }}>
+          {icon}
+        </div>
+      )}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 2, minWidth: 0 }}>
+        <span style={{ fontSize: 12, color: 'var(--color-muted-foreground)' }}>{lbl}</span>
+        <span style={{ fontSize: 22, fontWeight: 700 }}>{value == null ? '…' : value}</span>
+      </div>
     </div>
   )
 }
@@ -457,12 +460,13 @@ function ProspectList({ base }: { base: string }) {
     return ''
   }
 
-  // Sur mobile, la table s'effondre à une seule colonne essentielle (+ un « + » pour déplier le
-  // reste) quelle que soit la préférence de colonnes de l'utilisateur (desktop) — cf. skill
-  // melis-react-mobile-responsive. `hasHidden` ne dépend QUE de `narrow`, jamais des colonnes
-  // masquées manuellement par l'utilisateur.
-  const displayCols = narrow ? cols.map((c) => ({ ...c, visible: c.id === 'name' })) : cols
-  const hasHidden = narrow
+  // A Hidden column disappears entirely on both desktop and mobile — same rule everywhere, no "+"
+  // peek at Hidden ones. Desktop shows every Visible column inline. Mobile can't fit many columns,
+  // so only the FIRST Visible column (by the user's dragged order in ColManager) anchors inline;
+  // every OTHER Visible column surfaces behind the per-row "+" instead, in that same order.
+  const shownColsList = cols.filter((c) => c.visible)
+  const displayCols = narrow ? shownColsList.map((c, i) => ({ ...c, visible: i === 0 })) : shownColsList
+  const hasHidden = narrow && shownColsList.length > 1
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 20, padding: 24, height: '100%', boxSizing: 'border-box', overflow: 'auto' }}>
@@ -473,7 +477,7 @@ function ProspectList({ base }: { base: string }) {
           <p style={{ fontSize: 14, color: 'var(--color-muted-foreground)', margin: '2px 0 0', ...(narrow ? { overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' } : {}) }}>{t('subtitle')}</p>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
-          <ViewToggle mode={mode} onChange={(m) => { setMode(m); if (m === 'iframe') setFrameLoaded(true) }} compact={narrow} />
+          <ViewToggle mode={mode} onChange={(m) => { setMode(m); if (m === 'iframe') setFrameLoaded(true) }} compact={narrow} labels={{ react: t('view_new'), iframe: t('view_old') }} />
           <button style={btnGhost} onClick={handleRefresh} disabled={refreshing} title={t('refresh')}><RotateCcwIcon spinning={refreshing} /></button>
         </div>
       </div>
@@ -494,10 +498,10 @@ function ProspectList({ base }: { base: string }) {
       ) : (<>
       {/* KPI */}
       <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
-        <Kpi label={t('kpi_total')} value={stats?.total ?? null} />
-        <Kpi label={t('kpi_month')} value={stats?.thisMonth ?? null} />
-        <Kpi label={t('kpi_avg')} value={stats?.avgPerMonth ?? null} />
-        <Kpi label={t('kpi_anon')} value={stats?.anonymized ?? null} />
+        <Kpi label={t('kpi_total')} value={stats?.total ?? null} icon={<UsersKpiIcon />} tint="var(--color-primary)" />
+        <Kpi label={t('kpi_month')} value={stats?.thisMonth ?? null} icon={<CalendarDaysKpiIcon />} tint="#2563eb" />
+        <Kpi label={t('kpi_avg')} value={stats?.avgPerMonth ?? null} icon={<TrendingUpKpiIcon />} tint="#7c3aed" />
+        <Kpi label={t('kpi_anon')} value={stats?.anonymized ?? null} icon={<EyeOffKpiIcon />} tint="#d97706" />
       </div>
 
       {/* Filtres */}
@@ -675,7 +679,8 @@ function ProspectForm({ id, base }: { id: string; base: string }) {
   const [themes, setThemes] = useState<ThemeOption[]>([])
   const [loading, setLoading] = useState(false)
   const [saving, setSaving] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+  // Bannière d'erreur unifiée : un titre + la liste des champs en échec (client) ou le message serveur.
+  const [formError, setFormError] = useState<{ title: string; issues?: FormIssue[] } | null>(null)
   const subTabRegistered = useRef(false)
 
   useEffect(() => { if (!can('edit')) navigate(base) }, [base, navigate])
@@ -707,9 +712,14 @@ function ProspectForm({ id, base }: { id: string; base: string }) {
   }, [prospectId]) // eslint-disable-line react-hooks/exhaustive-deps
 
   async function submit() {
-    setError(null)
+    setFormError(null)
     // Aucun champ n'est obligatoire (parité legacy) ; on valide seulement le format email s'il est renseigné.
-    if (email.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) { setError(t('err_email')); return }
+    // On collecte TOUS les champs invalides pour les lister dans la bannière (ici uniquement l'email).
+    const found: FormIssue[] = []
+    if (email.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
+      found.push({ label: t('f_email'), message: t('err_email') })
+    }
+    if (found.length) { setFormError({ title: t('err_check'), issues: found }); return }
     setSaving(true)
     try {
       await saveProspect({
@@ -719,11 +729,13 @@ function ProspectForm({ id, base }: { id: string; base: string }) {
         theme: theme === '' ? null : Number(theme),
       })
       markProspectsListStale()
-      notify('ok', t('title'), t('saved'))
+      okNotify(t('title'), t('saved'))
       window.__melisUpdateSubTabLabel?.(base, path, name.trim())
       setTimeout(() => navigate(base), 600)
     } catch (e) {
-      setError(e instanceof Error ? e.message : t('err_save'))
+      const m = e instanceof Error ? e.message : t('err_save')
+      setFormError({ title: t('err_save'), issues: [{ message: m }] })
+      koNotify(t('err_save'), m)
     } finally { setSaving(false) }
   }
 
@@ -745,7 +757,7 @@ function ProspectForm({ id, base }: { id: string; base: string }) {
         </div>
       </div>
 
-      {error && <div style={{ ...card, borderColor: '#fca5a5', background: '#fef2f2', color: '#b91c1c', padding: '8px 14px', fontSize: 14 }}>{error}</div>}
+      {formError && <FormErrorBanner title={formError.title} issues={formError.issues} />}
 
       {loading ? (
         <div style={{ padding: 48, textAlign: 'center', color: 'var(--color-muted-foreground)' }}>{t('loading')}</div>

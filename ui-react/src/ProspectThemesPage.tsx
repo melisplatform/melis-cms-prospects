@@ -1,4 +1,4 @@
-import { Fragment, useEffect, useLayoutEffect, useRef, useState, type CSSProperties, type RefObject } from 'react'
+import { Fragment, useEffect, useLayoutEffect, useRef, useState, type CSSProperties, type ReactNode, type RefObject } from 'react'
 import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import {
   deleteTheme, fetchThemeById, fetchThemes, fetchThemeStats, saveTheme,
@@ -11,6 +11,8 @@ import { ExportModal, DownloadIcon } from './ExportModal'
 import { ViewToggle, type ViewMode } from './ViewToggle'
 import { useIsNarrow } from './shared/useIsNarrow'
 import { ExpandToggle, HiddenColsRow } from './shared/ExpandableRow'
+import { FormErrorBanner, okNotify, koNotify, type FormIssue } from './shared/melis-form-errors'
+import { useDragReorder } from './shared/use-drag-reorder'
 
 // Outil Thèmes legacy (vue « Old » en iframe). Renderable ZONE key — le `conf.type` target.
 // Les droits ne s'accrochent PAS dessus (cf. brick.manifest.json → melisKey).
@@ -74,7 +76,9 @@ const DICT: Record<Lang, Record<string, string>> = {
     f_name: 'Nom', f_code: 'Code', f_code_ph: 'Optionnel — identifiant technique',
     info_note: 'Le nom identifie le thème dans le back-office (formulaires de prospects).',
     err_save: 'Erreur lors de la sauvegarde', err_required: 'Le nom du thème est obligatoire.',
+    err_check: 'Veuillez vérifier les champs obligatoires.',
     no_access: 'Vous n’avez pas les droits pour consulter cette liste.', none: '—',
+    view_new: 'Nouveau', view_old: 'Ancien',
   },
   en: {
     title: 'Themes', subtitle: 'Contact themes (prospect forms)',
@@ -97,7 +101,9 @@ const DICT: Record<Lang, Record<string, string>> = {
     f_name: 'Name', f_code: 'Code', f_code_ph: 'Optional — technical identifier',
     info_note: 'The name identifies the theme in the back-office (prospect forms).',
     err_save: 'Error while saving', err_required: 'The theme name is required.',
+    err_check: 'Please check the required fields.',
     no_access: 'You do not have permission to view this list.', none: '—',
+    view_new: 'New', view_old: 'Old',
   },
 }
 function useT() {
@@ -108,10 +114,6 @@ function useT() {
     return s
   }
 }
-function notify(kind: 'ok' | 'ko', title: string, message: string) {
-  window.postMessage({ __melisNotif: true, kind, title, message }, '*')
-}
-
 // ── Styles (variables CSS du thème de l'hôte) ──
 const card: CSSProperties = { border: '1px solid var(--color-border)', background: 'var(--color-card)', borderRadius: 12, boxShadow: '0 1px 2px rgba(0,0,0,.04)' }
 const inputCss: CSSProperties = { height: 40, width: '100%', boxSizing: 'border-box', borderRadius: 8, border: '1px solid var(--color-input,var(--color-border))', background: 'var(--color-card)', color: 'var(--color-foreground)', padding: '0 12px', fontSize: 14, outline: 'none' }
@@ -165,6 +167,10 @@ function SortIcon({ dir }: { dir: 'asc' | 'desc' | null }) {
 }
 const Spinner = () => <svg style={{ width: 14, height: 14, animation: 'melis-themes-spin 0.8s linear infinite' }} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><style>{'@keyframes melis-themes-spin { to { transform: rotate(360deg) } }'}</style><path d="M21 12a9 9 0 1 1-6.219-8.56" /></svg>
 
+// Icônes des cartes KPI (24×24, cf. Kpi ci-dessous).
+const LayoutGridKpiIcon = () => <svg width={20} height={20} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="7" height="7" rx="1" /><rect x="14" y="3" width="7" height="7" rx="1" /><rect x="3" y="14" width="7" height="7" rx="1" /><rect x="14" y="14" width="7" height="7" rx="1" /></svg>
+const ListKpiIcon = () => <svg width={20} height={20} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round"><path d="M8 6h13M8 12h13M8 18h13" /><path d="M3 6h.01M3 12h.01M3 18h.01" /></svg>
+
 // Colonnes triables (toutes). Doit matcher le sortMap backend.
 const SORTABLE = new Set<ThemeSortKey>(['id', 'name', 'items'])
 
@@ -194,8 +200,11 @@ function ColManager({ anchorRef, cols, labelFor, onChange, onClose }: {
   anchorRef: RefObject<HTMLElement | null>; cols: ColDef[]; labelFor: (id: string) => string; onChange: (c: ColDef[]) => void; onClose: () => void
 }) {
   const t = useT()
-  const [dragId, setDragId] = useState<string | null>(null)
-  const [over, setOver] = useState<{ id: string; panel: 'visible' | 'hidden' } | null>(null)
+  // Touch-compatible drag (mouse + touch events, not native HTML5 draggable — that API never
+  // fires from touch input) — see shared/use-drag-reorder.ts.
+  const { draggingId: dragId, overTarget: over, dragPos, startDragMouse, startDragTouch } = useDragReorder({
+    cols, onChange: (next) => { onChange(next); saveCols(next) },
+  })
   const [pos, setPos] = useState<{ top?: number; bottom?: number; left: number; width: number; maxHeight: number } | null>(null)
   const shown = cols.filter((c) => c.visible)
   const hidden = cols.filter((c) => !c.visible)
@@ -219,31 +228,12 @@ function ColManager({ anchorRef, cols, labelFor, onChange, onClose }: {
     }
   }, [anchorRef])
 
-  function drop(panel: 'visible' | 'hidden') {
-    if (!dragId) return
-    const src = cols.find((c) => c.id === dragId)!
-    const upd = { ...src, visible: panel === 'visible' }
-    let vList = shown.filter((c) => c.id !== dragId)
-    const hList = hidden.filter((c) => c.id !== dragId)
-    if (panel === 'visible') {
-      const dst = over?.id
-      if (!dst || dst === '__panel__') vList = [...vList, upd]
-      else { const i = vList.findIndex((c) => c.id === dst); vList = i === -1 ? [...vList, upd] : [...vList.slice(0, i), upd, ...vList.slice(i)] }
-      const next = [...vList, ...hList]; onChange(next); saveCols(next)
-    } else { const next = [...vList, ...hList, upd]; onChange(next); saveCols(next) }
-    setDragId(null); setOver(null)
-  }
-
   function item(col: ColDef, panel: 'visible' | 'hidden') {
     const isOver = over?.id === col.id && over?.panel === panel
     return (
-      <div key={col.id} draggable
-        onDragStart={() => setDragId(col.id)}
-        onDragEnd={() => { setDragId(null); setOver(null) }}
-        onDragOver={(e) => { e.preventDefault(); e.stopPropagation(); if (over?.id !== col.id || over?.panel !== panel) setOver({ id: col.id, panel }) }}
-        onDrop={(e) => { e.preventDefault(); drop(panel) }}
+      <div key={col.id} data-col-item={col.id} onMouseDown={startDragMouse(col.id)} onTouchStart={startDragTouch(col.id)}
         style={{
-          display: 'flex', alignItems: 'center', gap: 8, borderRadius: 8, padding: '6px 8px', fontSize: 14, cursor: 'grab', userSelect: 'none',
+          display: 'flex', alignItems: 'center', gap: 8, borderRadius: 8, padding: '6px 8px', fontSize: 14, cursor: 'grab', userSelect: 'none', touchAction: 'none',
           opacity: dragId === col.id ? 0.4 : 1,
           background: isOver ? 'color-mix(in srgb, var(--color-primary) 12%, transparent)' : 'transparent',
           boxShadow: isOver ? '0 0 0 1px color-mix(in srgb, var(--color-primary) 35%, transparent)' : 'none',
@@ -255,6 +245,7 @@ function ColManager({ anchorRef, cols, labelFor, onChange, onClose }: {
 
   if (!pos) return null
   return (
+    <>
     <div style={{
       ...card, position: 'fixed', left: pos.left, width: pos.width, zIndex: 50,
       maxHeight: pos.maxHeight, overflowY: 'auto', display: 'flex', flexDirection: 'column',
@@ -265,15 +256,11 @@ function ColManager({ anchorRef, cols, labelFor, onChange, onClose }: {
         <button style={{ ...iconBtn, width: 22, height: 22 }} onClick={onClose}>✕</button>
       </div>
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, padding: 12 }}>
-        <div style={panelCss}
-          onDragOver={(e) => { e.preventDefault(); if (over?.id !== '__panel__' || over?.panel !== 'hidden') setOver({ id: '__panel__', panel: 'hidden' }) }}
-          onDrop={(e) => { e.preventDefault(); drop('hidden') }}>
+        <div data-col-panel="hidden" style={{ ...panelCss, ...(over?.id === '__panel__' && over.panel === 'hidden' ? { borderColor: 'color-mix(in srgb, var(--color-primary) 40%, transparent)', background: 'color-mix(in srgb, var(--color-primary) 5%, transparent)' } : {}) }}>
           <p style={panelTitle}>{t('cols_hidden')}</p>
           {hidden.length === 0 ? <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, color: 'var(--color-muted-foreground)', opacity: 0.5, padding: '16px 0' }}>{t('drag_here')}</div> : hidden.map((c) => item(c, 'hidden'))}
         </div>
-        <div style={panelCss}
-          onDragOver={(e) => { e.preventDefault(); if (over?.id !== '__panel__' || over?.panel !== 'visible') setOver({ id: '__panel__', panel: 'visible' }) }}
-          onDrop={(e) => { e.preventDefault(); drop('visible') }}>
+        <div data-col-panel="visible" style={{ ...panelCss, ...(over?.id === '__panel__' && over.panel === 'visible' ? { borderColor: 'color-mix(in srgb, var(--color-primary) 40%, transparent)', background: 'color-mix(in srgb, var(--color-primary) 5%, transparent)' } : {}) }}>
           <p style={panelTitle}>{t('cols_visible')}</p>
           {shown.length === 0 ? <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, color: 'var(--color-muted-foreground)', opacity: 0.5, padding: '16px 0' }}>{t('drag_here')}</div> : shown.map((c) => item(c, 'visible'))}
         </div>
@@ -283,15 +270,29 @@ function ColManager({ anchorRef, cols, labelFor, onChange, onClose }: {
           onClick={() => { onChange(DEFAULT_COLS); saveCols(DEFAULT_COLS) }}>{t('reset')}</button>
       </div>
     </div>
+    {dragId && dragPos && (
+      <div style={{ position: 'fixed', zIndex: 60, left: dragPos.x, top: dragPos.y, transform: 'translate(-50%, -50%)', pointerEvents: 'none', display: 'flex', alignItems: 'center', gap: 8, borderRadius: 8, padding: '6px 10px', fontSize: 14, fontWeight: 500, background: 'var(--color-card)', border: '1px solid color-mix(in srgb, var(--color-primary) 40%, transparent)', boxShadow: '0 4px 16px rgba(0,0,0,.25)' }}>
+        <GripIcon />{labelFor(dragId)}
+      </div>
+    )}
+    </>
   )
 }
 
 // ── KPI ──
-function Kpi({ label: lbl, value }: { label: string; value: number | string | null }) {
+function Kpi({ label: lbl, value, icon, tint }: { label: string; value: number | string | null; icon?: ReactNode; tint?: string }) {
+  const color = tint ?? 'var(--color-primary)'
   return (
-    <div style={{ ...card, display: 'flex', flexDirection: 'column', gap: 2, padding: 16, flex: 1, minWidth: 140 }}>
-      <span style={{ fontSize: 12, color: 'var(--color-muted-foreground)' }}>{lbl}</span>
-      <span style={{ fontSize: 22, fontWeight: 700 }}>{value == null ? '…' : value}</span>
+    <div style={{ ...card, display: 'flex', alignItems: 'center', gap: 12, padding: 16, flex: 1, minWidth: 120 }}>
+      {icon && (
+        <div style={{ width: 38, height: 38, borderRadius: 10, display: 'grid', placeItems: 'center', flexShrink: 0, color, background: `color-mix(in srgb, ${color} 14%, transparent)` }}>
+          {icon}
+        </div>
+      )}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 2, minWidth: 0 }}>
+        <span style={{ fontSize: 12, color: 'var(--color-muted-foreground)' }}>{lbl}</span>
+        <span style={{ fontSize: 22, fontWeight: 700 }}>{value == null ? '…' : value}</span>
+      </div>
     </div>
   )
 }
@@ -382,10 +383,13 @@ function ThemeList({ base }: { base: string }) {
     return ''
   }
 
-  // cf. skill melis-react-mobile-responsive : essential-column-collapse — `hasHidden` ne dépend
-  // QUE de `narrow`, jamais des colonnes masquées manuellement par l'utilisateur.
-  const displayCols = narrow ? cols.map((c) => ({ ...c, visible: c.id === 'name' })) : cols
-  const hasHidden = narrow
+  // A Hidden column disappears entirely on both desktop and mobile — same rule everywhere, no "+"
+  // peek at Hidden ones. Desktop shows every Visible column inline. Mobile can't fit many columns,
+  // so only the FIRST Visible column (by the user's dragged order in ColManager) anchors inline;
+  // every OTHER Visible column surfaces behind the per-row "+" instead, in that same order.
+  const shownColsList = cols.filter((c) => c.visible)
+  const displayCols = narrow ? shownColsList.map((c, i) => ({ ...c, visible: i === 0 })) : shownColsList
+  const hasHidden = narrow && shownColsList.length > 1
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 20, padding: 24, height: '100%', boxSizing: 'border-box', overflow: 'auto' }}>
@@ -399,7 +403,7 @@ function ThemeList({ base }: { base: string }) {
             dessous, largeur alignée via ce wrapper flex-col (pas de largeur explicite) — voir skill. */}
         <div style={narrow ? { display: 'flex', flexDirection: 'column', gap: 8, flexShrink: 0 } : { display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, justifyContent: narrow ? 'flex-end' : undefined }}>
-            <ViewToggle mode={mode} onChange={(m) => { setMode(m); if (m === 'iframe') setFrameLoaded(true) }} compact={narrow} />
+            <ViewToggle mode={mode} onChange={(m) => { setMode(m); if (m === 'iframe') setFrameLoaded(true) }} compact={narrow} labels={{ react: t('view_new'), iframe: t('view_old') }} />
             <button style={btnGhost} onClick={handleRefresh} disabled={refreshing} title={t('refresh')}><RotateCcwIcon spinning={refreshing} /></button>
           </div>
           {can('create') && (
@@ -426,8 +430,8 @@ function ThemeList({ base }: { base: string }) {
       ) : (<>
       {/* KPI */}
       <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
-        <Kpi label={t('kpi_total')} value={stats?.total ?? null} />
-        <Kpi label={t('kpi_items')} value={stats?.items ?? null} />
+        <Kpi label={t('kpi_total')} value={stats?.total ?? null} icon={<LayoutGridKpiIcon />} tint="var(--color-primary)" />
+        <Kpi label={t('kpi_items')} value={stats?.items ?? null} icon={<ListKpiIcon />} tint="#2563eb" />
       </div>
 
       {/* Filtres */}
@@ -587,19 +591,24 @@ function ThemeModal({ theme, onClose, onSaved }: { theme: ThemeItem | 'new'; onC
   const isNew = theme === 'new'
   const [name, setName] = useState(isNew ? '' : theme.name)
   const [saving, setSaving] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+  const [formError, setFormError] = useState<{ title: string; issues?: FormIssue[] } | null>(null)
 
   async function submit() {
-    setError(null)
-    if (!name.trim()) { setError(t('err_required')); return }
+    setFormError(null)
+    // Collecte de tous les champs invalides (ici uniquement le Nom).
+    const found: FormIssue[] = []
+    if (!name.trim()) found.push({ label: t('f_name'), message: t('err_required') })
+    if (found.length) { setFormError({ title: t('err_check'), issues: found }); return }
     setSaving(true)
     try {
       // Parité legacy (`prospects_theme_form`) : uniquement ID + Nom (le back préserve le code).
       await saveTheme({ id: isNew ? 0 : theme.id, name: name.trim() })
-      notify('ok', t('title'), t('saved'))
+      okNotify(t('title'), t('saved'))
       onSaved()
     } catch (e) {
-      setError(e instanceof Error ? e.message : t('err_save'))
+      const m = e instanceof Error ? e.message : t('err_save')
+      setFormError({ title: t('err_save'), issues: [{ message: m }] })
+      koNotify(t('err_save'), m)
     } finally { setSaving(false) }
   }
 
@@ -607,7 +616,7 @@ function ThemeModal({ theme, onClose, onSaved }: { theme: ThemeItem | 'new'; onC
     <div style={{ position: 'fixed', inset: 0, zIndex: 50, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(0,0,0,.5)', padding: 16 }}>
       <div style={{ ...card, padding: 24, width: '100%', maxWidth: 420 }}>
         <h3 style={{ fontSize: 16, fontWeight: 600, margin: '0 0 16px' }}>{isNew ? t('new_title') : t('rename')}</h3>
-        {error && <div style={{ ...card, borderColor: '#fca5a5', background: '#fef2f2', color: '#b91c1c', padding: '8px 14px', fontSize: 14, marginBottom: 14 }}>{error}</div>}
+        {formError && <div style={{ marginBottom: 14 }}><FormErrorBanner title={formError.title} issues={formError.issues} /></div>}
         <label style={label}>{t('f_name')}</label>
         <input style={inputCss} value={name} maxLength={45} autoComplete="off" autoFocus
           onChange={(e) => setName(e.target.value)}
@@ -799,7 +808,7 @@ function ThemeItemForm({ theme, itemId, langs, onClose, onSaved }: {
   const [activeLang, setActiveLang] = useState<number>(langs[0]?.id ?? 1)
   const [loading, setLoading] = useState(!isNew)
   const [saving, setSaving] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+  const [formError, setFormError] = useState<{ title: string; issues?: FormIssue[] } | null>(null)
 
   useEffect(() => { if (langs.length && !langs.some((l) => l.id === activeLang)) setActiveLang(langs[0].id) }, [langs]) // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -813,16 +822,20 @@ function ThemeItemForm({ theme, itemId, langs, onClose, onSaved }: {
   }, [itemId]) // eslint-disable-line react-hooks/exhaustive-deps
 
   async function submit() {
-    setError(null)
+    setFormError(null)
+    const found: FormIssue[] = []
     const anyText = Object.values(texts).some((v) => v && v.trim() !== '')
-    if (!anyText) { setError(t('items_required')); return }
+    if (!anyText) found.push({ label: t('items_content_per_lang'), message: t('items_required') })
+    if (found.length) { setFormError({ title: t('err_check'), issues: found }); return }
     setSaving(true)
     try {
       await saveThemeItem({ id: itemId, themeId: theme.id, translations: texts })
-      notify('ok', t('items_edit_title'), t('saved'))
+      okNotify(t('items_edit_title'), t('saved'))
       onSaved()
     } catch (e) {
-      setError(e instanceof Error ? e.message : t('err_save'))
+      const m = e instanceof Error ? e.message : t('err_save')
+      setFormError({ title: t('err_save'), issues: [{ message: m }] })
+      koNotify(t('err_save'), m)
     } finally { setSaving(false) }
   }
 
@@ -830,7 +843,7 @@ function ThemeItemForm({ theme, itemId, langs, onClose, onSaved }: {
     <div style={{ position: 'fixed', inset: 0, zIndex: 50, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(0,0,0,.5)', padding: 16 }}>
       <div style={{ ...card, padding: 24, width: '100%', maxWidth: 460, maxHeight: '90vh', overflow: 'auto' }}>
         <h3 style={{ fontSize: 16, fontWeight: 600, margin: '0 0 16px' }}>{isNew ? t('items_new_title') : t('items_edit_title')}</h3>
-        {error && <div style={{ ...card, borderColor: '#fca5a5', background: '#fef2f2', color: '#b91c1c', padding: '8px 14px', fontSize: 14, marginBottom: 14 }}>{error}</div>}
+        {formError && <div style={{ marginBottom: 14 }}><FormErrorBanner title={formError.title} issues={formError.issues} /></div>}
         {loading ? (
           <div style={{ padding: 32, textAlign: 'center', color: 'var(--color-muted-foreground)' }}>{t('loading')}</div>
         ) : (
