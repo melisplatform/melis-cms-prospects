@@ -23,6 +23,12 @@ class ToolProspectsController extends MelisAbstractActionController
     const ToolProspectsAppConfigPath = 'melistoolprospects/tools/melistoolprospects_tool_prospects';
     const TOOL_KEY = 'melistoolprospects_tool_prospects';
 
+    /** @INFO: Tool access check (CWE-862). */
+    private function hasAccess($key)
+    {
+        return $this->getServiceManager()->get('MelisCoreRights')->canAccess($key);
+    }
+
     /**
      * Renders the View file of this controller
      * @return \Laminas\View\Model\ViewModel
@@ -395,6 +401,9 @@ class ToolProspectsController extends MelisAbstractActionController
      */
     public function getToolProspectDataAction()
     {
+        if (! $this->hasAccess('melisprospects_tool_prospects_section')) {
+            return new JsonModel(['draw' => (int) $this->getRequest()->getPost('draw', 0), 'recordsTotal' => 0, 'recordsFiltered' => 0, 'data' => []]);
+        }
         /** @var \MelisCmsProspects\Model\Tables\MelisProspectTable $prospectTable */
         $prospectTable = $this->getServiceManager()->get('MelisProspects');
         $translator = $this->getServiceManager()->get('translator');
@@ -486,6 +495,10 @@ class ToolProspectsController extends MelisAbstractActionController
 
     public function exportToCsvAction()
     {
+        /** @INFO: Access check (tool right) — CWE-862 */
+        if (! $this->hasAccess('melisprospects_tool_prospects_section')) {
+            return new JsonModel(['success' => 0, 'textTitle' => '', 'textMessage' => 'tr_meliscore_microservice_api_key_no_access', 'errors' => [], 'datas' => []]);
+        }
         $prospectTable = $this->getServiceManager()->get('MelisProspects');
         $translator = $this->getServiceManager()->get('translator');
         $melisTool = $this->getServiceManager()->get('MelisCoreTool');
@@ -522,6 +535,10 @@ class ToolProspectsController extends MelisAbstractActionController
      */
     public function removeProspectDataAction()
     {
+        /** @INFO: Access check (tool right) — CWE-862 */
+        if (! $this->hasAccess('melisprospects_tool_prospects_section')) {
+            return new JsonModel(['success' => 0, 'textTitle' => '', 'textMessage' => 'tr_meliscore_microservice_api_key_no_access', 'errors' => [], 'datas' => []]);
+        }
         $response = array();
         $this->getEventManager()->trigger('meliscmsprospects_toolprospects_delete_start', $this, $response);
 
@@ -548,6 +565,10 @@ class ToolProspectsController extends MelisAbstractActionController
      */
     public function retrieveProspectDataByIdAction()
     {
+        /** @INFO: Access check (tool right) — CWE-862 */
+        if (! $this->hasAccess('melisprospects_tool_prospects_section')) {
+            return new JsonModel(['success' => 0, 'textTitle' => '', 'textMessage' => 'tr_meliscore_microservice_api_key_no_access', 'errors' => [], 'datas' => []]);
+        }
         $prospectTable = $this->getServiceManager()->get('MelisProspects');
         $id = $this->params()->fromRoute('id', $this->params()->fromQuery('id', ''));
 
@@ -560,6 +581,10 @@ class ToolProspectsController extends MelisAbstractActionController
      */
     public function updateProspectDataAction()
     {
+        /** @INFO: Access check (tool right) — CWE-862 */
+        if (! $this->hasAccess('melisprospects_tool_prospects_section')) {
+            return new JsonModel(['success' => 0, 'textTitle' => '', 'textMessage' => 'tr_meliscore_microservice_api_key_no_access', 'errors' => [], 'datas' => []]);
+        }
         $response = array();
         $this->getEventManager()->trigger('meliscmsprospects_toolprospects_save_start', $this, $response);
         $id = null;
@@ -629,6 +654,10 @@ class ToolProspectsController extends MelisAbstractActionController
 
     public function removeAllProspectDataAction()
     {
+        /** @INFO: Access check (tool right) — CWE-862 */
+        if (! $this->hasAccess('melisprospects_tool_prospects_section')) {
+            return new JsonModel(['success' => 0, 'textTitle' => '', 'textMessage' => 'tr_meliscore_microservice_api_key_no_access', 'errors' => [], 'datas' => []]);
+        }
         $response = array();
         $this->getEventManager()->trigger('meliscmsprospects_toolprospects_delete_start', $this, $response);
 
