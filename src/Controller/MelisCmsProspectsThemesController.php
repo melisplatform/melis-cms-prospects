@@ -24,6 +24,12 @@ class MelisCmsProspectsThemesController extends MelisAbstractActionController
     const LOG_UPDATE = 'CMS_PROSPECTS_THEME_UPDATE';
     const LOG_DELETE = 'CMS_PROSPECTS_THEME_DELETE';
 
+    /** @INFO: Tool access check (CWE-862). */
+    private function hasAccess($key)
+    {
+        return $this->getServiceManager()->get('MelisCoreRights')->canAccess($key);
+    }
+
     /**
      * Tool container
      * @return ViewModel
@@ -163,6 +169,9 @@ class MelisCmsProspectsThemesController extends MelisAbstractActionController
      */
     public function getDataAction()
     {
+        if (! $this->hasAccess('melisprospects_tool_themes_section')) {
+            return new JsonModel(['draw' => (int) $this->getRequest()->getPost('draw', 0), 'recordsTotal' => 0, 'recordsFiltered' => 0, 'data' => []]);
+        }
         $request           = $this->getRequest();
         $dataCount         = 0;
         $dataFilteredCount = 0;
@@ -217,6 +226,10 @@ class MelisCmsProspectsThemesController extends MelisAbstractActionController
      */
     public function saveAction()
     {
+        /** @INFO: Access check (tool right) — CWE-862 */
+        if (! $this->hasAccess('melisprospects_tool_themes_section')) {
+            return new JsonModel(['success' => 0, 'textTitle' => '', 'textMessage' => 'tr_meliscore_microservice_api_key_no_access', 'errors' => [], 'datas' => []]);
+        }
         $success = 0;
         $message = 'tr_melis_cms_prospects_theme_failed';
         $errors = [];
@@ -319,6 +332,10 @@ class MelisCmsProspectsThemesController extends MelisAbstractActionController
      */
     public function removeAction()
     {
+        /** @INFO: Access check (tool right) — CWE-862 */
+        if (! $this->hasAccess('melisprospects_tool_themes_section')) {
+            return new JsonModel(['success' => 0, 'textTitle' => '', 'textMessage' => 'tr_meliscore_microservice_api_key_no_access', 'errors' => [], 'datas' => []]);
+        }
         $success = 0;
         $message = 'tr_melis_cms_prospects_theme_delete_failed';
         $errors = [];
