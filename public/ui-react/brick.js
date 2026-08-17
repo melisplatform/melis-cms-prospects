@@ -815,19 +815,19 @@
 		height: 15,
 		flexShrink: 0
 	};
-	var MelisM = () => /* @__PURE__ */ (0, react_jsx_runtime.jsxs)("svg", {
+	var CodeIcon = () => /* @__PURE__ */ (0, react_jsx_runtime.jsxs)("svg", {
 		style: sIcon$3,
-		viewBox: "0 0 70 70",
-		fill: "currentColor",
+		viewBox: "0 0 24 24",
+		fill: "none",
+		stroke: "currentColor",
+		strokeWidth: "2",
+		strokeLinecap: "round",
+		strokeLinejoin: "round",
 		"aria-hidden": "true",
 		children: [
-			/* @__PURE__ */ (0, react_jsx_runtime.jsx)("path", { d: "M57.4,0c-4.8,0-8.6,3.9-8.6,8.6v49.2c0,4.8,3.9,8.6,8.6,8.6s8.6-3.9,8.6-8.6V8.7C66,3.9,62.2,0,57.4,0Z" }),
-			/* @__PURE__ */ (0, react_jsx_runtime.jsx)("path", { d: "M16.3,4.6C14,.4,8.8-1.2,4.6,1,.4,3.2-1.2,8.5,1,12.7l26.1,49.3c2.2,4.2,7.4,5.8,11.7,3.6,4.2-2.2,5.8-7.4,3.6-11.7L16.3,4.6Z" }),
-			/* @__PURE__ */ (0, react_jsx_runtime.jsx)("circle", {
-				cx: "8.8",
-				cy: "57.7",
-				r: "8.8"
-			})
+			/* @__PURE__ */ (0, react_jsx_runtime.jsx)("path", { d: "m18 16 4-4-4-4" }),
+			/* @__PURE__ */ (0, react_jsx_runtime.jsx)("path", { d: "m6 8-4 4 4 4" }),
+			/* @__PURE__ */ (0, react_jsx_runtime.jsx)("path", { d: "m14.5 4-5 16" })
 		]
 	});
 	var LayoutIcon = () => /* @__PURE__ */ (0, react_jsx_runtime.jsxs)("svg", {
@@ -878,7 +878,7 @@
 				style: tab(mode === "react"),
 				onClick: () => onChange("react"),
 				title: compact ? labels.react : void 0,
-				children: [/* @__PURE__ */ (0, react_jsx_runtime.jsx)(MelisM, {}), !compact && labels.react]
+				children: [/* @__PURE__ */ (0, react_jsx_runtime.jsx)(CodeIcon, {}), !compact && labels.react]
 			}), /* @__PURE__ */ (0, react_jsx_runtime.jsxs)("button", {
 				style: tab(mode === "iframe"),
 				onClick: () => onChange("iframe"),
@@ -987,151 +987,6 @@
 		}) });
 	}
 	//#endregion
-	//#region src/shared/melis-form-errors.tsx
-	function postNotif(kind, title, message, issues) {
-		try {
-			const fields = (issues ?? []).filter((i) => i && i.label).map((i) => ({
-				label: i.label,
-				messages: [i.message]
-			}));
-			window.postMessage({
-				__melisNotif: true,
-				kind,
-				title,
-				message,
-				fields
-			}, "*");
-		} catch {}
-	}
-	function okNotify(title, message = "") {
-		postNotif("ok", title, message);
-	}
-	/** Error toast. Pass `issues` to list offending fields inside the toast (host renders them). */
-	function koNotify(title, message = "", issues) {
-		postNotif("ko", title, message, issues);
-	}
-	function firstMessage(entry) {
-		if (entry == null) return "";
-		if (typeof entry === "string") return entry;
-		if (Array.isArray(entry)) return firstMessage(entry[0]);
-		if (typeof entry === "object") {
-			const hit = Object.entries(entry).find(([k]) => k !== "label" && k !== "form");
-			return hit ? firstMessage(hit[1]) : "";
-		}
-		return String(entry);
-	}
-	/**
-	* Normalise an error payload into FormIssue[]. Accepts:
-	*  - a plain string            → [{ message }]
-	*  - a string[]                → one issue each
-	*  - a FormIssue[]             → passthrough (already normalised)
-	*  - `{ field: "message" }`    → [{ label: field, message }]   (e.g. newsletter `errors`)
-	*  - MelisCore formatErrors    → `{ massd_text: { isEmpty: "…", label: "Input Label" } }`
-	*                                → [{ label: "Input Label", message: "…" }]
-	* The optional `labels` map renames a raw field key to a display label (server key → UI label).
-	*/
-	function collectIssues(input, labels = {}) {
-		if (input == null || input === "") return [];
-		if (typeof input === "string") return [{ message: input }];
-		if (Array.isArray(input)) return input.map((v) => typeof v === "string" ? { message: v } : v).filter((i) => i && (i.message || i.label));
-		if (typeof input === "object") {
-			const out = [];
-			for (const [field, entry] of Object.entries(input)) {
-				if (field === "label" || field === "form" || entry == null) continue;
-				const message = firstMessage(entry);
-				if (!message) continue;
-				const entryLabel = entry && typeof entry === "object" ? entry.label : void 0;
-				out.push({
-					label: labels[field] ?? entryLabel ?? field,
-					message
-				});
-			}
-			return out;
-		}
-		return [];
-	}
-	var box = {
-		border: "1px solid color-mix(in srgb, #ef4444 45%, var(--color-border,#e5e7eb))",
-		background: "color-mix(in srgb, #ef4444 10%, var(--color-card,#fff))",
-		color: "#dc2626",
-		borderRadius: 8,
-		padding: "10px 14px",
-		fontSize: 14,
-		lineHeight: 1.45
-	};
-	var listCss = {
-		margin: "6px 0 0",
-		padding: "0 0 0 18px",
-		display: "flex",
-		flexDirection: "column",
-		gap: 2
-	};
-	/**
-	* Standard form-error banner. Show it above a form/modal on a failed save/submit.
-	*  - `title`   headline (caller-provided → i18n stays with the caller). Defaults to a generic English
-	*              line; every real caller should pass its own translated string.
-	*  - `issues`  the missing/invalid fields to list. Pass anything `collectIssues` accepts OR a
-	*              ready FormIssue[]; a bare string is treated as a single message.
-	*  - `icon`    optional leading node (e.g. an alert glyph).
-	*  - `html`    when set, the caller vouches that `title` and each issue `message` carry TRUSTED
-	*              HTML (e.g. Melis service messages that embed `<b>path</b>`) → the markup is rendered
-	*              instead of escaped. Default false (safe text). Labels are our own i18n and are always
-	*              rendered as text. Only pass `html` for server/legacy messages you know are trusted —
-	*              it is a dangerouslySetInnerHTML sink; never enable it for free user input.
-	* When there are no issues and no title, renders nothing.
-	*/
-	function FormErrorBanner({ title, issues, icon, html, style }) {
-		const list = collectIssues(issues);
-		if (!title && list.length === 0) return null;
-		const headline = title ?? "Please check the required fields.";
-		const renderText = (value, s) => html ? /* @__PURE__ */ (0, react_jsx_runtime.jsx)("span", {
-			style: s,
-			dangerouslySetInnerHTML: { __html: value }
-		}) : /* @__PURE__ */ (0, react_jsx_runtime.jsx)("span", {
-			style: s,
-			children: value
-		});
-		return /* @__PURE__ */ (0, react_jsx_runtime.jsx)("div", {
-			role: "alert",
-			style: {
-				...box,
-				...style
-			},
-			children: /* @__PURE__ */ (0, react_jsx_runtime.jsxs)("div", {
-				style: {
-					display: "flex",
-					alignItems: "flex-start",
-					gap: 8
-				},
-				children: [icon != null && /* @__PURE__ */ (0, react_jsx_runtime.jsx)("span", {
-					style: {
-						flexShrink: 0,
-						lineHeight: 1.4
-					},
-					children: icon
-				}), /* @__PURE__ */ (0, react_jsx_runtime.jsxs)("div", {
-					style: {
-						flex: 1,
-						minWidth: 0
-					},
-					children: [headline && /* @__PURE__ */ (0, react_jsx_runtime.jsx)("div", {
-						style: { fontWeight: 600 },
-						children: renderText(headline)
-					}), list.length > 0 && /* @__PURE__ */ (0, react_jsx_runtime.jsx)("ul", {
-						style: listCss,
-						children: list.map((it, i) => /* @__PURE__ */ (0, react_jsx_runtime.jsxs)("li", {
-							style: { fontSize: 13 },
-							children: [it.label && /* @__PURE__ */ (0, react_jsx_runtime.jsxs)("span", {
-								style: { fontWeight: 600 },
-								children: [it.label, it.message ? " — " : ""]
-							}), it.message && renderText(it.message)]
-						}, i))
-					})]
-				})]
-			})
-		});
-	}
-	//#endregion
 	//#region src/ProspectsPage.tsx
 	var MELIS_KEY$1 = "MelisCmsProspects_tool_prospects";
 	var CAPS_KEY$1 = "melisprospects_tool_prospects_section";
@@ -1196,7 +1051,6 @@
 			f_theme: "Thème",
 			err_save: "Erreur lors de la sauvegarde",
 			err_email: "L’adresse email n’est pas valide.",
-			err_check: "Veuillez vérifier les champs obligatoires.",
 			no_access: "Vous n’avez pas les droits pour consulter cette liste.",
 			none: "—",
 			dr_label: "Date",
@@ -1268,7 +1122,6 @@
 			f_theme: "Theme",
 			err_save: "Error while saving",
 			err_email: "The email address is not valid.",
-			err_check: "Please check the required fields.",
 			no_access: "You do not have permission to view this list.",
 			none: "—",
 			dr_label: "Date",
@@ -1294,6 +1147,14 @@
 			if (vars) for (const [k, v] of Object.entries(vars)) s = s.replaceAll(`{${k}}`, String(v));
 			return s;
 		};
+	}
+	function notify$1(kind, title, message) {
+		window.postMessage({
+			__melisNotif: true,
+			kind,
+			title,
+			message
+		}, "*");
 	}
 	var card$1 = {
 		border: "1px solid var(--color-border)",
@@ -2844,7 +2705,7 @@
 		const [themes, setThemes] = (0, react.useState)([]);
 		const [loading, setLoading] = (0, react.useState)(false);
 		const [saving, setSaving] = (0, react.useState)(false);
-		const [formError, setFormError] = (0, react.useState)(null);
+		const [error, setError] = (0, react.useState)(null);
 		const subTabRegistered = (0, react.useRef)(false);
 		(0, react.useEffect)(() => {
 			if (!can$1("edit")) navigate(base);
@@ -2885,17 +2746,9 @@
 			}).catch(() => navigate(base)).finally(() => setLoading(false));
 		}, [prospectId]);
 		async function submit() {
-			setFormError(null);
-			const found = [];
-			if (email.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) found.push({
-				label: t("f_email"),
-				message: t("err_email")
-			});
-			if (found.length) {
-				setFormError({
-					title: t("err_check"),
-					issues: found
-				});
+			setError(null);
+			if (email.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
+				setError(t("err_email"));
 				return;
 			}
 			setSaving(true);
@@ -2912,16 +2765,11 @@
 					theme: theme === "" ? null : Number(theme)
 				});
 				markProspectsListStale();
-				okNotify(t("title"), t("saved"));
+				notify$1("ok", t("title"), t("saved"));
 				window.__melisUpdateSubTabLabel?.(base, path, name.trim());
 				setTimeout(() => navigate(base), 600);
 			} catch (e) {
-				const m = e instanceof Error ? e.message : t("err_save");
-				setFormError({
-					title: t("err_save"),
-					issues: [{ message: m }]
-				});
-				koNotify(t("err_save"), m);
+				setError(e instanceof Error ? e.message : t("err_save"));
 			} finally {
 				setSaving(false);
 			}
@@ -3002,9 +2850,16 @@
 						})
 					})]
 				}),
-				formError && /* @__PURE__ */ (0, react_jsx_runtime.jsx)(FormErrorBanner, {
-					title: formError.title,
-					issues: formError.issues
+				error && /* @__PURE__ */ (0, react_jsx_runtime.jsx)("div", {
+					style: {
+						...card$1,
+						borderColor: "#fca5a5",
+						background: "#fef2f2",
+						color: "#b91c1c",
+						padding: "8px 14px",
+						fontSize: 14
+					},
+					children: error
 				}),
 				loading ? /* @__PURE__ */ (0, react_jsx_runtime.jsx)("div", {
 					style: {
@@ -3345,7 +3200,6 @@
 			info_note: "Le nom identifie le thème dans le back-office (formulaires de prospects).",
 			err_save: "Erreur lors de la sauvegarde",
 			err_required: "Le nom du thème est obligatoire.",
-			err_check: "Veuillez vérifier les champs obligatoires.",
 			no_access: "Vous n’avez pas les droits pour consulter cette liste.",
 			none: "—",
 			view_new: "Nouveau",
@@ -3407,7 +3261,6 @@
 			info_note: "The name identifies the theme in the back-office (prospect forms).",
 			err_save: "Error while saving",
 			err_required: "The theme name is required.",
-			err_check: "Please check the required fields.",
 			no_access: "You do not have permission to view this list.",
 			none: "—",
 			view_new: "New",
@@ -3421,6 +3274,14 @@
 			if (vars) for (const [k, v] of Object.entries(vars)) s = s.replaceAll(`{${k}}`, String(v));
 			return s;
 		};
+	}
+	function notify(kind, title, message) {
+		window.postMessage({
+			__melisNotif: true,
+			kind,
+			title,
+			message
+		}, "*");
 	}
 	var card = {
 		border: "1px solid var(--color-border)",
@@ -4694,19 +4555,11 @@
 		const isNew = theme === "new";
 		const [name, setName] = (0, react.useState)(isNew ? "" : theme.name);
 		const [saving, setSaving] = (0, react.useState)(false);
-		const [formError, setFormError] = (0, react.useState)(null);
+		const [error, setError] = (0, react.useState)(null);
 		async function submit() {
-			setFormError(null);
-			const found = [];
-			if (!name.trim()) found.push({
-				label: t("f_name"),
-				message: t("err_required")
-			});
-			if (found.length) {
-				setFormError({
-					title: t("err_check"),
-					issues: found
-				});
+			setError(null);
+			if (!name.trim()) {
+				setError(t("err_required"));
 				return;
 			}
 			setSaving(true);
@@ -4715,15 +4568,10 @@
 					id: isNew ? 0 : theme.id,
 					name: name.trim()
 				});
-				okNotify(t("title"), t("saved"));
+				notify("ok", t("title"), t("saved"));
 				onSaved();
 			} catch (e) {
-				const m = e instanceof Error ? e.message : t("err_save");
-				setFormError({
-					title: t("err_save"),
-					issues: [{ message: m }]
-				});
-				koNotify(t("err_save"), m);
+				setError(e instanceof Error ? e.message : t("err_save"));
 			} finally {
 				setSaving(false);
 			}
@@ -4755,12 +4603,17 @@
 						},
 						children: isNew ? t("new_title") : t("rename")
 					}),
-					formError && /* @__PURE__ */ (0, react_jsx_runtime.jsx)("div", {
-						style: { marginBottom: 14 },
-						children: /* @__PURE__ */ (0, react_jsx_runtime.jsx)(FormErrorBanner, {
-							title: formError.title,
-							issues: formError.issues
-						})
+					error && /* @__PURE__ */ (0, react_jsx_runtime.jsx)("div", {
+						style: {
+							...card,
+							borderColor: "#fca5a5",
+							background: "#fef2f2",
+							color: "#b91c1c",
+							padding: "8px 14px",
+							fontSize: 14,
+							marginBottom: 14
+						},
+						children: error
 					}),
 					/* @__PURE__ */ (0, react_jsx_runtime.jsx)("label", {
 						style: label,
@@ -5183,7 +5036,7 @@
 		const [activeLang, setActiveLang] = (0, react.useState)(langs[0]?.id ?? 1);
 		const [loading, setLoading] = (0, react.useState)(!isNew);
 		const [saving, setSaving] = (0, react.useState)(false);
-		const [formError, setFormError] = (0, react.useState)(null);
+		const [error, setError] = (0, react.useState)(null);
 		(0, react.useEffect)(() => {
 			if (langs.length && !langs.some((l) => l.id === activeLang)) setActiveLang(langs[0].id);
 		}, [langs]);
@@ -5193,17 +5046,9 @@
 			fetchThemeItemById(itemId).then((d) => setTexts(d.translations ?? {})).catch(() => onClose()).finally(() => setLoading(false));
 		}, [itemId]);
 		async function submit() {
-			setFormError(null);
-			const found = [];
-			if (!Object.values(texts).some((v) => v && v.trim() !== "")) found.push({
-				label: t("items_content_per_lang"),
-				message: t("items_required")
-			});
-			if (found.length) {
-				setFormError({
-					title: t("err_check"),
-					issues: found
-				});
+			setError(null);
+			if (!Object.values(texts).some((v) => v && v.trim() !== "")) {
+				setError(t("items_required"));
 				return;
 			}
 			setSaving(true);
@@ -5213,15 +5058,10 @@
 					themeId: theme.id,
 					translations: texts
 				});
-				okNotify(t("items_edit_title"), t("saved"));
+				notify("ok", t("items_edit_title"), t("saved"));
 				onSaved();
 			} catch (e) {
-				const m = e instanceof Error ? e.message : t("err_save");
-				setFormError({
-					title: t("err_save"),
-					issues: [{ message: m }]
-				});
-				koNotify(t("err_save"), m);
+				setError(e instanceof Error ? e.message : t("err_save"));
 			} finally {
 				setSaving(false);
 			}
@@ -5255,12 +5095,17 @@
 						},
 						children: isNew ? t("items_new_title") : t("items_edit_title")
 					}),
-					formError && /* @__PURE__ */ (0, react_jsx_runtime.jsx)("div", {
-						style: { marginBottom: 14 },
-						children: /* @__PURE__ */ (0, react_jsx_runtime.jsx)(FormErrorBanner, {
-							title: formError.title,
-							issues: formError.issues
-						})
+					error && /* @__PURE__ */ (0, react_jsx_runtime.jsx)("div", {
+						style: {
+							...card,
+							borderColor: "#fca5a5",
+							background: "#fef2f2",
+							color: "#b91c1c",
+							padding: "8px 14px",
+							fontSize: 14,
+							marginBottom: 14
+						},
+						children: error
 					}),
 					loading ? /* @__PURE__ */ (0, react_jsx_runtime.jsx)("div", {
 						style: {
