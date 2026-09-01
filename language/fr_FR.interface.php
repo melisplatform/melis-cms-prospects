@@ -44,24 +44,24 @@
 	    'tr_tool_text_prospect_validation_invalid_phone_num' => 'Numéro de téléphone incorrect.',
 	    'tr_tool_text_prospect_validation_invalid_email' => 'L\'adresse email est incorecte, utilisez le format classic xxx@xxx.xx',
 	    
-	    'tr_tool_text_prospect_manager_empty_modal' => 'No access',
+	    'tr_tool_text_prospect_manager_empty_modal' => 'Aucun accès',
 	    
 	    // prompts
-	    'tr_tool_text_prospect_pros_name_error_long' => 'Prospect name should not be greater than 255 characters fr',
+	    'tr_tool_text_prospect_pros_name_error_long' => 'Le nom du prospect ne doit pas dépasser 255 caractères',
 	    'tr_tool_text_prospect_pros_name_error_empty' => 'Le nom du prospect ne doit pas être vide',
 	     
-	    'tr_tool_text_prospect_pros_email_error_long' => 'Email should not be greater than 255 characters fr',
+	    'tr_tool_text_prospect_pros_email_error_long' => 'L\'email ne doit pas dépasser 255 caractères',
 	    'tr_tool_text_prospect_pros_email_error_empty' => 'L\'email ne peut pas être vide',
 	    'tr_tool_text_prospect_pros_email_error_invalid' => 'Format non valide',
 	     
 	    'tr_tool_text_prospect_pros_telephone_error_long' => '',
 	    'tr_tool_text_prospect_pros_telephone_error_empty' => 'Le numéro de téléphone ne doit pas être vide',
 	     
-	    'tr_tool_text_prospect_pros_theme_error_long' => 'Prospect theme should not be greater than 255 characters fr',
+	    'tr_tool_text_prospect_pros_theme_error_long' => 'Le thème du prospect ne doit pas dépasser 255 caractères',
 	    'tr_tool_text_prospect_pros_theme_error_empty' => 'Le thème ne doit pas être vide',
 	     
 	    'tr_tool_text_prospect_pros_message_error_long' => '',
-	    'tr_tool_text_prospect_pros_message_error_empty' => 'le message ne dwa pas etre vide',
+	    'tr_tool_text_prospect_pros_message_error_empty' => 'Le message ne doit pas être vide',
 			
 	    'tr_melistoolprospects_melistoolprospects' => 'MelisToolProspects',
 	    
@@ -132,7 +132,7 @@
         'tr_contactus_subj_opt_5' => 'Autre',
 
 	    // Plugins
-	    'tr_melis_cms_prospects_theme_plugin_modal_theme' => 'Theme',
+	    'tr_melis_cms_prospects_theme_plugin_modal_theme' => 'Thème',
 	    'tr_melis_cms_prospects_theme_plugin_modal_theme tooltip' => 'Si le champ thème est affiché vous devez alors le choisir parmi ceux créés dans l&#39;outil thème',
 	    
 	    // tabs
