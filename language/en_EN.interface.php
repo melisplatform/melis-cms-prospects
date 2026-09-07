@@ -14,7 +14,7 @@
 	    'tr_melistoolprospects_prospects_pros_email tooltip' => 'Prospect email',
 	    'tr_melistoolprospects_prospects_pros_telephone' => 'Telephone',
 	    'tr_melistoolprospects_prospects_pros_telephone tooltip' => 'Prospect phone number',
-	    'tr_melistoolprospects_prospects_pros_societe' => 'Societe',
+	    'tr_melistoolprospects_prospects_pros_societe' => 'Company',
 	    'tr_melistoolprospects_prospects_pros_message' => 'Message',
 	    'tr_melistoolprospects_prospects_pros_message tooltip' => 'Message written by the user',
 	    'tr_melistoolprospects_prospects_pros_contact_date' => 'Date',
@@ -62,7 +62,9 @@
 	    
 	    'tr_tool_text_prospect_pros_message_error_long' => '',
 	    'tr_tool_text_prospect_pros_message_error_empty' => 'The message must not be empty',
-	    
+
+	    'tr_melistoolprospects_melistoolprospects' => 'MelisToolProspects',
+
 	    'tr_melistoolprospects_common_edit' => 'Edit',
 	    'tr_melistoolprospects_common_delete' => 'Delete',
 	    'tr_melistoolprospects_common_refresh' => 'Refresh',
@@ -94,6 +96,7 @@
 	    'tr_contactus_title' => 'Contact us',
 	    'tr_contactus_name' => 'Full name',
 	    'tr_contactus_company' => 'Company',
+	    'tr_contactus_society' => 'Company',
 	    'tr_contactus_country' => 'Country',
 	    'tr_contactus_email' => 'Email address',
 	    'tr_contactus_phone' => 'Phone number',
