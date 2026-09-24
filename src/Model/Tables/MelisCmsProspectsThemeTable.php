@@ -42,7 +42,7 @@ class MelisCmsProspectsThemeTable extends MelisGenericTable
 
         if(!empty($orderBy)) {
             $orderDirection = strtoupper($orderDirection) === 'DESC' ? 'DESC' : 'ASC';
-            $select->order($orderBy . ' ' . $orderDirection);
+            \MelisCore\Model\Tables\MelisGenericTable::addSafeOrder($select, $orderBy, $orderDirection);
         }
 
         $getCount = $this->tableGateway->selectWith($select);

@@ -51,7 +51,7 @@ class MelisProspectTable extends MelisGenericTable
     public function getProspectsOrderByDate($order = 'ASC')
     {
         $select = $this->tableGateway->getSql()->select();
-        $select->order(array('pros_contact_date' => $order));
+        \MelisCore\Model\Tables\MelisGenericTable::addSafeOrder($select, 'pros_contact_date', $order);
         
         $resultSet = $this->tableGateway->selectWith($select);
         return $resultSet;
@@ -132,7 +132,7 @@ class MelisProspectTable extends MelisGenericTable
 
         if(!empty($orderBy)) {
             $orderDirection = strtoupper($orderDirection) === 'DESC' ? 'DESC' : 'ASC';
-            $select->order($orderBy . ' ' . $orderDirection);
+            \MelisCore\Model\Tables\MelisGenericTable::addSafeOrder($select, $orderBy, $orderDirection);
         }
 
         /**
