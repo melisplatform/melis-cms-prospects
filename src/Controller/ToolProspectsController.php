@@ -20,6 +20,13 @@ use Laminas\Session\Container;
  */
 class ToolProspectsController extends MelisAbstractActionController
 {
+    /**
+     * Outil auquel ce contrôleur appartient (audit DEKRA 7.0) : MelisCoreAuthorizationListener
+     * vérifie canAccess() sur cette clé AVANT le dispatch. La clé de TOOL_KEY n'est pas cochable
+     * dans Utilisateurs → Droits (TOOL_KEY reste la clé de configuration de l'outil).
+     */
+    const MELIS_KEY = 'melisprospects_tool_prospects_section';
+
     const ToolProspectsAppConfigPath = 'melistoolprospects/tools/melistoolprospects_tool_prospects';
     const TOOL_KEY = 'melistoolprospects_tool_prospects';
 
