@@ -60,6 +60,44 @@ class MelisCmsProspectsGdprAutoDeleteService extends MelisGeneralService impleme
     }
 
     /**
+     * SECURITY (audit PRO-H2) : secret serveur utilisé pour signer les clés de revalidation
+     * RGPD. Généré aléatoirement au premier besoin et persisté dans data/ (hors webroot).
+     * Repli si data/ n'est pas inscriptible : secret déterministe dérivé de la config DB
+     * (jamais exposée au client) — dans les deux cas, non recalculable par un anonyme.
+     *
+     * @return string
+     */
+    private function getValidationSecret()
+    {
+        static $secret = null;
+        if ($secret !== null) {
+            return $secret;
+        }
+
+        $file = 'data/MelisCmsProspects.gdpr.secret';
+        if (is_file($file)) {
+            $stored = (string) @file_get_contents($file);
+            if ($stored !== '') {
+                return $secret = $stored;
+            }
+        }
+
+        $generated = bin2hex(random_bytes(32));
+        if (is_dir('data') && @file_put_contents($file, $generated, LOCK_EX) !== false) {
+            @chmod($file, 0600);
+            return $secret = $generated;
+        }
+
+        $dbConfig = [];
+        try {
+            $dbConfig = $this->getServiceManager()->get('config')['db'] ?? [];
+        } catch (\Exception $e) {
+            // ignore — fallback below still yields a non-public value
+        }
+        return $secret = hash('sha256', 'MelisCmsProspects-gdpr|' . json_encode($dbConfig));
+    }
+
+    /**
      * retrieve user by validation key
      *
      * @param $validationKey
@@ -74,8 +112,8 @@ class MelisCmsProspectsGdprAutoDeleteService extends MelisGeneralService impleme
                 foreach ($emails as $id => $emailOpts) {
                     // check user existence
                     if (isset($emailOpts['config']['last_date']) && !empty($emailOpts['config']['last_date'])) {
-                        // search for the validation key
-                        if ($emailOpts['config']['validationKey'] == $validationKey) {
+                        // search for the validation key (comparaison constant-time — audit PRO-H2)
+                        if (hash_equals((string) $emailOpts['config']['validationKey'], (string) $validationKey)) {
                             // return user data
                             $userData = $this->getUserById($id);
                             if (! empty($userData)) {
@@ -194,11 +232,21 @@ class MelisCmsProspectsGdprAutoDeleteService extends MelisGeneralService impleme
                         // tags
                         $tags = $this->assigningValueOfTags($prospectsTags, $data);
                         $config = [
-                            'lang'       => $langAvailable, 
+                            'lang'       => $langAvailable,
                             'site_id'    => $data['pros_site_id'],
                             'last_date'  => $data['pros_gdpr_lastdate'],
                             'account_id' => $data['pros_id'],
-                            'validationKey' => md5(implode('', array_keys($prospectsTags)) . $type . $data['pros_id']),
+                            /**
+                             * SECURITY (audit PRO-H2) : clé de revalidation en HMAC-SHA256 avec un
+                             * secret serveur — l'ancien md5 de valeurs PUBLIQUES (tags statiques +
+                             * type fini + pros_id incrémental) était recalculable par un anonyme
+                             * (IDOR : revalidation anti-purge RGPD + oracle d'existence).
+                             */
+                            'validationKey' => hash_hmac(
+                                'sha256',
+                                implode('', array_keys($prospectsTags)) . $type . $data['pros_id'],
+                                $this->getValidationSecret()
+                            ),
                             'email' => $data['pros_email'] ?? null
                         ];
 

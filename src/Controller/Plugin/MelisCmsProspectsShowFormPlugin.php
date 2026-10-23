@@ -48,12 +48,47 @@ use Laminas\Session\Container;
 class MelisCmsProspectsShowFormPlugin extends MelisTemplatingPlugin
 {
 
+    /**
+     * SECURITY (audit PRO-H1 / PRO-M1) : clés de config que le QUERY STRING / POST d'un
+     * visiteur anonyme ne doit JAMAIS pouvoir écraser en rendu front — elles définissent
+     * la politique du plugin (champs affichés, champs requis, thème, site de rattachement,
+     * template). Elles restent fusionnables hors front (édition back-office).
+     */
+    private const PROTECTED_FRONT_KEYS = ['fields', 'required_fields', 'theme', 'pros_site_id', 'template_path'];
 
     public function __construct($updatesPluginConfig = array())
     {
         $this->configPluginKey = 'meliscmsprospects';
         $this->pluginXmlDbKey = 'melisCmsProspects';
         parent::__construct($updatesPluginConfig);
+    }
+
+    /**
+     * Retire les clés sensibles des paramètres GET/POST fusionnés dans la config front
+     * (y compris leurs formes éclatées `cle-souscle-0`, reconstruites par
+     * formatGetPostInArray). Cf. PROTECTED_FRONT_KEYS.
+     */
+    private function stripProtectedFrontKeys($parameters)
+    {
+        if ($this->renderMode === 'front' && is_array($parameters)) {
+            foreach (array_keys($parameters) as $key) {
+                $base = explode('-', (string) $key)[0];
+                if (in_array($base, self::PROTECTED_FRONT_KEYS, true)) {
+                    unset($parameters[$key]);
+                }
+            }
+        }
+        return $parameters;
+    }
+
+    public function loadGetDataPluginConfig()
+    {
+        return $this->stripProtectedFrontKeys(parent::loadGetDataPluginConfig());
+    }
+
+    public function loadPostDataPluginConfig()
+    {
+        return $this->stripProtectedFrontKeys(parent::loadPostDataPluginConfig());
     }
 
 
@@ -177,16 +212,24 @@ class MelisCmsProspectsShowFormPlugin extends MelisTemplatingPlugin
                 if ($postedFields == $fields|| empty($fields))
                 {
                     $prospectsForm->setData($post);
-                    
+
                     $requiredFields = $this->pluginFrontConfig['required_fields'] ? explode(',', $this->pluginFrontConfig['required_fields']) : array();
                     foreach ($prospectsForm->getElements() As $key => $val)
                     {
                         if (!in_array($key, $requiredFields))
                         {
-                            $prospectsForm->getInputFilter()->remove($key);
+                            /**
+                             * SECURITY (audit PRO-H1) : ne JAMAIS retirer l'input filter entier —
+                             * cela supprimait aussi les filters (StripTags/StringTrim) et les
+                             * validators de format. Un champ non obligatoire reste filtré et
+                             * validé quand une valeur est fournie ; il est seulement optionnel.
+                             */
+                            if ($prospectsForm->getInputFilter()->has($key)) {
+                                $prospectsForm->getInputFilter()->get($key)->setRequired(false);
+                            }
                         }
                     }
-                    
+
                     if($prospectsForm->isValid())
                     {
                         $siteId = null;
@@ -195,7 +238,12 @@ class MelisCmsProspectsShowFormPlugin extends MelisTemplatingPlugin
                          * Getting the current page id
                          */
                         $pageId = (!empty($this->getFormData()['pageId'])) ? $this->getFormData()['pageId'] :$this->getController()->params()->fromRoute('idpage');
-                        $selectedSiteId = (!empty(($this->getFormData()['pros_site_id']))) ? $this->getFormData()['pros_site_id'] : null;
+                        /**
+                         * SECURITY (audit PRO-M1) : pros_site_id vient de la CONFIG du plugin
+                         * (XML de page / app config — plus écrasable par le front depuis
+                         * stripProtectedFrontKeys), à défaut du site de la page courante.
+                         */
+                        $selectedSiteId = (int) ($this->pluginFrontConfig['pros_site_id'] ?? 0) ?: null;
 
                         if(is_null($selectedSiteId) && empty($selectedSiteId))
                         {
@@ -208,14 +256,30 @@ class MelisCmsProspectsShowFormPlugin extends MelisTemplatingPlugin
                         }else{
                             $siteId = $selectedSiteId;
                         }
-                        
+
+                        /**
+                         * SECURITY (audit PRO-H1, confirmé en live) : on ne persiste QUE les
+                         * valeurs FILTRÉES du formulaire (StripTags/StringTrim appliqués) sur une
+                         * liste blanche de colonnes publiques — jamais le POST brut. Les colonnes
+                         * internes (pros_anonymized, pros_gdpr_lastdate, pros_id…) ne sont plus
+                         * atteignables par un anonyme.
+                         */
+                        $formData = (array) $prospectsForm->getData();
+                        $allowedColumns = ['pros_name', 'pros_email', 'pros_telephone', 'pros_message', 'pros_company', 'pros_country', 'pros_theme'];
+                        $datas = array_intersect_key($formData, array_flip($allowedColumns));
+
+                        // pros_type : accepté du POST (par design, hors formulaire) mais borné et sans HTML.
+                        if (isset($post['pros_type']) && is_string($post['pros_type'])) {
+                            $datas['pros_type'] = mb_substr(strip_tags($post['pros_type']), 0, 100);
+                        }
+
                         // Preparing the Datas that required for adding prospects
-                        $post['pros_contact_date'] = date('Y-m-d H:i:s');
-                        $post['pros_site_id']      = $siteId;
-                        
+                        $datas['pros_contact_date'] = date('Y-m-d H:i:s');
+                        $datas['pros_site_id']      = $siteId;
+
                         // Saving the Prospects from Contactus form using the Prospects Service
                         $prospectService = $this->getServiceManager()->get('MelisProspectsService');
-                        $responseData = $prospectService->saveProspectsDatas($post);
+                        $responseData = $prospectService->saveProspectsDatas($datas);
                         
                         // Resting form elements after saving prospects
                         foreach ($prospectsForm->getElements() As $key => $val)
@@ -525,42 +589,52 @@ class MelisCmsProspectsShowFormPlugin extends MelisTemplatingPlugin
      * This method saves the XML version of this plugin in DB, for this pageId
      * Automatically called from savePageSession listenner in PageEdition
      */
+    /**
+     * SECURITY (audit PRO-M2) : neutralise la séquence `]]>` dans un contenu destiné
+     * à une section CDATA (sinon elle ferme le CDATA et injecte des nœuds XML).
+     */
+    private function xmlCdata($value)
+    {
+        return str_replace(']]>', ']]]]><![CDATA[>', (string) $value);
+    }
+
     public function savePluginConfigToXml($parameters)
     {
         $xmlValueFormatted = '';
-        
+
         // template_path is mendatory for all plugins
         if (!empty($parameters['template_path']))
-            $xmlValueFormatted .= "\t\t" . '<template_path><![CDATA[' . $parameters['template_path'] . ']]></template_path>';
+            $xmlValueFormatted .= "\t\t" . '<template_path><![CDATA[' . $this->xmlCdata($parameters['template_path']) . ']]></template_path>';
         if (!empty($parameters['pros_site_id']))
-            $xmlValueFormatted .= "\t\t" . '<pros_site_id><![CDATA[' . $parameters['pros_site_id'] . ']]></pros_site_id>';
+            $xmlValueFormatted .= "\t\t" . '<pros_site_id><![CDATA[' . (int) $parameters['pros_site_id'] . ']]></pros_site_id>';
         if(!empty($parameters['fields']))
-            $xmlValueFormatted .= "\t\t" . '<fields><![CDATA['   . implode(',', $parameters['fields']). ']]></fields>';
+            $xmlValueFormatted .= "\t\t" . '<fields><![CDATA['   . $this->xmlCdata(implode(',', $parameters['fields'])) . ']]></fields>';
         if(!empty($parameters['required_fields']))
-            $xmlValueFormatted .= "\t\t" . '<required_fields><![CDATA['   . implode(',', $parameters['required_fields']) . ']]></required_fields>';
+            $xmlValueFormatted .= "\t\t" . '<required_fields><![CDATA['   . $this->xmlCdata(implode(',', $parameters['required_fields'])) . ']]></required_fields>';
         if(!empty($parameters['theme']))
-            $xmlValueFormatted .= "\t\t" . '<theme><![CDATA['   . $parameters['theme'] . ']]></theme>';
+            $xmlValueFormatted .= "\t\t" . '<theme><![CDATA['   . (int) $parameters['theme'] . ']]></theme>';
 
         // for resizing
         $widthDesktop = null;
         $widthMobile   = null;
         $widthTablet  = null;
 
+        /** SECURITY (audit PRO-M2) : valeurs d'ATTRIBUT échappées (une `"` injectait des attributs/nœuds). */
         if (! empty($parameters['melisPluginDesktopWidth'])) {
-            $widthDesktop =  " width_desktop=\"" . $parameters['melisPluginDesktopWidth'] . "\" ";
+            $widthDesktop =  " width_desktop=\"" . htmlspecialchars((string) $parameters['melisPluginDesktopWidth'], ENT_QUOTES, 'UTF-8') . "\" ";
         }
         if (! empty($parameters['melisPluginMobileWidth'])) {
-            $widthMobile =  "width_mobile=\"" . $parameters['melisPluginMobileWidth'] . "\" ";
+            $widthMobile =  "width_mobile=\"" . htmlspecialchars((string) $parameters['melisPluginMobileWidth'], ENT_QUOTES, 'UTF-8') . "\" ";
         }
         if (! empty($parameters['melisPluginTabletWidth'])) {
-            $widthTablet =  "width_tablet=\"" . $parameters['melisPluginTabletWidth'] . "\" ";
+            $widthTablet =  "width_tablet=\"" . htmlspecialchars((string) $parameters['melisPluginTabletWidth'], ENT_QUOTES, 'UTF-8') . "\" ";
         }
 
         // Something has been saved, let's generate an XML for DB
-        $xmlValueFormatted = "\t" . '<' . $this->pluginXmlDbKey . ' id="' . $parameters['melisPluginId'] . '"' .$widthDesktop . $widthMobile . $widthTablet . ' >' .
+        $xmlValueFormatted = "\t" . '<' . $this->pluginXmlDbKey . ' id="' . htmlspecialchars((string) $parameters['melisPluginId'], ENT_QUOTES, 'UTF-8') . '"' .$widthDesktop . $widthMobile . $widthTablet . ' >' .
             $xmlValueFormatted .
             "\t" . '</' . $this->pluginXmlDbKey . '>' . "\n";
-        
+
         return $xmlValueFormatted;
     }
 }

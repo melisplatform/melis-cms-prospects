@@ -1,13 +1,13 @@
 <?php 
     $id = '';
     if (!empty($this->zoneconfig['conf']['id'])){
-        $id = $this->zoneconfig['conf']['id'];
+        $id = $this->escapeHtmlAttr($this->zoneconfig['conf']['id']);
     } 
 ?>
 <div >
-    <div class="modal fade" id="<?= $this->id ?>_container">
+    <div class="modal fade" id="<?= $this->escapeHtmlAttr($this->id) ?>_container">
         <div class="modal-dialog">
-          <div id="<?= $this->id ?>" data-melisKey="<?= $this->melisKey; ?>" class="modal-content"></div>
+          <div id="<?= $this->escapeHtmlAttr($this->id) ?>" data-melisKey="<?= $this->escapeHtmlAttr($this->melisKey); ?>" class="modal-content"></div>
         </div>
     </div>
 </div>

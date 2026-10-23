@@ -37,6 +37,54 @@ class ToolProspectsController extends MelisAbstractActionController
     }
 
     /**
+     * SECURITY (audit PRO-M6) : la capacité React (`export`, …) est opposable côté serveur
+     * aussi sur les endpoints legacy. Default-allow (comme CapabilityGuardTrait) ; admin bypass.
+     */
+    private function hasCapability($cap)
+    {
+        try {
+            $auth = $this->getServiceManager()->get('MelisCoreAuth');
+            if (!empty($auth->getIdentity()->usr_admin)) {
+                return true;
+            }
+            if (class_exists(\MelisReactApi\Service\Capabilities::class)) {
+                return \MelisReactApi\Service\Capabilities::isAllowed(
+                    $this->getServiceManager()->get('config'),
+                    $auth->getAuthRights(),
+                    self::MELIS_KEY,
+                    $cap
+                );
+            }
+        } catch (\Throwable $e) {
+            // default-allow : ne jamais bloquer sur une erreur du service de droits
+        }
+        return true;
+    }
+
+    /**
+     * SECURITY (audit PRO-H4) : échappement HTML systématique d'une cellule renvoyée
+     * aux datatables (rendu HTML brut côté client, aucun `render` d'échappement).
+     */
+    private function escapeCell($value)
+    {
+        return htmlspecialchars((string) $value, ENT_QUOTES, 'UTF-8');
+    }
+
+    /**
+     * SECURITY (audit PRO-M3) : pros_message conserve son HTML (richesse rédactionnelle)
+     * mais est débarrassé des vecteurs d'exécution (script/iframe, handlers on*, javascript:).
+     */
+    private function sanitizeRichText($html)
+    {
+        $html = (string) $html;
+        $html = preg_replace('#<\s*(script|iframe|object|embed)\b[^>]*>.*?<\s*/\s*\1\s*>#is', '', $html);
+        $html = preg_replace('#<\s*(script|iframe|object|embed)\b[^>]*/?\s*>#i', '', $html);
+        $html = preg_replace('/\son\w+\s*=\s*("[^"]*"|\'[^\']*\'|[^\s>]+)/i', '', $html);
+        $html = preg_replace('/\b(javascript|vbscript)\s*:/i', 'blocked:', $html);
+        return $html;
+    }
+
+    /**
      * Renders the View file of this controller
      * @return \Laminas\View\Model\ViewModel
      */
@@ -260,6 +308,16 @@ class ToolProspectsController extends MelisAbstractActionController
     {
         $prospectId = (int) $this->params()->fromQuery('prospectId', '');
 
+        /**
+         * SECURITY (audit PRO-H6, CWE-862) : cette action charge une fiche prospect complète
+         * (données personnelles) dans le formulaire — elle exige le droit outil comme les
+         * autres actions du contrôleur (la gate centrale est en mode `report` par défaut).
+         * Sans le droit : le formulaire est rendu VIDE (aucune donnée chargée).
+         */
+        if (! $this->hasAccess('melisprospects_tool_prospects_section')) {
+            $prospectId = 0;
+        }
+
         $melisCoreConfig = $this->getServiceManager()->get('MelisCoreConfig');
         $appConfigForm = $melisCoreConfig->getFormMergedAndOrdered('melistoolprospects/tools/melistoolprospects_tool_prospects/forms/melistoolprospects_tool_prospects_update', 'melistoolprospects_tool_prospects_update');
         $factory = new \Laminas\Form\Factory();
@@ -359,6 +417,12 @@ class ToolProspectsController extends MelisAbstractActionController
      */
     public function renderToolProspectsContentFiltersSiteAction()
     {
+        /** SECURITY (audit PRO-B3) : même garde que les endpoints data du contrôleur. */
+        if (! $this->hasAccess('melisprospects_tool_prospects_section')) {
+            $view = new ViewModel();
+            $view->options = '';
+            return $view;
+        }
         $tableSite = $this->getServiceManager()->get('MelisEngineTableSite');
         $translator = $this->getServiceManager()->get('translator');
         $sites = $tableSite->fetchAll();
@@ -367,7 +431,8 @@ class ToolProspectsController extends MelisAbstractActionController
         $options = '<option  value="">' . $translator->translate('tr_melistoolprospects_prospects_common_choose_label') . '</option>';
         foreach ($sites as $site) {
             $selected  = ($site->site_id == $siteId) ? 'selected' : '';
-            $options .= '<option value="' . $site->site_id . '" ' . $selected . '>' . $site->site_label . '</option>';
+            /** SECURITY (audit PRO-H4/B) : libellé et valeur échappés (site_label est une donnée stockée). */
+            $options .= '<option value="' . (int) $site->site_id . '" ' . $selected . '>' . $this->escapeCell($site->site_label) . '</option>';
         }
 
         $view =  new ViewModel();
@@ -380,6 +445,12 @@ class ToolProspectsController extends MelisAbstractActionController
      */
     public function renderToolProspectsContentFiltersProsTypeAction()
     {
+        /** SECURITY (audit PRO-B3) : même garde que les endpoints data du contrôleur. */
+        if (! $this->hasAccess('melisprospects_tool_prospects_section')) {
+            $view = new ViewModel();
+            $view->options = '';
+            return $view;
+        }
         $prospectsTable = $this->getServiceManager()->get('MelisProspects');
         $translator = $this->getServiceManager()->get('translator');
         $types = $prospectsTable->fetchAll()->toArray();
@@ -394,7 +465,11 @@ class ToolProspectsController extends MelisAbstractActionController
 
         $options = '<option  value="">' . $translator->translate('tr_melistoolprospects_prospects_common_choose_label') . '</option>';
         foreach ($prosTypes as $type) {
-            $options .= '<option value="' . $type . '">' . $type . '</option>';
+            /**
+             * SECURITY (audit PRO-H4) : pros_type est saisissable par un ANONYME via le
+             * formulaire public — échappement obligatoire (valeur ET contenu de l'option).
+             */
+            $options .= '<option value="' . $this->escapeCell($type) . '">' . $this->escapeCell($type) . '</option>';
         }
 
         $view =  new ViewModel();
@@ -468,7 +543,12 @@ class ToolProspectsController extends MelisAbstractActionController
             for ($ctr = 0; $ctr < count($tableData); $ctr++) {
                 // apply text limits
                 foreach ($tableData[$ctr] as $vKey => $vValue) {
-                    $tableData[$ctr][$vKey] = $melisTool->sanitize($melisTool->limitedText($vValue));
+                    /**
+                     * SECURITY (audit PRO-H4) : échappement HTML systématique — l'ancien
+                     * `sanitize()` (denylist melis-core) laissait passer des payloads
+                     * (<img onerror=…>) saisis par un ANONYME via le formulaire public.
+                     */
+                    $tableData[$ctr][$vKey] = $this->escapeCell($melisTool->limitedText($vValue));
                 }
 
                 // manually modify value of the desired row
@@ -486,9 +566,10 @@ class ToolProspectsController extends MelisAbstractActionController
                     $itemName = !empty($themeItem) ? $themeItem->pros_theme_name . ' / ' . $themeItem->item_trans_text : '';
                 }
 
-                $tableData[$ctr]['pros_theme'] = !empty($itemName) ? $itemName : $translator->translate($tableData[$ctr]['pros_theme']);
+                /** SECURITY (audit PRO-H4) : $itemName (nom de thème stocké) était affecté APRÈS la boucle, brut. */
+                $tableData[$ctr]['pros_theme'] = $this->escapeCell(!empty($itemName) ? $itemName : $translator->translate($tableData[$ctr]['pros_theme']));
 
-                $tableData[$ctr]['pros_message'] = strip_tags($tableData[$ctr]['pros_message'] ?? '');
+                $tableData[$ctr]['pros_message'] = $this->escapeCell(strip_tags(html_entity_decode($tableData[$ctr]['pros_message'] ?? '', ENT_QUOTES, 'UTF-8')));
             }
         }
 
@@ -505,6 +586,13 @@ class ToolProspectsController extends MelisAbstractActionController
         /** @INFO: Access check (tool right) — CWE-862 */
         if (! $this->hasAccess('melisprospects_tool_prospects_section')) {
             return new JsonModel(['success' => 0, 'textTitle' => '', 'textMessage' => 'tr_meliscore_microservice_api_key_no_access', 'errors' => [], 'datas' => []]);
+        }
+        /**
+         * SECURITY (audit PRO-M6) : la capacité `export` (react.capabilities.php) est vérifiée
+         * côté serveur — la masquer dans l'UI ne suffisait pas (exfiltration de masse via URL).
+         */
+        if (! $this->hasCapability('export')) {
+            return new JsonModel(['success' => 0, 'textTitle' => '', 'textMessage' => 'Forbidden (capability: export)', 'errors' => [], 'datas' => []]);
         }
         $prospectTable = $this->getServiceManager()->get('MelisProspects');
         $translator = $this->getServiceManager()->get('translator');
@@ -546,12 +634,21 @@ class ToolProspectsController extends MelisAbstractActionController
         if (! $this->hasAccess('melisprospects_tool_prospects_section')) {
             return new JsonModel(['success' => 0, 'textTitle' => '', 'textMessage' => 'tr_meliscore_microservice_api_key_no_access', 'errors' => [], 'datas' => []]);
         }
+        /**
+         * SECURITY (audit PRO-H5) : mutation → POST uniquement. Le listener CSRF central
+         * exempte les verbes sûrs : exécutable en GET, cette suppression contournait le CSRF
+         * (une simple balise <img> same-site suffisait). 405 sinon.
+         */
+        if (! $this->getRequest()->isPost()) {
+            $this->getResponse()->setStatusCode(405);
+            return new JsonModel(['success' => 0, 'textTitle' => 'tr_melistoolprospects_tool_prospects', 'textMessage' => 'POST required', 'errors' => []]);
+        }
         $response = array();
         $this->getEventManager()->trigger('meliscmsprospects_toolprospects_delete_start', $this, $response);
 
         $translator = $this->getServiceManager()->get('translator');
         $prospectTable = $this->getServiceManager()->get('MelisProspects');
-        $id = $this->params()->fromRoute('id', $this->params()->fromQuery('id', ''));
+        $id = (int) $this->params()->fromPost('id', $this->params()->fromRoute('id', 0));
 
         $prospectTable->deleteById($id);
 
@@ -622,6 +719,8 @@ class ToolProspectsController extends MelisAbstractActionController
                 $data['pros_contact_date'] = $curData->pros_contact_date;
                 $data['pros_type'] = $curData->pros_type;
                 $data['pros_theme'] = empty($data['pros_theme']) ? null : $data['pros_theme'];
+                /** SECURITY (audit PRO-M3) : pros_message garde son HTML mais sans vecteurs d'exécution. */
+                $data['pros_message'] = $this->sanitizeRichText($data['pros_message'] ?? '');
                 $prospectTable->save($data, $id);
 
                 // add event to Flash messenger

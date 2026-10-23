@@ -172,9 +172,11 @@ var toolProspects = {
             translations.tr_prospect_manager_fm_delete_data_title,
             translations.tr_tool_text_prospect_manager_delete_confirm,
             function() {
+                // SECURITY (audit PRO-H5) : mutation en POST — le serveur refuse désormais le GET (405)
                 $.ajax({
-                    type        : 'GET',
-                    url         : '/melis/MelisCmsProspects/ToolProspects/removeProspectData?id='+id,
+                    type        : 'POST',
+                    url         : '/melis/MelisCmsProspects/ToolProspects/removeProspectData',
+                    data        : { id : id },
                     dataType    : 'json',
                     encode		: true
                 }).done(function(data) {

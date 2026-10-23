@@ -1,8 +1,8 @@
 <?php
 	$id = '';
 	if (!empty($this->zoneconfig['conf']['id']))
-		$id = ' id="'. $this->zoneconfig['conf']['id'] . '"';
-	$data_melisKey = $this->melisKey;
+		$id = ' id="'. $this->escapeHtmlAttr($this->zoneconfig['conf']['id']) . '"';
+	$data_melisKey = $this->escapeHtmlAttr($this->melisKey);
 ?>
 <div class="spacing-x2 innerAll" <?= $id; ?> data-melisKey='<?= $data_melisKey; ?>'>
     <div class="widget-body padding-none">

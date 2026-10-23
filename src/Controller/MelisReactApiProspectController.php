@@ -309,6 +309,7 @@ class MelisReactApiProspectController extends MelisAbstractActionController
 
     public function saveAction(): HttpResponse
     {
+        if ($denyVerb = $this->denyUnlessVerb(['POST', 'PUT'])) { return $denyVerb; }
         if ($deny = $this->denyUnlessAccess()) { return $deny; }
         if ($denyCap = $this->denyUnlessCan('edit')) { return $denyCap; }
 
@@ -346,6 +347,9 @@ class MelisReactApiProspectController extends MelisAbstractActionController
                 return $this->jsonResponse(['success' => false, 'error' => 'Le nom ou l\'email dépasse 255 caractères.'], 400);
             }
 
+            /** SECURITY (audit PRO-M3) : pros_message garde son HTML mais sans vecteurs d'exécution. */
+            $message = $this->sanitizeRichText($message);
+
             // pros_contact_date et pros_type sont IMMUABLES depuis cet écran : on ne les
             // reprend JAMAIS du payload client, seulement de la ligne existante.
             $db->query(
@@ -372,6 +376,7 @@ class MelisReactApiProspectController extends MelisAbstractActionController
 
     public function deleteAction(): HttpResponse
     {
+        if ($denyVerb = $this->denyUnlessVerb(['DELETE', 'POST'])) { return $denyVerb; }
         if ($deny = $this->denyUnlessAccess()) { return $deny; }
         if ($denyCap = $this->denyUnlessCan('delete')) { return $denyCap; }
 
@@ -428,6 +433,36 @@ class MelisReactApiProspectController extends MelisAbstractActionController
     private function isAuthenticated(): bool
     {
         return $this->getServiceManager()->get('MelisCoreAuth')->hasIdentity();
+    }
+
+    /**
+     * SECURITY (audit PRO-H5, même motif que melis-cms-news CN-M2) : les endpoints mutants ne
+     * doivent pas être joignables en GET — le listener CSRF central exempte les verbes sûrs,
+     * une écriture en GET contournerait donc entièrement le CSRF. 405 sinon.
+     */
+    private function denyUnlessVerb(array $verbs): ?HttpResponse
+    {
+        $method = strtoupper($this->getRequest()->getMethod());
+        if (!in_array($method, $verbs, true)) {
+            return $this->jsonResponse(
+                ['success' => false, 'error' => implode(' or ', $verbs) . ' required'],
+                405
+            );
+        }
+        return null;
+    }
+
+    /**
+     * SECURITY (audit PRO-M3) : pros_message conserve son HTML (richesse rédactionnelle)
+     * mais est débarrassé des vecteurs d'exécution (script/iframe, handlers on*, javascript:).
+     */
+    private function sanitizeRichText(string $html): string
+    {
+        $html = preg_replace('#<\s*(script|iframe|object|embed)\b[^>]*>.*?<\s*/\s*\1\s*>#is', '', $html);
+        $html = preg_replace('#<\s*(script|iframe|object|embed)\b[^>]*/?\s*>#i', '', $html);
+        $html = preg_replace('/\son\w+\s*=\s*("[^"]*"|\'[^\']*\'|[^\s>]+)/i', '', $html);
+        $html = preg_replace('/\b(javascript|vbscript)\s*:/i', 'blocked:', $html);
+        return $html;
     }
 
     /**

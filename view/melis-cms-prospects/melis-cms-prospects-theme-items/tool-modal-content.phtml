@@ -4,7 +4,7 @@ $id = '';
 if (!empty($this->zoneconfig['conf']['name']))
     $name = $this->zoneconfig['conf']['name'];
 if (!empty($this->zoneconfig['conf']['id']))
-    $id = $this->zoneconfig['conf']['id'];
+    $id = $this->escapeHtmlAttr($this->zoneconfig['conf']['id']);
 
 ?>
 <div class="modal-content">
@@ -14,7 +14,7 @@ if (!empty($this->zoneconfig['conf']['id']))
                 <div class="widget-head">
                     <ul class="nav nav-tabs">
                         <li class="nav-item active">
-                            <a data-bs-target="#<?php echo $this->zoneconfig['conf']['id'] ?>" href="#<?php echo $this->zoneconfig['conf']['id'] ?>" class="nav-link glyphicons pencil" data-bs-toggle="tab" aria-expanded="true"><i></i> <?php echo sprintf($this->translate('tr_melis_cms_prospects_theme_items_edit'), !empty($this->code) ? strtoupper($this->code) : null); ?></a>
+                            <a data-bs-target="#<?php echo $this->escapeHtmlAttr($this->zoneconfig['conf']['id']) ?>" href="#<?php echo $this->escapeHtmlAttr($this->zoneconfig['conf']['id']) ?>" class="nav-link glyphicons pencil" data-bs-toggle="tab" aria-expanded="true"><i></i> <?php echo sprintf($this->translate('tr_melis_cms_prospects_theme_items_edit'), !empty($this->code) ? strtoupper($this->code) : null); ?></a>
                         </li>
                     </ul>
                 </div>

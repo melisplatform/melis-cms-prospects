@@ -182,6 +182,7 @@ class MelisReactApiProspectThemeController extends MelisAbstractActionController
 
     public function saveAction(): HttpResponse
     {
+        if ($denyVerb = $this->denyUnlessVerb(['POST', 'PUT'])) { return $denyVerb; }
         if ($deny = $this->denyUnlessAccess()) { return $deny; }
 
         try {
@@ -211,6 +212,13 @@ class MelisReactApiProspectThemeController extends MelisAbstractActionController
             }
             if (mb_strlen($name) > 45) {
                 return $fail('Le nom du thème ne peut dépasser 45 caractères.');
+            }
+            /**
+             * SECURITY (audit PRO-H4) : le nom de thème est rendu dans le chrome du BO
+             * (datatables, <h1>, titres d'onglets) — aucun HTML n'y a de sens, on refuse.
+             */
+            if (preg_match('/[<>]/', $name) || ($hasCode && preg_match('/[<>]/', $code))) {
+                return $fail('Le nom et le code du thème ne peuvent pas contenir « < » ou « > ».');
             }
             if ($hasCode && mb_strlen($code) > 45) {
                 return $fail('Le code du thème ne peut dépasser 45 caractères.');
@@ -283,6 +291,7 @@ class MelisReactApiProspectThemeController extends MelisAbstractActionController
 
     public function deleteAction(): HttpResponse
     {
+        if ($denyVerb = $this->denyUnlessVerb(['DELETE', 'POST'])) { return $denyVerb; }
         if ($deny = $this->denyUnlessAccess()) { return $deny; }
         if ($denyCap = $this->denyUnlessCan('delete')) { return $denyCap; }
 
@@ -446,6 +455,7 @@ class MelisReactApiProspectThemeController extends MelisAbstractActionController
 
     public function itemSaveAction(): HttpResponse
     {
+        if ($denyVerb = $this->denyUnlessVerb(['POST', 'PUT'])) { return $denyVerb; }
         if ($deny = $this->denyUnlessAccess()) { return $deny; }
 
         try {
@@ -470,7 +480,8 @@ class MelisReactApiProspectThemeController extends MelisAbstractActionController
             foreach ($trans as $langId => $text) {
                 $lid = (int) $langId;
                 if ($lid > 0) {
-                    $clean[$lid] = mb_substr(trim((string) $text), 0, 255);
+                    /** SECURITY (audit PRO-H4) : libellé rendu dans le chrome BO — pas de HTML. */
+                    $clean[$lid] = mb_substr(preg_replace('/[<>]/', '', trim((string) $text)), 0, 255);
                 }
             }
             // Au moins une traduction non vide (parité legacy saveItemAction : inputValidator).
@@ -527,6 +538,7 @@ class MelisReactApiProspectThemeController extends MelisAbstractActionController
 
     public function itemDeleteAction(): HttpResponse
     {
+        if ($denyVerb = $this->denyUnlessVerb(['DELETE', 'POST'])) { return $denyVerb; }
         if ($deny = $this->denyUnlessAccess()) { return $deny; }
         if ($denyCap = $this->denyUnlessCan('items.delete')) { return $denyCap; }
 
@@ -585,6 +597,23 @@ class MelisReactApiProspectThemeController extends MelisAbstractActionController
     private function isAuthenticated(): bool
     {
         return $this->getServiceManager()->get('MelisCoreAuth')->hasIdentity();
+    }
+
+    /**
+     * SECURITY (audit PRO-H5, même motif que melis-cms-news CN-M2) : les endpoints mutants ne
+     * doivent pas être joignables en GET — le listener CSRF central exempte les verbes sûrs,
+     * une écriture en GET contournerait donc entièrement le CSRF. 405 sinon.
+     */
+    private function denyUnlessVerb(array $verbs): ?HttpResponse
+    {
+        $method = strtoupper($this->getRequest()->getMethod());
+        if (!in_array($method, $verbs, true)) {
+            return $this->jsonResponse(
+                ['success' => false, 'error' => implode(' or ', $verbs) . ' required'],
+                405
+            );
+        }
+        return null;
     }
 
     /** Traduit une clé `tr_...` dans la locale courante — parité exacte avec le legacy, qui
