@@ -601,7 +601,11 @@
 			try {
 				const all = await fetchAll();
 				const header = included.map((c) => labelFor(c.id));
-				const rows = all.map((it) => included.map((c) => getCell(it, c.id)));
+				const sanitizeCell = (v) => {
+					const s = String(v ?? "");
+					return /^[=+\-@\t\r]/.test(s) && (s.trim() === "" || isNaN(Number(s))) ? `'${s}` : s;
+				};
+				const rows = all.map((it) => included.map((c) => sanitizeCell(getCell(it, c.id))));
 				const dateStr = (/* @__PURE__ */ new Date()).toISOString().slice(0, 10);
 				if (format === "xlsx" && xlsx) {
 					const ws = xlsx.utils.aoa_to_sheet([header, ...rows]);

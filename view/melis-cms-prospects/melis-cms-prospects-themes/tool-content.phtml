@@ -1,11 +1,11 @@
 <?php
 $id = '';
 if (!empty($this->zoneconfig['conf']['id']))
-    $id = $this->zoneconfig['conf']['id'];
+    $id = $this->escapeHtmlAttr($this->zoneconfig['conf']['id']);
 
 ?>
 
-<div id="<?= $id; ?>" data-melisKey="<?= $this->melisKey; ?>">
+<div id="<?= $id; ?>" data-melisKey="<?= $this->escapeHtmlAttr($this->melisKey); ?>">
     <div class="spacing-x2 innerAll">
         <?php
         /*

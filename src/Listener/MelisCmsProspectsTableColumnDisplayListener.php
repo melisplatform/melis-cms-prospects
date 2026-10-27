@@ -44,7 +44,12 @@ class MelisCmsProspectsTableColumnDisplayListener extends MelisGeneralListener
                 if ($prosData)
                     $name = $prosData->pros_name;
 
-                $params['data'] = $name;
+                /**
+                 * SECURITY (audit PRO-M8) : pros_name est saisi par un ANONYME et le
+                 * consommateur (datatable d'un outil généré par le Tool Creator) rend
+                 * en HTML brut — on livre une valeur échappée.
+                 */
+                $params['data'] = htmlspecialchars((string) $name, ENT_QUOTES, 'UTF-8');
             }
         );
     }

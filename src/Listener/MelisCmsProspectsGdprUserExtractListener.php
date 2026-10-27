@@ -43,7 +43,15 @@ class MelisCmsProspectsGdprUserExtractListener extends MelisGeneralListener
                         foreach ($prospect as $prospectColumn => $prospectValue) {
                             if (isset($columns[$prospectColumn])) {
                                 $newKey = $columns[$prospectColumn]['text'];
-                                $moduleId->appendChild($xmlDoc->createElement($newKey, $prospectValue));
+                                /**
+                                 * SECURITY (audit PRO-M7) : le 2ᵉ argument de createElement()
+                                 * n'est PAS échappé (doc PHP) — un `&` ou un fragment XML saisi
+                                 * anonymement via le formulaire public cassait/forgeait l'extract
+                                 * RGPD. createTextNode() échappe correctement.
+                                 */
+                                $element = $xmlDoc->createElement($newKey);
+                                $element->appendChild($xmlDoc->createTextNode((string) $prospectValue));
+                                $moduleId->appendChild($element);
                             }
                         }
                     }

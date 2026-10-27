@@ -2,10 +2,10 @@
 	$id = '';
 	$width = '12';
 	if (!empty($this->zoneconfig['conf']['id']))
-		$id = ' id="'. $this->zoneconfig['conf']['id'] . '"';
+		$id = ' id="'. $this->escapeHtmlAttr($this->zoneconfig['conf']['id']) . '"';
 	if (!empty($this->zoneconfig['conf']['width']))
 	    $width = $this->zoneconfig['conf']['width'];
-	$data_melisKey = $this->melisKey;
+	$data_melisKey = $this->escapeHtmlAttr($this->melisKey);
 ?>
 <div class="col-md-<?php echo $width ?> text-center" <?= $id; ?> data-melisKey='<?= $data_melisKey; ?>'>
 	<div class="widget widget-inverse text-center">

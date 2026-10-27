@@ -19,6 +19,13 @@ use MelisCore\Controller\MelisAbstractActionController;
  */
 class MelisCmsProspectsThemeItemsController extends MelisAbstractActionController
 {
+    /**
+     * SECURITY (audit PRO-M5) : sans cette constante, la gate centrale
+     * (MelisCoreAuthorizationListener) journalisait ce contrôleur `UNMAPPED`
+     * et le laissait passer. Clé identique au contrôleur React Theme.
+     */
+    const MELIS_KEY = 'melisprospects_tool_themes_section';
+
     const LOG_ADD = 'CMS_PROSPECTS_THEME_ITEM_ADD';
     const LOG_UPDATE = 'CMS_PROSPECTS_THEME_ITEM_UPDATE';
     const LOG_DELETE = 'CMS_PROSPECTS_THEME_ITEM_DELETE';
@@ -117,6 +124,11 @@ class MelisCmsProspectsThemeItemsController extends MelisAbstractActionControlle
         $data     = array();
         $themeItemId  = (int)$this->params()->fromQuery('itemId', null);
 
+        /** SECURITY (audit PRO-M5) : pas de chargement de données sans le droit outil. */
+        if (! $this->hasAccess('melisprospects_tool_themes_section')) {
+            $themeItemId = 0;
+        }
+
         $code = $this->params()->fromQuery('code', null);
         $form = $this->getThemeItemForm();
         
@@ -203,7 +215,9 @@ class MelisCmsProspectsThemeItemsController extends MelisAbstractActionControlle
 
                     foreach ($forms['forms'] as $idx => $form) {
                         $transId = isset($form['item_trans_id']) ? (int)$form['item_trans_id'] : null;
-                        $text = $form['item_trans_text'];
+                        /** SECURITY (audit PRO-H4) : libellé rendu dans le chrome BO — pas de HTML. */
+                        $text = preg_replace('/[<>]/', '', (string) $form['item_trans_text']);
+                        $form['item_trans_text'] = $text;
 
                         if (!empty($transId) && empty($text)) {
                             // delete the entry if it is blank
@@ -373,13 +387,19 @@ class MelisCmsProspectsThemeItemsController extends MelisAbstractActionControlle
             for($ctr = 0; $ctr < count($tableData); $ctr++)
             {
                 $tableData[$ctr]['DT_RowId'] = $tableData[$ctr]['pros_theme_item_id'];
-                
+
                 if(empty($tableData[$ctr]['item_trans_text'])){
                     $tableData[$ctr]['item_trans_text'] = $itemTable->getItemById(
                         $tableData[$ctr]['pros_theme_item_id']
                     )->current()->item_trans_text;
                 }
-                
+
+                /** SECURITY (audit PRO-H4) : cellules échappées — rendu HTML brut côté DataTables. */
+                foreach ($tableData[$ctr] as $vKey => $vValue) {
+                    if (is_string($vValue)) {
+                        $tableData[$ctr][$vKey] = htmlspecialchars($vValue, ENT_QUOTES, 'UTF-8');
+                    }
+                }
             }
         }
         
@@ -436,6 +456,11 @@ class MelisCmsProspectsThemeItemsController extends MelisAbstractActionControlle
 
     private function getTheme()
     {
+        /** SECURITY (audit PRO-M5) : pas de chargement de thème sans le droit outil. */
+        if (! $this->hasAccess('melisprospects_tool_themes_section')) {
+            return null;
+        }
+
         $id = (int) $this->params()->fromQuery('id', null);
 
         if($id) {

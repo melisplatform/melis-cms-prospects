@@ -2,10 +2,10 @@
 $id = '';
 $themeId = isset($this->theme->pros_theme_id) ? (int) $this->theme->pros_theme_id : null;
 if (!empty($this->zoneconfig['conf']['id']))
-    $id = $themeId . '_' . $this->zoneconfig['conf']['id'];
+    $id = $themeId . '_' . $this->escapeHtmlAttr($this->zoneconfig['conf']['id']);
 ?>
 
-<div id="<?= $id; ?>" data-melisKey="<?= $this->melisKey; ?>" data-themeId="<?= $themeId; ?>">
+<div id="<?= $id; ?>" data-melisKey="<?= $this->escapeHtmlAttr($this->melisKey); ?>" data-themeId="<?= $themeId; ?>">
     <div class="spacing-x2 innerAll">
         <?php
         /*

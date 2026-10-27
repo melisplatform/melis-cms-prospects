@@ -98,7 +98,14 @@ export function ExportModal<T>({ cols: colsProp, labelFor, fetchAll, getCell, fi
     try {
       const all = await fetchAll()
       const header = included.map(c => labelFor(c.id))
-      const rows = all.map(it => included.map(c => getCell(it, c.id)))
+      // SECURITY (audit PRO-H3) : neutralisation de l'injection de formule tableur — une
+      // cellule commençant par = + - @ (saisie par un anonyme via le formulaire public)
+      // serait évaluée par Excel à l'ouverture. Préfixe apostrophe, sauf nombres légitimes.
+      const sanitizeCell = (v: unknown): string => {
+        const s = String(v ?? '')
+        return /^[=+\-@\t\r]/.test(s) && (s.trim() === '' || isNaN(Number(s))) ? `'${s}` : s
+      }
+      const rows = all.map(it => included.map(c => sanitizeCell(getCell(it, c.id))))
       const dateStr = new Date().toISOString().slice(0, 10)
       if (format === 'xlsx' && xlsx) {
         const ws = xlsx.utils.aoa_to_sheet([header, ...rows])

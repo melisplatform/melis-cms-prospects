@@ -20,6 +20,13 @@ use MelisCore\Controller\MelisAbstractActionController;
  */
 class MelisCmsProspectsThemesController extends MelisAbstractActionController
 {
+    /**
+     * SECURITY (audit PRO-M5) : sans cette constante, la gate centrale
+     * (MelisCoreAuthorizationListener) journalisait ce contrôleur `UNMAPPED`
+     * et le laissait passer. Clé identique au contrôleur React Theme.
+     */
+    const MELIS_KEY = 'melisprospects_tool_themes_section';
+
     const LOG_ADD = 'CMS_PROSPECTS_THEME_ADD';
     const LOG_UPDATE = 'CMS_PROSPECTS_THEME_UPDATE';
     const LOG_DELETE = 'CMS_PROSPECTS_THEME_DELETE';
@@ -111,6 +118,11 @@ class MelisCmsProspectsThemesController extends MelisAbstractActionController
     {
         $id = $this->params()->fromRoute('id', $this->params()->fromQuery('id', ''));
 
+        /** SECURITY (audit PRO-M5) : pas de chargement de données sans le droit outil. */
+        if (! $this->hasAccess('melisprospects_tool_themes_section')) {
+            $id = '';
+        }
+
         $melisKey = $this->params()->fromRoute('melisKey', '');
         $title    = $this->tool()->getTranslation('tr_melis_cms_prospects_theme_new_title');
         $data     = array();
@@ -197,7 +209,8 @@ class MelisCmsProspectsThemesController extends MelisAbstractActionController
             for($ctr = 0; $ctr < count($tableData); $ctr++) {
                 // apply text limits
                 foreach($tableData[$ctr] as $vKey => $vValue) {
-                    $tableData[$ctr][$vKey] = $this->tool()->limitedText($vValue, 80);
+                    /** SECURITY (audit PRO-H4) : cellules échappées — rendu HTML brut côté DataTables. */
+                    $tableData[$ctr][$vKey] = htmlspecialchars((string) $this->tool()->limitedText($vValue, 80), ENT_QUOTES, 'UTF-8');
                 }
 
                 $tableData[$ctr]['DT_RowId'] = $tableData[$ctr]['pros_theme_id'];
@@ -242,6 +255,13 @@ class MelisCmsProspectsThemesController extends MelisAbstractActionController
             $allowSave = false;
 
             $data = $this->tool()->sanitizeRecursive($request->getPost()->toArray(), ["'", '"'], false);
+            /** SECURITY (audit PRO-H4) : nom/code rendus dans le chrome BO — pas de HTML. */
+            if (isset($data['pros_theme_name'])) {
+                $data['pros_theme_name'] = preg_replace('/[<>]/', '', (string) $data['pros_theme_name']);
+            }
+            if (isset($data['pros_theme_code'])) {
+                $data['pros_theme_code'] = preg_replace('/[<>]/', '', (string) $data['pros_theme_code']);
+            }
             if (!empty($data['pros_theme_id'])) {
                 $id = (int)$data['pros_theme_id'];
                 $logType = self::LOG_UPDATE;

@@ -4,18 +4,18 @@ $id = '';
 if (!empty($this->zoneconfig['conf']['name']))
     $name = $this->zoneconfig['conf']['name'];
 if (!empty($this->zoneconfig['conf']['id']))
-    $id = $this->zoneconfig['conf']['id'];
+    $id = $this->escapeHtmlAttr($this->zoneconfig['conf']['id']);
 
 
 ?>
-<div class="modal-content" id="<?= $id; ?>" data-melisKey="<?= $this->melisKey; ?>">
+<div class="modal-content" id="<?= $id; ?>" data-melisKey="<?= $this->escapeHtmlAttr($this->melisKey); ?>">
     <div class="modal-body padding-none">
         <div class="wizard">
             <div class="widget widget-tabs widget-tabs-double widget-tabs-responsive margin-none border-none">
                 <div class="widget-head">
                     <ul class="nav nav-tabs">
                         <li class="nav-item active">
-                            <a data-bs-target="#<?php echo $this->zoneconfig['conf']['id'] ?>" href="#<?php echo $this->zoneconfig['conf']['id'] ?>" class="nav-link glyphicons <?php echo ($this->id) ? 'pencil' : 'plus'?>" data-bs-toggle="tab" aria-expanded="true"><i></i> <?php echo $this->title ?></a>
+                            <a data-bs-target="#<?php echo $this->escapeHtmlAttr($this->zoneconfig['conf']['id']) ?>" href="#<?php echo $this->escapeHtmlAttr($this->zoneconfig['conf']['id']) ?>" class="nav-link glyphicons <?php echo ($this->id) ? 'pencil' : 'plus'?>" data-bs-toggle="tab" aria-expanded="true"><i></i> <?php echo $this->title ?></a>
                         </li>
                     </ul>
                 </div>

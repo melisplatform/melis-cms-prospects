@@ -17,7 +17,7 @@ return [
 							'name'	=> 'microservice_form',
 							'id'	=> 'microservice_form',
 							'method'=> 'POST',
-							'action'=> $_SERVER['REQUEST_URI'],
+							'action'=> '', // SECURITY (audit PRO-M9) : REQUEST_URI réfléchi brut dans l'attribut action — vide = soumission sur l'URL courante
 						],
 						'hydrator' => 'Laminas\Hydrator\ArraySerializableHydrator',
 						'elements' => [
@@ -74,7 +74,7 @@ return [
 							'name'	=> 'microservice_form',
 							'id'	=> 'microservice_form',
 							'method'=> 'POST',
-							'action'=> $_SERVER['REQUEST_URI'],
+							'action'=> '', // SECURITY (audit PRO-M9) : REQUEST_URI réfléchi brut dans l'attribut action — vide = soumission sur l'URL courante
 						],
 						'hydrator' => 'Laminas\Hydrator\ArraySerializableHydrator',
 						'elements' => [
@@ -164,7 +164,7 @@ return [
 							'name'	=> 'microservice_form',
 							'id'	=> 'microservice_form',
 							'method'=> 'POST',
-							'action'=> $_SERVER['REQUEST_URI'],
+							'action'=> '', // SECURITY (audit PRO-M9) : REQUEST_URI réfléchi brut dans l'attribut action — vide = soumission sur l'URL courante
 						],
 						'hydrator' => 'Laminas\Hydrator\ArraySerializableHydrator',
 						'elements' => [
