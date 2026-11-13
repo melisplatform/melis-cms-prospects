@@ -1055,6 +1055,7 @@
 			f_theme: "Thème",
 			err_save: "Erreur lors de la sauvegarde",
 			err_email: "L’adresse email n’est pas valide.",
+			err_name: "Le nom est obligatoire.",
 			no_access: "Vous n’avez pas les droits pour consulter cette liste.",
 			none: "—",
 			dr_label: "Date",
@@ -1126,6 +1127,7 @@
 			f_theme: "Theme",
 			err_save: "Error while saving",
 			err_email: "The email address is not valid.",
+			err_name: "The name is required.",
 			no_access: "You do not have permission to view this list.",
 			none: "—",
 			dr_label: "Date",
@@ -2751,6 +2753,10 @@
 		}, [prospectId]);
 		async function submit() {
 			setError(null);
+			if (!name.trim()) {
+				setError(t("err_name"));
+				return;
+			}
 			if (email.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
 				setError(t("err_email"));
 				return;
@@ -2918,7 +2924,7 @@
 										type: "email",
 										value: email,
 										onChange: (e) => setEmail(e.target.value),
-										maxLength: 255,
+										maxLength: 150,
 										autoComplete: "off"
 									})] }),
 									/* @__PURE__ */ (0, react_jsx_runtime.jsxs)("div", { children: [/* @__PURE__ */ (0, react_jsx_runtime.jsx)("label", {
@@ -2928,6 +2934,7 @@
 										style: inputCss$1,
 										value: telephone,
 										onChange: (e) => setTelephone(e.target.value),
+										maxLength: 20,
 										autoComplete: "off"
 									})] }),
 									/* @__PURE__ */ (0, react_jsx_runtime.jsxs)("div", { children: [/* @__PURE__ */ (0, react_jsx_runtime.jsx)("label", {
@@ -4629,7 +4636,10 @@
 						maxLength: 45,
 						autoComplete: "off",
 						autoFocus: true,
-						onChange: (e) => setName(e.target.value),
+						onChange: (e) => {
+							setName(e.target.value);
+							setError(null);
+						},
 						onKeyDown: (e) => {
 							if (e.key === "Enter" && !saving) submit();
 						}
@@ -5184,10 +5194,13 @@
 								maxLength: 255,
 								autoComplete: "off",
 								autoFocus: true,
-								onChange: (e) => setTexts((p) => ({
-									...p,
-									[String(activeLang)]: e.target.value
-								}))
+								onChange: (e) => {
+									setTexts((p) => ({
+										...p,
+										[String(activeLang)]: e.target.value
+									}));
+									setError(null);
+								}
 							})] })
 						]
 					}),

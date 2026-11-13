@@ -354,7 +354,7 @@ return [
                                             'options' => [
                                                 'encoding' => 'UTF-8',
                                                 //'min'      => 1,
-                                                'max'      => 255,
+                                                'max'      => 150,   // pros_email is VARCHAR(150) (Mantis #11374)
                                                 'messages' => [
                                                     \Laminas\Validator\StringLength::TOO_LONG => 'tr_tool_text_prospect_pros_email_error_long'
                                                 ],
@@ -369,9 +369,10 @@ return [
                                             ],
                                         ],
                                         [
+                                            // Mantis #11372: same pattern as the front contact form — accepts « - » and « + ».
                                             'name' => 'regex', false,
                                             'options' => [
-                                                'pattern' => '/^[a-zA-Z0-9]+([._@]?[a-zA-Z0-9])*$/',
+                                                'pattern' => '/^[A-Za-z0-9._%+\-]+@[A-Za-z0-9](?:[A-Za-z0-9\-]*[A-Za-z0-9])?(?:\.[A-Za-z0-9](?:[A-Za-z0-9\-]*[A-Za-z0-9])?)+$/',
                                                 'messages' => [\Laminas\Validator\Regex::NOT_MATCH => 'tr_meliscore_tool_user_invalid_email'],
                                                 'encoding' => 'UTF-8',
                                             ],
@@ -391,6 +392,16 @@ return [
                                             'options' => [
                                                 'pattern' => '/^([0-9\(\)\/\+ \-]*)$/',
                                                 'messages'=> [\Laminas\Validator\Regex::NOT_MATCH => sprintf('tr_tool_text_prospect_validation_invalid_phone_num','%value%')],
+                                            ],
+                                        ],
+                                        [
+                                            'name'    => 'StringLength',
+                                            'options' => [
+                                                'encoding' => 'UTF-8',
+                                                'max'      => 20,   // pros_telephone is VARCHAR(20) (Mantis #11374)
+                                                'messages' => [
+                                                    \Laminas\Validator\StringLength::TOO_LONG => 'tr_tool_text_prospect_pros_telephone_error_long',
+                                                ],
                                             ],
                                         ],
                                         [
@@ -454,7 +465,30 @@ return [
                                         ['name' => 'StringTrim'],
                                     ],
                                 ],
-                
+                                // Mantis #11374: pros_company is VARCHAR(45); without a limit here a
+                                // longer value failed in SQL instead of on the field. (This form has
+                                // no pros_country element, so no filter for it: it would null the column.)
+                                'pros_company' => [
+                                    'name'     => 'pros_company',
+                                    'required' => false,
+                                    'validators' => [
+                                        [
+                                            'name'    => 'StringLength',
+                                            'options' => [
+                                                'encoding' => 'UTF-8',
+                                                'max'      => 45,
+                                                'messages' => [
+                                                    \Laminas\Validator\StringLength::TOO_LONG => 'tr_contactus_company_long',
+                                                ],
+                                            ],
+                                        ],
+                                    ],
+                                    'filters'  => [
+                                        ['name' => 'StripTags'],
+                                        ['name' => 'StringTrim'],
+                                    ],
+                                ],
+
                             ], // end input filter
                         ],
                     ], // end forms

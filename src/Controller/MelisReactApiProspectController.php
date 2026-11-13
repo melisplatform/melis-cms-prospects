@@ -343,8 +343,34 @@ class MelisReactApiProspectController extends MelisAbstractActionController
             if (!preg_match('/^[0-9()\/+ -]*$/', $telephone)) {
                 return $this->jsonResponse(['success' => false, 'error' => 'Le téléphone contient des caractères non autorisés.'], 400);
             }
-            if (mb_strlen($name) > 255 || mb_strlen($email) > 255) {
-                return $this->jsonResponse(['success' => false, 'error' => 'Le nom ou l\'email dépasse 255 caractères.'], 400);
+            // Mantis #11375: a prospect always has a name (the contact form requires it).
+            if ($name === '') {
+                return $this->jsonResponse(['success' => false, 'error' => 'Le nom est obligatoire.'], 400);
+            }
+            // Mantis #11374: limits = the column sizes, so a long value is a 400 on the field, not a SQL 500.
+            foreach ([
+                'name'      => [$name, 255, 'Le nom ne doit pas dépasser 255 caractères.'],
+                'email'     => [$email, 150, 'L\'email ne doit pas dépasser 150 caractères.'],
+                'telephone' => [$telephone, 20, 'Le téléphone ne doit pas dépasser 20 caractères.'],
+                'company'   => [$company, 45, 'La société ne doit pas dépasser 45 caractères.'],
+                'country'   => [$country, 45, 'Le pays ne doit pas dépasser 45 caractères.'],
+            ] as [$value, $max, $error]) {
+                if (mb_strlen($value) > $max) {
+                    return $this->jsonResponse(['success' => false, 'error' => $error], 400);
+                }
+            }
+            // Mantis #11375: a NEW site / theme item must exist. The value already stored is let
+            // through, so a prospect whose item was deleted since can still be saved unchanged.
+            $storedSite  = $current[0]['pros_site_id'] !== null ? (int) $current[0]['pros_site_id'] : null;
+            $storedTheme = $current[0]['pros_theme'] !== null ? (int) $current[0]['pros_theme'] : null;
+            if ($siteId !== null && $siteId !== $storedSite
+                && !iterator_to_array($db->query('SELECT site_id FROM melis_cms_site WHERE site_id = ?', [$siteId]))) {
+                return $this->jsonResponse(['success' => false, 'error' => 'Site inconnu.'], 400);
+            }
+            if ($theme !== null && $theme !== $storedTheme && !iterator_to_array($db->query(
+                'SELECT pros_theme_item_id FROM melis_cms_prospects_theme_items WHERE pros_theme_item_id = ?', [$theme]
+            ))) {
+                return $this->jsonResponse(['success' => false, 'error' => 'Thème inconnu.'], 400);
             }
 
             /** SECURITY (audit PRO-M3) : pros_message garde son HTML mais sans vecteurs d'exécution. */

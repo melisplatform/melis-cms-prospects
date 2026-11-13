@@ -67,7 +67,7 @@ const DICT: Record<Lang, Record<string, string>> = {
     edit_title: 'Prospect', sec_contact: 'Coordonnées', sec_message: 'Message', sec_details: 'Détails',
     f_name: 'Nom', f_email: 'Email', f_phone: 'Téléphone', f_company: 'Société', f_country: 'Pays',
     f_site: 'Site', f_site_ph: '— Aucun site —', f_type: 'Type', f_date: 'Date de contact', f_theme: 'Thème',
-    err_save: 'Erreur lors de la sauvegarde', err_email: 'L’adresse email n’est pas valide.',
+    err_save: 'Erreur lors de la sauvegarde', err_email: 'L’adresse email n’est pas valide.', err_name: 'Le nom est obligatoire.',
     no_access: 'Vous n’avez pas les droits pour consulter cette liste.', none: '—',
     dr_label: 'Date', dr_all: 'Toutes les dates', dr_today: "Aujourd'hui", dr_yesterday: 'Hier',
     dr_last7: '7 derniers jours', dr_last30: '30 derniers jours', dr_thismonth: 'Ce mois-ci', dr_lastmonth: 'Le mois dernier',
@@ -89,7 +89,7 @@ const DICT: Record<Lang, Record<string, string>> = {
     edit_title: 'Prospect', sec_contact: 'Contact information', sec_message: 'Message', sec_details: 'Details',
     f_name: 'Name', f_email: 'Email', f_phone: 'Phone', f_company: 'Company', f_country: 'Country',
     f_site: 'Site', f_site_ph: '— No site —', f_type: 'Type', f_date: 'Contact date', f_theme: 'Theme',
-    err_save: 'Error while saving', err_email: 'The email address is not valid.',
+    err_save: 'Error while saving', err_email: 'The email address is not valid.', err_name: 'The name is required.',
     no_access: 'You do not have permission to view this list.', none: '—',
     dr_label: 'Date', dr_all: 'All dates', dr_today: 'Today', dr_yesterday: 'Yesterday',
     dr_last7: 'Last 7 days', dr_last30: 'Last 30 days', dr_thismonth: 'This month', dr_lastmonth: 'Last month',
@@ -713,8 +713,9 @@ function ProspectForm({ id, base }: { id: string; base: string }) {
 
   async function submit() {
     setError(null)
-    // Aucun champ n'est obligatoire (parité legacy) ; on valide seulement le format email s'il est renseigné.
-    if (email.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) { setError(t('err_email')); return }
+    // Seul le nom est obligatoire (Mantis #11375, comme l'API) ; le format email n'est validé que s'il est renseigné.
+    if (!name.trim()) { setError(t('err_name')); return }
+    if (email.trim() &&!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) { setError(t('err_email')); return }
     setSaving(true)
     try {
       await saveProspect({
@@ -767,11 +768,12 @@ function ProspectForm({ id, base }: { id: string; base: string }) {
                 </div>
                 <div>
                   <label style={label}>{t('f_email')}</label>
-                  <input style={inputCss} type="email" value={email} onChange={(e) => setEmail(e.target.value)} maxLength={255} autoComplete="off" />
+                  {/* Mantis #11374: maxLength = column size (pros_email 150, pros_telephone 20). */}
+                  <input style={inputCss} type="email" value={email} onChange={(e) => setEmail(e.target.value)} maxLength={150} autoComplete="off" />
                 </div>
                 <div>
                   <label style={label}>{t('f_phone')}</label>
-                  <input style={inputCss} value={telephone} onChange={(e) => setTelephone(e.target.value)} autoComplete="off" />
+                  <input style={inputCss} value={telephone} onChange={(e) => setTelephone(e.target.value)} maxLength={20} autoComplete="off" />
                 </div>
                 <div>
                   <label style={label}>{t('f_company')}</label>

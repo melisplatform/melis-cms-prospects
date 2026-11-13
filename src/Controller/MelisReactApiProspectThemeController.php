@@ -480,8 +480,18 @@ class MelisReactApiProspectThemeController extends MelisAbstractActionController
             foreach ($trans as $langId => $text) {
                 $lid = (int) $langId;
                 if ($lid > 0) {
-                    /** SECURITY (audit PRO-H4) : libellé rendu dans le chrome BO — pas de HTML. */
-                    $clean[$lid] = mb_substr(preg_replace('/[<>]/', '', trim((string) $text)), 0, 255);
+                    $clean[$lid] = mb_substr(trim((string) $text), 0, 255);
+                }
+            }
+            /**
+             * SECURITY (audit PRO-H4) : libellé rendu dans le chrome BO — pas de HTML.
+             * Mantis #11375 : on REFUSE « < » / « > » avec un message, comme le nom du thème —
+             * les retirer en silence enregistrait « qa <b>x</b> » sous « qa bx/b ».
+             */
+            foreach ($clean as $txt) {
+                if (preg_match('/[<>]/', $txt)) {
+                    $this->fireLog('meliscmsprospects_theme_item_save_end', 0, 'tr_melis_cms_prospects_theme_items', 'tr_melis_cms_prospects_theme_items_save_failed', $id > 0 ? self::LOG_ITEM_UPDATE : self::LOG_ITEM_ADD, $id);
+                    return $this->jsonResponse(['success' => false, 'error' => 'Le nom de l\'élément ne peut pas contenir « < » ou « > ».'], 400);
                 }
             }
             // Au moins une traduction non vide (parité legacy saveItemAction : inputValidator).

@@ -191,7 +191,9 @@ return [
                                                 'options' => [
                                                     'encoding' => 'UTF-8',
                                                     //'min'      => 1,
-                                                    'max'      => 100,
+                                                    // Mantis #11374: pros_company is VARCHAR(45) — a longer value
+                                                    // failed in SQL with no field error.
+                                                    'max'      => 45,
                                                     'messages' => [
                                                         \Laminas\Validator\StringLength::TOO_LONG => 'tr_contactus_company_long',
                                                     ],
@@ -220,7 +222,7 @@ return [
                                                 'options' => [
                                                     'encoding' => 'UTF-8',
                                                     //'min'      => 1,
-                                                    'max'      => 100,
+                                                    'max'      => 45,   // pros_country is VARCHAR(45) (Mantis #11374)
                                                     'messages' => [
                                                         \Laminas\Validator\StringLength::TOO_LONG => 'tr_contactus_country_long',
                                                     ],
@@ -263,16 +265,30 @@ return [
                                                 ],
                                             ],
                                             [
+                                                // Mantis #11372: the old pattern refused « - » and « + »
+                                                // (jean-pierre@…, a+b@…, @ex-ample.com). Plain address:
+                                                // letters, digits and ._%+- before the @, DNS labels after.
                                                 'name' => 'regex', false,
                                                 'options' => [
-                                                    'pattern' => '/^[a-zA-Z0-9]+([._@]?[a-zA-Z0-9])*$/',
+                                                    'pattern' => '/^[A-Za-z0-9._%+\-]+@[A-Za-z0-9](?:[A-Za-z0-9\-]*[A-Za-z0-9])?(?:\.[A-Za-z0-9](?:[A-Za-z0-9\-]*[A-Za-z0-9])?)+$/',
                                                     'messages' => [\Laminas\Validator\Regex::NOT_MATCH => 'tr_contactus_invalid_email'],
                                                     'encoding' => 'UTF-8',
                                                 ],
                                             ],
+                                            [
+                                                'name'    => 'StringLength',
+                                                'options' => [
+                                                    'encoding' => 'UTF-8',
+                                                    'max'      => 150,   // pros_email is VARCHAR(150) (Mantis #11374)
+                                                    'messages' => [
+                                                        \Laminas\Validator\StringLength::TOO_LONG => 'tr_contactus_invalid_email',
+                                                    ],
+                                                ],
+                                            ],
                                         ],
+                                        // No StripTags: it turned « a<x>@example.com » into another, valid
+                                        // address. The regex above already refuses < > and quotes.
                                         'filters'  => [
-                                            ['name' => 'StripTags'],
                                             ['name' => 'StringTrim'],
                                         ],
                                     ],
@@ -285,7 +301,7 @@ return [
                                                 'options' => [
                                                     'encoding' => 'UTF-8',
                                                     //'min'      => 1,
-                                                    'max'      => 50,
+                                                    'max'      => 20,   // pros_telephone is VARCHAR(20) (Mantis #11374)
                                                     'messages' => [
                                                         \Laminas\Validator\StringLength::TOO_LONG => 'tr_contactus_phone_long',
                                                     ],

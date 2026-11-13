@@ -179,7 +179,9 @@ class MelisCmsProspectsShowFormPlugin extends MelisTemplatingPlugin
 
         if($request->isPost()) {
             
-            $post = $request->getPost()->toArray();
+            // Mantis #11373: undo the front XSS listener's encoding so we validate and save what the
+            // visitor typed; StripTags/StringTrim still run on the decoded values.
+            $post = $this->decodeFrontPost($request->getPost()->toArray());
 
             // to avoid conflict in melis edition mode
             if (!empty($post))
@@ -556,6 +558,24 @@ class MelisCmsProspectsShowFormPlugin extends MelisTemplatingPlugin
     {
         $data = parent::getFormData();
         return $data;
+    }
+
+    /**
+     * Mantis #11373. MelisFrontXSSParameterListener encodes every front POST value with
+     * htmlspecialchars(htmlentities($v)), so « l'été » reached the form as
+     * « l&amp;#039;&amp;eacute;t&amp;eacute; »: saved escaped twice, and the length checks
+     * counted the entities (a short company with an accent overflowed pros_company).
+     * This reverses exactly those two steps. It is safe: the form filters (StripTags,
+     * StringTrim) and validators run on the decoded text, and every display escapes on output.
+     */
+    private function decodeFrontPost(array $post): array
+    {
+        array_walk_recursive($post, function (&$value) {
+            if (is_string($value)) {
+                $value = html_entity_decode(htmlspecialchars_decode($value, ENT_QUOTES), ENT_QUOTES | ENT_HTML401, 'UTF-8');
+            }
+        });
+        return $post;
     }
 
     /**

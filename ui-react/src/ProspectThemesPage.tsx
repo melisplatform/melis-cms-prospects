@@ -615,7 +615,8 @@ function ThemeModal({ theme, onClose, onSaved }: { theme: ThemeItem | 'new'; onC
         {error && <div style={{ ...card, borderColor: '#fca5a5', background: '#fef2f2', color: '#b91c1c', padding: '8px 14px', fontSize: 14, marginBottom: 14 }}>{error}</div>}
         <label style={label}>{t('f_name')}</label>
         <input style={inputCss} value={name} maxLength={45} autoComplete="off" autoFocus
-          onChange={(e) => setName(e.target.value)}
+          // Mantis #11375: the banner is about the value just saved — drop it as soon as it is edited.
+          onChange={(e) => { setName(e.target.value); setError(null) }}
           onKeyDown={(e) => { if (e.key === 'Enter' && !saving) submit() }} />
         <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8, marginTop: 20 }}>
           <button style={btnGhost} onClick={onClose}>{t('cancel')}</button>
@@ -860,7 +861,7 @@ function ThemeItemForm({ theme, itemId, langs, onClose, onSaved }: {
             <div>
               <label style={label}>{t('items_name')}</label>
               <input style={inputCss} value={texts[String(activeLang)] ?? ''} maxLength={255} autoComplete="off" autoFocus
-                onChange={(e) => setTexts((p) => ({ ...p, [String(activeLang)]: e.target.value }))} />
+                onChange={(e) => { setTexts((p) => ({ ...p, [String(activeLang)]: e.target.value })); setError(null) }} />
             </div>
           </div>
         )}
