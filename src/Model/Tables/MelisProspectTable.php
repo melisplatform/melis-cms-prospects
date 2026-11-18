@@ -184,7 +184,8 @@ class MelisProspectTable extends MelisGenericTable
                 if ($isSpecificSearch)
                     $select->where->expression('LOWER(pros_name) = ?', strtolower($searchInputs['user_name']));
                 else
-                    $select->where->expression('LOWER(pros_name) LIKE ?', '%' . strtolower($searchInputs['user_name']) . '%');
+                    // « % » / « _ » searched as characters, not LIKE wildcards (Mantis #0011544)
+                    $select->where->expression('LOWER(pros_name) LIKE ?', '%' . addcslashes(strtolower($searchInputs['user_name']), '%_\\') . '%');
             }
 
             if (!empty($searchInputs['user_email']))
