@@ -21,8 +21,8 @@ use Laminas\Session\Container;
 class ToolProspectsController extends MelisAbstractActionController
 {
     /**
-     * Outil auquel ce contrôleur appartient (audit DEKRA 7.0) : MelisCoreAuthorizationListener
-     * vérifie canAccess() sur cette clé AVANT le dispatch. La clé de TOOL_KEY n'est pas cochable
+     * Outil auquel ce contrôleur appartient : MelisCoreAuthorizationListener
+     * vérifie canAccess() sur cette clé avant le dispatch. La clé de TOOL_KEY n'est pas cochable
      * dans Utilisateurs → Droits (TOOL_KEY reste la clé de configuration de l'outil).
      */
     const MELIS_KEY = 'melisprospects_tool_prospects_section';
@@ -30,7 +30,7 @@ class ToolProspectsController extends MelisAbstractActionController
     const ToolProspectsAppConfigPath = 'melistoolprospects/tools/melistoolprospects_tool_prospects';
     const TOOL_KEY = 'melistoolprospects_tool_prospects';
 
-    /** @INFO: Tool access check (CWE-862). */
+    /** @INFO: Tool access check. */
     private function hasAccess($key)
     {
         return $this->getServiceManager()->get('MelisCoreRights')->canAccess($key);
@@ -583,7 +583,7 @@ class ToolProspectsController extends MelisAbstractActionController
 
     public function exportToCsvAction()
     {
-        /** @INFO: Access check (tool right) — CWE-862 */
+        /** @INFO: Access check (tool right) */
         if (! $this->hasAccess('melisprospects_tool_prospects_section')) {
             return new JsonModel(['success' => 0, 'textTitle' => '', 'textMessage' => 'tr_meliscore_microservice_api_key_no_access', 'errors' => [], 'datas' => []]);
         }
@@ -630,7 +630,7 @@ class ToolProspectsController extends MelisAbstractActionController
      */
     public function removeProspectDataAction()
     {
-        /** @INFO: Access check (tool right) — CWE-862 */
+        /** @INFO: Access check (tool right) */
         if (! $this->hasAccess('melisprospects_tool_prospects_section')) {
             return new JsonModel(['success' => 0, 'textTitle' => '', 'textMessage' => 'tr_meliscore_microservice_api_key_no_access', 'errors' => [], 'datas' => []]);
         }
@@ -669,7 +669,7 @@ class ToolProspectsController extends MelisAbstractActionController
      */
     public function retrieveProspectDataByIdAction()
     {
-        /** @INFO: Access check (tool right) — CWE-862 */
+        /** @INFO: Access check (tool right) */
         if (! $this->hasAccess('melisprospects_tool_prospects_section')) {
             return new JsonModel(['success' => 0, 'textTitle' => '', 'textMessage' => 'tr_meliscore_microservice_api_key_no_access', 'errors' => [], 'datas' => []]);
         }
@@ -685,7 +685,7 @@ class ToolProspectsController extends MelisAbstractActionController
      */
     public function updateProspectDataAction()
     {
-        /** @INFO: Access check (tool right) — CWE-862 */
+        /** @INFO: Access check (tool right) */
         if (! $this->hasAccess('melisprospects_tool_prospects_section')) {
             return new JsonModel(['success' => 0, 'textTitle' => '', 'textMessage' => 'tr_meliscore_microservice_api_key_no_access', 'errors' => [], 'datas' => []]);
         }
@@ -760,7 +760,7 @@ class ToolProspectsController extends MelisAbstractActionController
 
     public function removeAllProspectDataAction()
     {
-        /** @INFO: Access check (tool right) — CWE-862 */
+        /** @INFO: Access check (tool right) */
         if (! $this->hasAccess('melisprospects_tool_prospects_section')) {
             return new JsonModel(['success' => 0, 'textTitle' => '', 'textMessage' => 'tr_meliscore_microservice_api_key_no_access', 'errors' => [], 'datas' => []]);
         }
