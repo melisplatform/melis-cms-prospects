@@ -40,8 +40,8 @@ class MelisReactApiProspectController extends MelisAbstractActionController
 
     /** melisKey of the RIGHTS-BEARING menu node — the access guard AND the capability key.
      *  MUST stay in sync with config/react.capabilities.php: denyUnlessCan() resolves capabilities
-     *  through this constant, so a mismatch makes every server-side capability check silently
-     *  default-allow. NOT `MelisCmsProspects_tool_prospects` — that is the `conf.type` target, kept
+     *  through this constant, so a mismatch breaks every server-side capability check.
+     *  NOT `MelisCmsProspects_tool_prospects` — that is the `conf.type` target, kept
      *  as the renderable ZONE key (iframe); it is not granted on its own, so guarding on it would
      *  403 every request. */
     private const MELIS_KEY = 'melisprospects_tool_prospects_section';
@@ -347,7 +347,7 @@ class MelisReactApiProspectController extends MelisAbstractActionController
                 return $this->jsonResponse(['success' => false, 'error' => 'Le nom ou l\'email dépasse 255 caractères.'], 400);
             }
 
-            /** SECURITY (audit PRO-M3) : pros_message garde son HTML mais sans vecteurs d'exécution. */
+            /** pros_message garde son HTML, assaini. */
             $message = $this->sanitizeRichText($message);
 
             // pros_contact_date et pros_type sont IMMUABLES depuis cet écran : on ne les
@@ -436,9 +436,7 @@ class MelisReactApiProspectController extends MelisAbstractActionController
     }
 
     /**
-     * SECURITY (audit PRO-H5, même motif que melis-cms-news CN-M2) : les endpoints mutants ne
-     * doivent pas être joignables en GET — le listener CSRF central exempte les verbes sûrs,
-     * une écriture en GET contournerait donc entièrement le CSRF. 405 sinon.
+     * Endpoints mutants : verbe non-GET exigé (POST/PUT/DELETE selon l'action, 405 sinon).
      */
     private function denyUnlessVerb(array $verbs): ?HttpResponse
     {
@@ -453,8 +451,8 @@ class MelisReactApiProspectController extends MelisAbstractActionController
     }
 
     /**
-     * SECURITY (audit PRO-M3) : pros_message conserve son HTML (richesse rédactionnelle)
-     * mais est débarrassé des vecteurs d'exécution (script/iframe, handlers on*, javascript:).
+     * pros_message conserve son HTML (richesse rédactionnelle), assaini :
+     * retrait de script/iframe/object/embed, des attributs on* et des schémas javascript:/vbscript:.
      */
     private function sanitizeRichText(string $html): string
     {

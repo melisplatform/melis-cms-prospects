@@ -49,10 +49,9 @@ class MelisCmsProspectsShowFormPlugin extends MelisTemplatingPlugin
 {
 
     /**
-     * SECURITY (audit PRO-H1 / PRO-M1) : clés de config que le QUERY STRING / POST d'un
-     * visiteur anonyme ne doit JAMAIS pouvoir écraser en rendu front — elles définissent
-     * la politique du plugin (champs affichés, champs requis, thème, site de rattachement,
-     * template). Elles restent fusionnables hors front (édition back-office).
+     * Clés de config ignorées dans les paramètres GET/POST en rendu front (champs affichés,
+     * champs requis, thème, site de rattachement, template). Elles restent fusionnables
+     * hors front (édition back-office).
      */
     private const PROTECTED_FRONT_KEYS = ['fields', 'required_fields', 'theme', 'pros_site_id', 'template_path'];
 
@@ -219,10 +218,8 @@ class MelisCmsProspectsShowFormPlugin extends MelisTemplatingPlugin
                         if (!in_array($key, $requiredFields))
                         {
                             /**
-                             * SECURITY (audit PRO-H1) : ne JAMAIS retirer l'input filter entier —
-                             * cela supprimait aussi les filters (StripTags/StringTrim) et les
-                             * validators de format. Un champ non obligatoire reste filtré et
-                             * validé quand une valeur est fournie ; il est seulement optionnel.
+                             * Un champ non obligatoire reste filtré et validé quand une valeur
+                             * est fournie ; il est seulement optionnel.
                              */
                             if ($prospectsForm->getInputFilter()->has($key)) {
                                 $prospectsForm->getInputFilter()->get($key)->setRequired(false);
@@ -239,9 +236,8 @@ class MelisCmsProspectsShowFormPlugin extends MelisTemplatingPlugin
                          */
                         $pageId = (!empty($this->getFormData()['pageId'])) ? $this->getFormData()['pageId'] :$this->getController()->params()->fromRoute('idpage');
                         /**
-                         * SECURITY (audit PRO-M1) : pros_site_id vient de la CONFIG du plugin
-                         * (XML de page / app config — plus écrasable par le front depuis
-                         * stripProtectedFrontKeys), à défaut du site de la page courante.
+                         * pros_site_id vient de la config du plugin (XML de page / app config),
+                         * à défaut du site de la page courante.
                          */
                         $selectedSiteId = (int) ($this->pluginFrontConfig['pros_site_id'] ?? 0) ?: null;
 
@@ -258,11 +254,8 @@ class MelisCmsProspectsShowFormPlugin extends MelisTemplatingPlugin
                         }
 
                         /**
-                         * SECURITY (audit PRO-H1, confirmé en live) : on ne persiste QUE les
-                         * valeurs FILTRÉES du formulaire (StripTags/StringTrim appliqués) sur une
-                         * liste blanche de colonnes publiques — jamais le POST brut. Les colonnes
-                         * internes (pros_anonymized, pros_gdpr_lastdate, pros_id…) ne sont plus
-                         * atteignables par un anonyme.
+                         * Seules les valeurs filtrées du formulaire (StripTags/StringTrim) des
+                         * colonnes déclarées ci-dessous sont persistées.
                          */
                         $formData = (array) $prospectsForm->getData();
                         $allowedColumns = ['pros_name', 'pros_email', 'pros_telephone', 'pros_message', 'pros_company', 'pros_country', 'pros_theme'];
@@ -590,8 +583,7 @@ class MelisCmsProspectsShowFormPlugin extends MelisTemplatingPlugin
      * Automatically called from savePageSession listenner in PageEdition
      */
     /**
-     * SECURITY (audit PRO-M2) : neutralise la séquence `]]>` dans un contenu destiné
-     * à une section CDATA (sinon elle ferme le CDATA et injecte des nœuds XML).
+     * Neutralise la séquence `]]>` dans un contenu destiné à une section CDATA.
      */
     private function xmlCdata($value)
     {
@@ -619,7 +611,7 @@ class MelisCmsProspectsShowFormPlugin extends MelisTemplatingPlugin
         $widthMobile   = null;
         $widthTablet  = null;
 
-        /** SECURITY (audit PRO-M2) : valeurs d'ATTRIBUT échappées (une `"` injectait des attributs/nœuds). */
+        /** Valeurs d'attribut échappées. */
         if (! empty($parameters['melisPluginDesktopWidth'])) {
             $widthDesktop =  " width_desktop=\"" . htmlspecialchars((string) $parameters['melisPluginDesktopWidth'], ENT_QUOTES, 'UTF-8') . "\" ";
         }

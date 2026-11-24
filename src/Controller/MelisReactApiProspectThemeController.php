@@ -213,10 +213,7 @@ class MelisReactApiProspectThemeController extends MelisAbstractActionController
             if (mb_strlen($name) > 45) {
                 return $fail('Le nom du thème ne peut dépasser 45 caractères.');
             }
-            /**
-             * SECURITY (audit PRO-H4) : le nom de thème est rendu dans le chrome du BO
-             * (datatables, <h1>, titres d'onglets) — aucun HTML n'y a de sens, on refuse.
-             */
+            /** Nom et code en texte brut (sans « < » ni « > »). */
             if (preg_match('/[<>]/', $name) || ($hasCode && preg_match('/[<>]/', $code))) {
                 return $fail('Le nom et le code du thème ne peuvent pas contenir « < » ou « > ».');
             }
@@ -480,7 +477,7 @@ class MelisReactApiProspectThemeController extends MelisAbstractActionController
             foreach ($trans as $langId => $text) {
                 $lid = (int) $langId;
                 if ($lid > 0) {
-                    /** SECURITY (audit PRO-H4) : libellé rendu dans le chrome BO — pas de HTML. */
+                    /** Libellé en texte brut. */
                     $clean[$lid] = mb_substr(preg_replace('/[<>]/', '', trim((string) $text)), 0, 255);
                 }
             }
@@ -600,9 +597,7 @@ class MelisReactApiProspectThemeController extends MelisAbstractActionController
     }
 
     /**
-     * SECURITY (audit PRO-H5, même motif que melis-cms-news CN-M2) : les endpoints mutants ne
-     * doivent pas être joignables en GET — le listener CSRF central exempte les verbes sûrs,
-     * une écriture en GET contournerait donc entièrement le CSRF. 405 sinon.
+     * Endpoints mutants : verbe non-GET exigé (POST/PUT/DELETE selon l'action, 405 sinon).
      */
     private function denyUnlessVerb(array $verbs): ?HttpResponse
     {

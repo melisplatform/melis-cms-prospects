@@ -60,10 +60,9 @@ class MelisCmsProspectsGdprAutoDeleteService extends MelisGeneralService impleme
     }
 
     /**
-     * SECURITY (audit PRO-H2) : secret serveur utilisé pour signer les clés de revalidation
-     * RGPD. Généré aléatoirement au premier besoin et persisté dans data/ (hors webroot).
-     * Repli si data/ n'est pas inscriptible : secret déterministe dérivé de la config DB
-     * (jamais exposée au client) — dans les deux cas, non recalculable par un anonyme.
+     * Secret serveur utilisé pour signer les clés de revalidation RGPD. Généré
+     * aléatoirement au premier besoin et persisté dans data/ (hors webroot).
+     * Repli si data/ n'est pas inscriptible : secret déterministe dérivé de la config DB.
      *
      * @return string
      */
@@ -112,7 +111,7 @@ class MelisCmsProspectsGdprAutoDeleteService extends MelisGeneralService impleme
                 foreach ($emails as $id => $emailOpts) {
                     // check user existence
                     if (isset($emailOpts['config']['last_date']) && !empty($emailOpts['config']['last_date'])) {
-                        // search for the validation key (comparaison constant-time — audit PRO-H2)
+                        // search for the validation key (comparaison en temps constant)
                         if (hash_equals((string) $emailOpts['config']['validationKey'], (string) $validationKey)) {
                             // return user data
                             $userData = $this->getUserById($id);
@@ -237,10 +236,8 @@ class MelisCmsProspectsGdprAutoDeleteService extends MelisGeneralService impleme
                             'last_date'  => $data['pros_gdpr_lastdate'],
                             'account_id' => $data['pros_id'],
                             /**
-                             * SECURITY (audit PRO-H2) : clé de revalidation en HMAC-SHA256 avec un
-                             * secret serveur — l'ancien md5 de valeurs PUBLIQUES (tags statiques +
-                             * type fini + pros_id incrémental) était recalculable par un anonyme
-                             * (IDOR : revalidation anti-purge RGPD + oracle d'existence).
+                             * Clé de revalidation : HMAC-SHA256 avec un secret serveur,
+                             * comparaison en temps constant.
                              */
                             'validationKey' => hash_hmac(
                                 'sha256',

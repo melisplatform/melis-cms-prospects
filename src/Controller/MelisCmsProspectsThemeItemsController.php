@@ -20,9 +20,8 @@ use MelisCore\Controller\MelisAbstractActionController;
 class MelisCmsProspectsThemeItemsController extends MelisAbstractActionController
 {
     /**
-     * SECURITY (audit PRO-M5) : sans cette constante, la gate centrale
-     * (MelisCoreAuthorizationListener) journalisait ce contrôleur `UNMAPPED`
-     * et le laissait passer. Clé identique au contrôleur React Theme.
+     * Outil auquel ce contrôleur appartient : MelisCoreAuthorizationListener vérifie
+     * canAccess() sur cette clé avant le dispatch. Clé identique au contrôleur React Theme.
      */
     const MELIS_KEY = 'melisprospects_tool_themes_section';
 
@@ -124,7 +123,7 @@ class MelisCmsProspectsThemeItemsController extends MelisAbstractActionControlle
         $data     = array();
         $themeItemId  = (int)$this->params()->fromQuery('itemId', null);
 
-        /** SECURITY (audit PRO-M5) : pas de chargement de données sans le droit outil. */
+        /** Droit de l'outil exigé. */
         if (! $this->hasAccess('melisprospects_tool_themes_section')) {
             $themeItemId = 0;
         }
@@ -215,7 +214,7 @@ class MelisCmsProspectsThemeItemsController extends MelisAbstractActionControlle
 
                     foreach ($forms['forms'] as $idx => $form) {
                         $transId = isset($form['item_trans_id']) ? (int)$form['item_trans_id'] : null;
-                        /** SECURITY (audit PRO-H4) : libellé rendu dans le chrome BO — pas de HTML. */
+                        /** Libellé en texte brut. */
                         $text = preg_replace('/[<>]/', '', (string) $form['item_trans_text']);
                         $form['item_trans_text'] = $text;
 
@@ -394,7 +393,7 @@ class MelisCmsProspectsThemeItemsController extends MelisAbstractActionControlle
                     )->current()->item_trans_text;
                 }
 
-                /** SECURITY (audit PRO-H4) : cellules échappées — rendu HTML brut côté DataTables. */
+                /** Cellules échappées (rendues en HTML par DataTables). */
                 foreach ($tableData[$ctr] as $vKey => $vValue) {
                     if (is_string($vValue)) {
                         $tableData[$ctr][$vKey] = htmlspecialchars($vValue, ENT_QUOTES, 'UTF-8');
@@ -456,7 +455,7 @@ class MelisCmsProspectsThemeItemsController extends MelisAbstractActionControlle
 
     private function getTheme()
     {
-        /** SECURITY (audit PRO-M5) : pas de chargement de thème sans le droit outil. */
+        /** Droit de l'outil exigé. */
         if (! $this->hasAccess('melisprospects_tool_themes_section')) {
             return null;
         }

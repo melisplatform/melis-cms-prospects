@@ -21,9 +21,8 @@ use MelisCore\Controller\MelisAbstractActionController;
 class MelisCmsProspectsThemesController extends MelisAbstractActionController
 {
     /**
-     * SECURITY (audit PRO-M5) : sans cette constante, la gate centrale
-     * (MelisCoreAuthorizationListener) journalisait ce contrôleur `UNMAPPED`
-     * et le laissait passer. Clé identique au contrôleur React Theme.
+     * Outil auquel ce contrôleur appartient : MelisCoreAuthorizationListener vérifie
+     * canAccess() sur cette clé avant le dispatch. Clé identique au contrôleur React Theme.
      */
     const MELIS_KEY = 'melisprospects_tool_themes_section';
 
@@ -118,7 +117,7 @@ class MelisCmsProspectsThemesController extends MelisAbstractActionController
     {
         $id = $this->params()->fromRoute('id', $this->params()->fromQuery('id', ''));
 
-        /** SECURITY (audit PRO-M5) : pas de chargement de données sans le droit outil. */
+        /** Droit de l'outil exigé. */
         if (! $this->hasAccess('melisprospects_tool_themes_section')) {
             $id = '';
         }
@@ -209,7 +208,7 @@ class MelisCmsProspectsThemesController extends MelisAbstractActionController
             for($ctr = 0; $ctr < count($tableData); $ctr++) {
                 // apply text limits
                 foreach($tableData[$ctr] as $vKey => $vValue) {
-                    /** SECURITY (audit PRO-H4) : cellules échappées — rendu HTML brut côté DataTables. */
+                    /** Cellules échappées (rendues en HTML par DataTables). */
                     $tableData[$ctr][$vKey] = htmlspecialchars((string) $this->tool()->limitedText($vValue, 80), ENT_QUOTES, 'UTF-8');
                 }
 
@@ -255,7 +254,7 @@ class MelisCmsProspectsThemesController extends MelisAbstractActionController
             $allowSave = false;
 
             $data = $this->tool()->sanitizeRecursive($request->getPost()->toArray(), ["'", '"'], false);
-            /** SECURITY (audit PRO-H4) : nom/code rendus dans le chrome BO — pas de HTML. */
+            /** Nom et code en texte brut. */
             if (isset($data['pros_theme_name'])) {
                 $data['pros_theme_name'] = preg_replace('/[<>]/', '', (string) $data['pros_theme_name']);
             }

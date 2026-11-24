@@ -30,8 +30,7 @@ class MelisCmsProspectsService extends MelisGeneralService implements MelisCmsPr
 	    $prospectsTable = $this->getServiceManager()->get('MelisProspects');
 
 	    /**
-	     * SECURITY (audit PRO-H1, défense en profondeur) : liste blanche des colonnes
-	     * persistables par ce service — jamais le tableau appelant brut. Les colonnes
+	     * Liste blanche des colonnes persistables par ce service. Les colonnes
 	     * internes (pros_id, pros_anonymized, pros_gdpr_lastdate) ne passent pas par ici.
 	     */
 	    $allowedColumns = [
@@ -48,9 +47,7 @@ class MelisCmsProspectsService extends MelisGeneralService implements MelisCmsPr
 	    catch (\Exception $e)
 	    {
 	        /**
-	         * SECURITY (audit PRO-B1) : jamais d'echo d'exception dans la réponse —
-	         * ce chemin est atteint par la soumission ANONYME du formulaire public
-	         * (fuite de schéma SQL / oracle d'erreur). On journalise côté serveur.
+	         * Exception journalisée côté serveur, message générique renvoyé.
 	         */
 	        error_log('MelisCmsProspectsService::saveProspectsDatas failed: ' . $e->getMessage());
 	        return null;

@@ -98,9 +98,8 @@ export function ExportModal<T>({ cols: colsProp, labelFor, fetchAll, getCell, fi
     try {
       const all = await fetchAll()
       const header = included.map(c => labelFor(c.id))
-      // SECURITY (audit PRO-H3) : neutralisation de l'injection de formule tableur — une
-      // cellule commençant par = + - @ (saisie par un anonyme via le formulaire public)
-      // serait évaluée par Excel à l'ouverture. Préfixe apostrophe, sauf nombres légitimes.
+      // Cellules commençant par = + - @ préfixées d'une apostrophe (non interprétées comme
+      // formules), sauf nombres.
       const sanitizeCell = (v: unknown): string => {
         const s = String(v ?? '')
         return /^[=+\-@\t\r]/.test(s) && (s.trim() === '' || isNaN(Number(s))) ? `'${s}` : s

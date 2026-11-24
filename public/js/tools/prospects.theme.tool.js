@@ -78,8 +78,7 @@ $(function() {
         $body.on("click", "button.btn_prospects_theme_items", function() {
             var $this   = $(this),
                 id      = $this.parents("tr").attr("id"),
-                // SECURITY (audit PRO-H4) : .text() — .html() réinjectait le markup de la
-                // cellule dans le titre d'onglet (dé-échappant toute protection amont)
+                // .text() : contenu inséré en texte.
                 name    = $this.parents("tr").find("td:nth-child(2)").text();
 
             melisHelper.tabOpen(translations.tr_melis_cms_prospects_theme + " / " + name, "fa-edit", id + "_id_MelisCmsProspects_tool_theme_items", "MelisCmsProspects_tool_theme_items",  { id : id } );

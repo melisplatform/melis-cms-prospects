@@ -70,8 +70,7 @@ class MelisCmsProspectsGdprUserInfoListener extends MelisGeneralListener
                 foreach ($arrayData as $dataKey => $dataValue) {
                     if ($columnValue == $dataKey) {
                         /**
-                         * SECURITY (audit PRO-M8) : valeurs saisies anonymement, affichées par
-                         * la datatable GDPR de melis-core (HTML brut) — livrées échappées.
+                         * Valeurs échappées avant affichage (datatable GDPR de melis-core).
                          */
                         $safeValue = is_string($dataValue) ? htmlspecialchars($dataValue, ENT_QUOTES, 'UTF-8') : $dataValue;
                         $datasArray[$arrayData['pros_id']] = $datasArray[$arrayData['pros_id']] + [$dataKey => $safeValue];
